@@ -9,4 +9,13 @@ public class StudentStats {
 
     @ManyToOne
     private TeacherDashboard teacherDashboard;
+
+    public CourseExecution getCourseExecution(){ return courseExecution; }
+    public TeacherDashboard getTeacherDashboard(){ return teacherDashboard; }
+    public void setCourseExecution(CourseExecution courseExecution) {
+        this.courseExecution = courseExecution;
+    }
+    public void setTeacherDashboard(TeacherDashboard teacherDashboard){
+        this.teacherDashboard = teacherDashboard;
+    }
 }
