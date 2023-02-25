@@ -1,9 +1,11 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
-import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.TeacherDashboard;
-
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
+import javax.persistence.*;
+@Entity
 public class StudentStats {
+    @Id
     @OneToOne
     private CourseExecution courseExecution;
 

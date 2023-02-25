@@ -31,4 +31,5 @@ public class StudentStatsDto {
                         "numStudent=" + numStudent +
                         ", numMore75CorrectQuestions=" + numMore75CorrectQuestions +
                         ", numAtLeast3Quizzes=" + numAtLeast3Quizzes + '}';
+        }
 }
