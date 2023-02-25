@@ -7,6 +7,17 @@ public class StudentStatsDto {
         private Integer numMore75CorrectQuestions =0;
         private Integer numAtLeast3Quizzes =0;
 
+
+        public StudentStatsDto() {
+        }
+
+        /*public StudentStatsDto(StudentStats studentStats) {
+                numStudent = studentStats.();
+                numMore75CorrectQuestions = studentStats.();
+                numAtLeast3Quizzes = studentStats.();
+        }*/
+
+
         public Integer getNumStudent(){
                 return this.numStudent;
         }
@@ -28,8 +39,8 @@ public class StudentStatsDto {
         @Override
         public String toString() {
                 return "StudentStatsDto{" +
-                        "numStudent=" + numStudent +
-                        ", numMore75CorrectQuestions=" + numMore75CorrectQuestions +
-                        ", numAtLeast3Quizzes=" + numAtLeast3Quizzes + '}';
+                        "numStudent=" + getNumStudent() +
+                        ", numMore75CorrectQuestions=" + getNumMore75CorrectQuestions() +
+                        ", numAtLeast3Quizzes=" + getNumAtLeast3Quizzes() + '}';
         }
 }
