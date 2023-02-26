@@ -4,6 +4,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.questionsubmission.domain.QuestionSubmission;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
 import pt.ulisboa.tecnico.socialsoftware.tutor.studentdashboard.domain.StudentDashboard;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
@@ -64,7 +65,11 @@ public class QuestionStats implements DomainEntity {
 
     // SET
 
-    public void setNumQuestionsAvailable(int numQuestionsavailable){
+    public void setId(Integer id) {
+        this.id = id;
+    }
+
+    public void setNumQuestionsAvailable(int numQuestionsavailable) {
         this.numQuestionsAvailable = numQuestionsavailable;
     }
 
@@ -88,46 +93,42 @@ public class QuestionStats implements DomainEntity {
         // Only used for XML generation
     }
 
-    public void remove(){
+    public void remove() {
         this.courseExecution = null;
         this.teacherDashboard = null;
-        //ver se precisamos de adicionar mais ?
+        // ver se precisamos de adicionar mais ?
     }
 
-    public void update(){
+    public void update() {
         this.setNumQuestionsAvailable(0);
         this.setNumQuestionsAnsweredUniq(0);
         this.setAverageQuestionsAnsweredUniq(0.0);
         int count = 0;
-        Double average = 0.0;//arredonda-se ou nao ????
+        Double average = 0.0;// arredonda-se ou nao ????
 
         this.setNumQuestionsAvailable(this.teacherDashboard.getCourseExecution().getNumberOfQuestions());
-        Set <Student> students = teacherDashboard.getCourseExecution().getStudents();
+        Set<Student> students = teacherDashboard.getCourseExecution().getStudents();
 
-        for(Student stu : students){
-            set<QuestionSubmission> questionSub = stu.getQuestionSubmissions();
-            set<Question> questions = new Hashset<> ();
-            for(QuestionSubmission qt :questionSub){
+        for (Student stu : students) {
+            Set<QuestionSubmission> questionSub = stu.getQuestionSubmissions();
+            Set<Question> questions = new HashSet<>();
+            for (QuestionSubmission qt : questionSub) {
                 questions.add(qt.getQuestion());
             }
             count += questions.size();
         }
         this.setNumQuestionsAnsweredUniq(count);
-        average = count/(students.size());
+        average = (double) count / (students.size());
         this.setAverageQuestionsAnsweredUniq(average);
 
     }
 
     @Override
-    public String ToString(){
-        return "Dashboard{" +
-                "id = " + getId() +
-                ",courseExecution = " + getCourseExecution() +
-                ",teacherDashboard = " +  getTeacherDashboard() +
-                ",NumQuestionsAvailable = " + getNumQuestionsAvailable() +
-                ",NumQuestionsAnsweredUniq = " + getNumQuestionsAnsweredUniq() +
-                ",averageQuestionsAnsweredUniq = " + getAverageQuestionsAnsweredUniq() + "}";
+    public String toString() {
+        return "Dashboard{" + "id = " + getId() + ",courseExecution = " + getCourseExecution() + ",teacherDashboard = "
+                + getTeacherDashboard() + ",NumQuestionsAvailable = " + getNumQuestionsAvailable()
+                + ",NumQuestionsAnsweredUniq = " + getNumQuestionsAnsweredUniq() + ",averageQuestionsAnsweredUniq = "
+                + getAverageQuestionsAnsweredUniq() + "}";
     }
-
 
 }
