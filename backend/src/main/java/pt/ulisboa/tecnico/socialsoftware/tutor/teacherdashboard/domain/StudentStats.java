@@ -27,6 +27,8 @@ public class StudentStats implements DomainEntity {
     }
 
     public StudentStats(CourseExecution courseExecution, TeacherDashboard teacherDashboard) {
+        //verificar se o teacher da a disciplina?
+        //meter teacherDashboard?
         setCourseExecution(courseExecution);
         setTeacherDashboard(teacherDashboard);
     }
@@ -61,6 +63,16 @@ public class StudentStats implements DomainEntity {
     }
     public void setNumAtLeast3Quizzes(int value){
         this.numAtLeast3Quizzes= value;
+    }
+
+    public void remove() {
+        //this.courseExecution.getWeeklyScores().remove(this);
+        //this.teacherDashboard.getWeeklyScores().remove(this);                         //PERGUNTAR
+        this.courseExecution = null;
+        this.teacherDashboard = null;
+    }
+    public void update() {
+        //this.setPercentage(this.getQuestion().getDifficulty());
     }
 
     public void accept(Visitor visitor) {
