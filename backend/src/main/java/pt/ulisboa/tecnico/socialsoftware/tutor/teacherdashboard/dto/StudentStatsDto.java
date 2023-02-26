@@ -1,9 +1,10 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto;
 
 //import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
-//import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats;
 
 public class StudentStatsDto {
+        private Integer id;
         private Integer numStudent =0;
         private Integer numMore75CorrectQuestions =0;
         private Integer numAtLeast3Quizzes =0;
@@ -12,11 +13,11 @@ public class StudentStatsDto {
         public StudentStatsDto() {
         }
 
-        /*public StudentStatsDto(StudentStats studentStats) {
-                numStudent = studentStats.();
-                numMore75CorrectQuestions = studentStats.();
-                numAtLeast3Quizzes = studentStats.();
-        }*/
+        public StudentStatsDto(StudentStats studentStats) {
+                numStudent = studentStats.getNumStudent();
+                numMore75CorrectQuestions = studentStats.getNumMore75CorrectQuestions();
+                numAtLeast3Quizzes = studentStats.getNumAtLeast3Quizzes();
+        }
 
 
         public Integer getNumStudent(){

@@ -9,16 +9,27 @@ import javax.persistence.*;
 
 @Entity
 public class StudentStats implements DomainEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
+
+    private Integer numStudent =0;
+    private Integer numMore75CorrectQuestions =0;
+    private Integer numAtLeast3Quizzes =0;
 
     @OneToOne
     private CourseExecution courseExecution;
 
     @ManyToOne
     private TeacherDashboard teacherDashboard;
+
+    public StudentStats() {
+    }
+
+    public StudentStats(CourseExecution courseExecution, TeacherDashboard teacherDashboard) {
+        setCourseExecution(courseExecution);
+        setTeacherDashboard(teacherDashboard);
+    }
 
     public CourseExecution getCourseExecution(){ return courseExecution; }
     public void setCourseExecution(CourseExecution courseExecution) {
@@ -31,6 +42,25 @@ public class StudentStats implements DomainEntity {
 
     public Integer getId() {
         return id;
+    }
+
+    public Integer getNumStudent(){
+        return this.numStudent;
+    }
+    public void setNumStudent(int numstudents){
+        this.numStudent= numstudents;
+    }
+    public Integer getNumMore75CorrectQuestions(){
+        return this.numMore75CorrectQuestions;
+    }
+    public void setNumMore75CorrectQuestions(int value){
+        this.numMore75CorrectQuestions= value;
+    }
+    public Integer getNumAtLeast3Quizzes(){
+        return this.numAtLeast3Quizzes;
+    }
+    public void setNumAtLeast3Quizzes(int value){
+        this.numAtLeast3Quizzes= value;
     }
 
     public void accept(Visitor visitor) {
