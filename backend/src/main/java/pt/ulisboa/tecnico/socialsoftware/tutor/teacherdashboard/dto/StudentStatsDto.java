@@ -4,7 +4,7 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats;
 
 public class StudentStatsDto {
-        private Integer id;
+        private Integer id=0;
         private Integer numStudent =0;
         private Integer numMore75CorrectQuestions =0;
         private Integer numAtLeast3Quizzes =0;
@@ -14,11 +14,19 @@ public class StudentStatsDto {
         }
 
         public StudentStatsDto(StudentStats studentStats) {
+                id = studentStats.getId();
                 numStudent = studentStats.getNumStudent();
                 numMore75CorrectQuestions = studentStats.getNumMore75CorrectQuestions();
                 numAtLeast3Quizzes = studentStats.getNumAtLeast3Quizzes();
         }
 
+        public Integer getId() {
+                return id;
+        }
+
+        public void setId(Integer id) {
+                this.id = id;
+        }
 
         public Integer getNumStudent(){
                 return this.numStudent;
