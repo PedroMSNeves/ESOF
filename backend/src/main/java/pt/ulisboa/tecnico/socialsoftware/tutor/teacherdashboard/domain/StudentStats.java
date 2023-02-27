@@ -1,5 +1,6 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain;
 
+
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
 import pt.ulisboa.tecnico.socialsoftware.tutor.studentdashboard.domain.StudentDashboard;
@@ -7,10 +8,11 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User;
+
 import javax.persistence.*;
 import java.util.stream.Collectors;
 import java.util.*;
-
+import java.time.LocalDateTime;
 
 @Entity
 public class StudentStats implements DomainEntity {
@@ -72,6 +74,10 @@ public class StudentStats implements DomainEntity {
     }
     public void addNumAtLeast3Quizzes(){
         this.numAtLeast3Quizzes++;
+    }
+    public LocalDateTime getEndDate()
+    {
+        return this.courseExecution.getEndDate();
     }
 
     public void remove() {
