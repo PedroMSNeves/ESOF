@@ -21,7 +21,7 @@ public class QuestionStats implements DomainEntity {
 
     private int numQuestionsAvailable = 0;
     private int numQuestionsAnsweredUniq = 0;
-    private Double averageQuestionsAnsweredUniq = 0.0;
+    private float averageQuestionsAnsweredUniq = 0;
 
     @OneToOne
     private CourseExecution courseExecution;
@@ -51,7 +51,7 @@ public class QuestionStats implements DomainEntity {
         return this.numQuestionsAnsweredUniq;
     }
 
-    public Double getAverageQuestionsAnsweredUniq() {
+    public float getAverageQuestionsAnsweredUniq() {
         return this.averageQuestionsAnsweredUniq;
     }
 
@@ -77,7 +77,7 @@ public class QuestionStats implements DomainEntity {
         this.numQuestionsAnsweredUniq = num;
     }
 
-    public void setAverageQuestionsAnsweredUniq(Double averageQuestionsAnsweredUniq) {
+    public void setAverageQuestionsAnsweredUniq(float averageQuestionsAnsweredUniq) {
         this.averageQuestionsAnsweredUniq = averageQuestionsAnsweredUniq;
     }
 
@@ -102,12 +102,12 @@ public class QuestionStats implements DomainEntity {
     public void update() {
         this.setNumQuestionsAvailable(0);
         this.setNumQuestionsAnsweredUniq(0);
-        this.setAverageQuestionsAnsweredUniq(0.0);
+        this.setAverageQuestionsAnsweredUniq(0);
         int count = 0;
-        Double average = 0.0;// arredonda-se ou nao ????
+        float average = 0;// arredonda-se ou nao ????
 
-        this.setNumQuestionsAvailable(this.teacherDashboard.getCourseExecution().getNumberOfQuestions());
-        Set<Student> students = teacherDashboard.getCourseExecution().getStudents();
+        this.setNumQuestionsAvailable(this.courseExecution.getNumberOfQuestions());
+        Set<Student> students = this.courseExecution.getStudents();
 
         for (Student stu : students) {
             Set<QuestionSubmission> questionSub = stu.getQuestionSubmissions();
@@ -118,7 +118,7 @@ public class QuestionStats implements DomainEntity {
             count += questions.size();
         }
         this.setNumQuestionsAnsweredUniq(count);
-        average = (double) count / (students.size());
+        average =  count / (students.size());
         this.setAverageQuestionsAnsweredUniq(average);
 
     }

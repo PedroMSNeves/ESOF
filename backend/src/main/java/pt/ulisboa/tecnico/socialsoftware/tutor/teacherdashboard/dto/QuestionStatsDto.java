@@ -10,7 +10,7 @@ public class QuestionStatsDto implements Serializable {
     private Integer id;
     private int numQuestionsAvailable = 0;
     private int numQuestionsAnsweredUniq = 0;
-    private Double averageQuestionsAnsweredUniq = 0.0;
+    private float averageQuestionsAnsweredUniq = 0;
 
     public QuestionStatsDto() {
     }
@@ -35,7 +35,7 @@ public class QuestionStatsDto implements Serializable {
         return this.numQuestionsAnsweredUniq;
     }
 
-    public Double getAverageQuestionsAnsweredUniq() {
+    public float getAverageQuestionsAnsweredUniq() {
         return this.averageQuestionsAnsweredUniq;
     }
 
@@ -53,7 +53,7 @@ public class QuestionStatsDto implements Serializable {
         this.numQuestionsAnsweredUniq = num;
     }
 
-    public void setAverageQuestionsAnsweredUniq(Double averageQuestionsAnsweredUniq) {
+    public void setAverageQuestionsAnsweredUniq(float averageQuestionsAnsweredUniq) {
         this.averageQuestionsAnsweredUniq = averageQuestionsAnsweredUniq;
     }
 
