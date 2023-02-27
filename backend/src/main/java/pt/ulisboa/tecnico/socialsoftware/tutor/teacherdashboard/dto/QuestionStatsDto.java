@@ -59,7 +59,7 @@ public class QuestionStatsDto implements Serializable {
 
     @Override
     public String toString() {
-        return "Dashboard{" + "id = " + getId() +
+        return "QuestionStatsDto{" + "id = " + getId() +
             ",NumQuestionsAvailable = " + getNumQuestionsAvailable() +
             ",NumQuestionsAnsweredUniq = " + getNumQuestionsAnsweredUniq() +
             ",averageQuestionsAnsweredUniq = " + getAverageQuestionsAnsweredUniq() +

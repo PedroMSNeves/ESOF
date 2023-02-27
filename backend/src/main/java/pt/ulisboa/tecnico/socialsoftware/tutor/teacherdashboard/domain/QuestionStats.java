@@ -125,7 +125,7 @@ public class QuestionStats implements DomainEntity {
 
     @Override
     public String toString() {
-        return "Dashboard{" + "id = " + getId() + ",courseExecution = " + getCourseExecution() + ",teacherDashboard = "
+        return "QuestionStats{" + "id = " + getId() + ",courseExecution = " + getCourseExecution() + ",teacherDashboard = "
                 + getTeacherDashboard() + ",NumQuestionsAvailable = " + getNumQuestionsAvailable()
                 + ",NumQuestionsAnsweredUniq = " + getNumQuestionsAnsweredUniq() + ",averageQuestionsAnsweredUniq = "
                 + getAverageQuestionsAnsweredUniq() + "}";

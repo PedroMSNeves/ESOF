@@ -71,6 +71,9 @@ public class CourseExecution implements DomainEntity {
     @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "course_id")
     private Course course;
+    
+    @OneToOne
+    private QuestionStats questionstats;
 
     public CourseExecution() {
     }
