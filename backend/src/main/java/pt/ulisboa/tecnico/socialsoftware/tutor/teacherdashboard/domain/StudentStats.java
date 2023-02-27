@@ -10,7 +10,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User;
 import javax.persistence.*;
 import java.util.stream.Collectors;
 import java.util.*;
-//import java.io.Serializable;
+
 
 @Entity
 public class StudentStats implements DomainEntity {
@@ -32,8 +32,6 @@ public class StudentStats implements DomainEntity {
     }
 
     public StudentStats(CourseExecution courseExecution, TeacherDashboard teacherDashboard) {
-        //verificar se o teacher da a disciplina?
-        //meter teacherDashboard?
         setCourseExecution(courseExecution);
         setTeacherDashboard(teacherDashboard);
     }
@@ -88,20 +86,18 @@ public class StudentStats implements DomainEntity {
         this.setNumAtLeast3Quizzes(0);
         this.setNumMore75CorrectQuestions(0);
 
-        Set<Student> students = teacherDashboard.getCourseExecution().getStudents(); //podemos filtrar assim?
-        this.setNumStudent(teacherDashboard.getCourseExecution().getNumberOfActiveStudents()); // or courseExecution.getNumberOfActiveStudents();
-        //queremos so os ativos?
+        Set<Student> students = courseExecution.getStudents();
+        this.setNumStudent(courseExecution.getNumberOfActiveStudents());
 
         for (Student st : students) {
-            StudentDashboard stdb= st.getDashboards().stream().filter(dash -> dash.getCourseExecution().getId() == teacherDashboard.getCourseExecution().getId()).findFirst().get();
-            //porque so vai ter um dashboard por disciplina, perguntar se pode ser assim
+            StudentDashboard stdb= st.getDashboards().stream().filter(dash -> dash.getCourseExecution().getId() == courseExecution.getId()).findFirst().get();
 
             if((stdb.getNumberOfTeacherQuizzes() + stdb.getNumberOfStudentQuizzes() + stdb.getNumberOfInClassQuizzes())>=3) {this.addNumAtLeast3Quizzes();}
 
             if(((stdb.getNumberOfCorrectTeacherAnswers() + stdb.getNumberOfCorrectStudentAnswers() + stdb.getNumberOfCorrectInClassAnswers())*100/
                     (stdb.getNumberOfTeacherAnswers() + stdb.getNumberOfStudentAnswers() + stdb.getNumberOfInClassAnswers()))
                     >75) {this.addNumMore75CorrectQuestions();}
-        }//perguntar tambem
+        }
 
     }
 
@@ -112,7 +108,10 @@ public class StudentStats implements DomainEntity {
     public String toString() {
         return "Dashboard{" +
                 "id=" + getId() +
-                "courseExecution=" + getCourseExecution() +
-                ", teacherDashboard=" + getTeacherDashboard() + '}';
+                ", courseExecution=" + getCourseExecution() +
+                ", teacherDashboard=" + getTeacherDashboard() +
+                ", numStudent=" + getNumStudent() +
+                ", numMore75CorrectQuestions=" + getNumMore75CorrectQuestions() +
+                ", numAtLeast3Quizzes=" + getNumAtLeast3Quizzes() + '}';
     }
 }

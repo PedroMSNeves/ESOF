@@ -2,8 +2,9 @@ package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto;
 
 //import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats;
+import java.io.Serializable;
 
-public class StudentStatsDto {
+public class StudentStatsDto implements Serializable {
         private Integer id=0;
         private Integer numStudent =0;
         private Integer numMore75CorrectQuestions =0;
@@ -49,7 +50,8 @@ public class StudentStatsDto {
         @Override
         public String toString() {
                 return "StudentStatsDto{" +
-                        "numStudent=" + getNumStudent() +
+                        "id=" + getId() +
+                        ", numStudent=" + getNumStudent() +
                         ", numMore75CorrectQuestions=" + getNumMore75CorrectQuestions() +
                         ", numAtLeast3Quizzes=" + getNumAtLeast3Quizzes() + '}';
         }
