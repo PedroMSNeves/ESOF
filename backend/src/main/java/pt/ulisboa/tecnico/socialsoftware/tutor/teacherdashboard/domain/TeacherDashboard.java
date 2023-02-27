@@ -4,6 +4,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats;
+import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -20,6 +23,9 @@ public class TeacherDashboard implements DomainEntity {
 
     @ManyToOne
     private Teacher teacher;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacherDashboard", orphanRemoval = true)
+    private final Set<StudentStats> studentStats = new HashSet<>();
 
     public TeacherDashboard() {
     }
@@ -53,6 +59,18 @@ public class TeacherDashboard implements DomainEntity {
     public void setTeacher(Teacher teacher) {
         this.teacher = teacher;
         this.teacher.addDashboard(this);
+    }
+
+    public Set<StudentStats> getStudentStats(){ return this.studentStats; }
+
+    public void addStudentStats(StudentStats studentStat) {
+        if (studentStats.stream().anyMatch(studentStat1 -> studentStat1.getId() == studentStat.getId()) ) {
+            //throw new TutorException(ErrorMessage.FAILED_ANSWER_ALREADY_CREATED);
+        }
+        //if (studentStats.stream().anyMatch(studentStat1 -> studentStat1.getQuestionAnswer() == studentStat.getQuestionAnswer())) {
+            //throw new TutorException(ErrorMessage.FAILED_ANSWER_ALREADY_CREATED);
+        //}
+        studentStats.add(studentStat);
     }
 
     public void accept(Visitor visitor) {
