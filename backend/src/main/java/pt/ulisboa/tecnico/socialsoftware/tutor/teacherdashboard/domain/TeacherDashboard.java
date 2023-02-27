@@ -6,6 +6,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuestionStats;
 import java.util.HashSet;
+import java.util.Set;
 
 import javax.persistence.*;
 
@@ -32,6 +33,14 @@ public class TeacherDashboard implements DomainEntity {
     public TeacherDashboard(CourseExecution courseExecution, Teacher teacher) {
         setCourseExecution(courseExecution);
         setTeacher(teacher);
+    }
+
+    public Set<QuestionStats> getQuestionStats(){
+        return this.questionStats;
+    }
+
+    public void addQuestionStats(QuestionStats qst){
+        this.questionStats.add(qst);
     }
 
     public void remove() {
