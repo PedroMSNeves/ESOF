@@ -6,9 +6,9 @@ import java.io.Serializable;
 
 public class StudentStatsDto implements Serializable {
         private Integer id=0;
-        private Integer numStudent =0;
-        private Integer numMore75CorrectQuestions =0;
-        private Integer numAtLeast3Quizzes =0;
+        private int numStudent =0;
+        private int numMore75CorrectQuestions =0;
+        private int numAtLeast3Quizzes =0;
 
 
         public StudentStatsDto() {
@@ -29,19 +29,19 @@ public class StudentStatsDto implements Serializable {
                 this.id = id;
         }
 
-        public Integer getNumStudent(){
+        public int getNumStudent(){
                 return this.numStudent;
         }
         public void setNumStudent(int numstudents){
                 this.numStudent= numstudents;
         }
-        public Integer getNumMore75CorrectQuestions(){
+        public int getNumMore75CorrectQuestions(){
                 return this.numMore75CorrectQuestions;
         }
         public void setNumMore75CorrectQuestions(int value){
                 this.numMore75CorrectQuestions= value;
         }
-        public Integer getNumAtLeast3Quizzes(){
+        public int getNumAtLeast3Quizzes(){
                 return this.numAtLeast3Quizzes;
         }
         public void setNumAtLeast3Quizzes(int value){

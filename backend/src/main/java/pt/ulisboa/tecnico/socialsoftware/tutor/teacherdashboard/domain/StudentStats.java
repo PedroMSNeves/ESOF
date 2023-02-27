@@ -18,9 +18,9 @@ public class StudentStats implements DomainEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    private Integer numStudent =0;
-    private Integer numMore75CorrectQuestions =0;
-    private Integer numAtLeast3Quizzes =0;
+    private int numStudent =0;
+    private int numMore75CorrectQuestions =0;
+    private int numAtLeast3Quizzes =0;
 
     @OneToOne
     private CourseExecution courseExecution;
@@ -46,16 +46,16 @@ public class StudentStats implements DomainEntity {
     }
 
     public Integer getId() {
-        return id;
+        return this.id;
     }
 
-    public Integer getNumStudent(){
+    public int getNumStudent(){
         return this.numStudent;
     }
     public void setNumStudent(int numstudents){
         this.numStudent= numstudents;
     }
-    public Integer getNumMore75CorrectQuestions(){
+    public int getNumMore75CorrectQuestions(){
         return this.numMore75CorrectQuestions;
     }
     public void setNumMore75CorrectQuestions(int value){
@@ -64,12 +64,11 @@ public class StudentStats implements DomainEntity {
     public void addNumMore75CorrectQuestions(){
         this.numMore75CorrectQuestions++;
     }
-    public Integer getNumAtLeast3Quizzes(){
+    public int getNumAtLeast3Quizzes(){
         return this.numAtLeast3Quizzes;
     }
     public void setNumAtLeast3Quizzes(int value){
         this.numAtLeast3Quizzes= value;
-
     }
     public void addNumAtLeast3Quizzes(){
         this.numAtLeast3Quizzes++;
