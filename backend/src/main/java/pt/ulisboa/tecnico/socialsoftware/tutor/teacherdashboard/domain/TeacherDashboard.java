@@ -37,10 +37,6 @@ public class TeacherDashboard implements DomainEntity {
 
     public void remove() {
         teacher.getDashboards().remove(this);
-        for(StudentStats st: getStudentStats())//perguntar
-        {
-            st.remove();
-        }
         teacher = null;
     }
 
@@ -67,13 +63,16 @@ public class TeacherDashboard implements DomainEntity {
 
     public Set<StudentStats> getStudentStats(){ return this.studentStats; }
 
+    public StudentStats getCourseExecutionStudentStats(CourseExecution courseExecution) {
+        return getStudentStats.stream()
+                .filter(ss -> ss.getCourseExecution() == getCourseExecution())
+                .findAny()
+                .orElse(null);
+    }
     public void addStudentStats(StudentStats studentStat) {
         if (studentStats.stream().anyMatch(studentStat1 -> studentStat1.getId() == studentStat.getId()) ) {
             //throw new TutorException(ErrorMessage.FAILED_ANSWER_ALREADY_CREATED);
         }
-        //if (studentStats.stream().anyMatch(studentStat1 -> studentStat1.getQuestionAnswer() == studentStat.getQuestionAnswer())) {
-            //throw new TutorException(ErrorMessage.FAILED_ANSWER_ALREADY_CREATED);
-        //}
         studentStats.add(studentStat);
     }
 

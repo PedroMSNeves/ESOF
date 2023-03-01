@@ -13,7 +13,7 @@ import java.util.Optional;
 import javax.persistence.*;
 import java.util.stream.Collectors;
 import java.util.*;
-import java.time.LocalDateTime;
+//import java.time.LocalDateTime;
 
 @Entity
 public class StudentStats implements DomainEntity {
@@ -95,13 +95,11 @@ public class StudentStats implements DomainEntity {
         this.setNumMore75CorrectQuestions(0);
 
         Set<Student> students = courseExecution.getStudents();
-       // this.setNumStudent(courseExecution.getNumberOfActiveStudents());
 
         for (Student st : students) {
-            StudentDashboard stdb= st.getDashboards().stream()
-                    .filter(dash -> dash.getCourseExecution().getId() == courseExecution.getId())
-                    .findFirst().orElse(null);
+            StudentDashboard stdb= st.getCourseExecutionDashboard(getCourseExecution());
             if(stdb==null){continue;}
+
             this.addNumStudent();
             if((stdb.getNumberOfTeacherQuizzes() + stdb.getNumberOfStudentQuizzes() + stdb.getNumberOfInClassQuizzes())>=3) {this.addNumAtLeast3Quizzes();}
 
