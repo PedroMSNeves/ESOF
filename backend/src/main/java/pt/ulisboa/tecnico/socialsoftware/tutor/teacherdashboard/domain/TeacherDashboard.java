@@ -77,7 +77,7 @@ public class TeacherDashboard implements DomainEntity {
         }
         studentStats.add(studentStat);
     }
-
+    //falta update fazer com todos
     public void accept(Visitor visitor) {
         // Only used for XML generation
     }
