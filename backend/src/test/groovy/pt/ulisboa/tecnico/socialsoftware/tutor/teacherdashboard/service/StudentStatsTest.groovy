@@ -41,8 +41,8 @@ class StudentStatsTest extends SpockTest {
         teacherDashboardRepository.save(teacherDashboard)
     }
 
-    def newstudent(courseExecution){
-        def student = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
+    def newstudent(courseExecution,username){
+        def student = new Student(USER_1_NAME, username, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
         student.addCourse(courseExecution)
         userRepository.save(student)
         def studentDashboard = new StudentDashboard(courseExecution, student)
@@ -118,7 +118,7 @@ class StudentStatsTest extends SpockTest {
     @Unroll
     def "create an empty StudentStats and updated with course that as 1 empty student"() {
         when: "a studentStats is created"
-        newstudent(externalCourseExecution)
+        newstudent(externalCourseExecution,"dadsad")
         newStudentStats(teacherDashboard,externalCourseExecution)
 
 
@@ -282,74 +282,80 @@ class StudentStatsTest extends SpockTest {
         answerDetailsRepository.save(answerDetails)
         return quizAnswer
     }
-
-
+    def quizz(student,answered,correct)
+    {
+        def question = createQuestion()
+        def quiz = createQuiz()
+        def quizQuestion = createQuizQuestion(quiz, question)
+        def quizzAnswer = answerQuiz(answered, correct, true, quizQuestion, quiz,student)
+        student.getCourseExecutionDashboard(externalCourseExecution).statistics(quizzAnswer)
+    }
      @Unroll
      def "create an empty StudentStats populate it with less than 75 acc within 3 quizzes"() {
          when: "a studentStats is created and the quizzes"
-         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
-         //studentStatsRepository.save(studentStats)
-         teacherDashboard.addStudentStats(studentStats)
-         def student1 = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
-         userRepository.save(student1)
-         def student2 = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
-         student1.addCourse(externalCourseExecution)
-         student2.addCourse(externalCourseExecution)
-         def studentdashboard1 = new StudentDashboard(externalCourseExecution, student1)
-         def studentdashboard2 = new StudentDashboard(externalCourseExecution, student2)
-         studentDashboardRepository.save(studentdashboard1)
-         studentDashboardRepository.save(studentdashboard2)
-
-         for(int i=0;i<3;i++)
-         {
-             def question = createQuestion()
-             def quiz = createQuiz()
-             def quizQuestion = createQuizQuestion(quiz, question)
-             def quizzAnswer = answerQuiz(true, false, true, quizQuestion, quiz,student1)
-             studentdashboard1.statistics(quizzAnswer)
+         newStudentStats(teacherDashboard,externalCourseExecution)
+         def student1 = newstudent(externalCourseExecution,"1")
+         def student2 = newstudent(externalCourseExecution,"2")
+         for(int i=0;i<3;i++) {
+             quizz(student1,true,false)
          }
+
          then: "an empty studentStats is updated"
+         studentStatsRepository.count() == 1L
+         def result = studentStatsRepository.findAll().get(0)
 
-         def result = studentStats//studentStatsRepository.findAll().get(0)
-
-         studentStats.update()
+         result.update()
          result.getNumStudent() == 2
          result.getNumMore75CorrectQuestions() == 0
          result.getNumAtLeast3Quizzes() == 1
      }
 
     @Unroll
+    def "create an empty StudentStats populate it with less than 75 acc within 3 quizzes in 2 quizzes"() {
+        when: "a studentStats is created and the quizzes"
+        newStudentStats(teacherDashboard,externalCourseExecution)
+        def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+        newstudent(externalCourseExecution,"3")
+        for(int i=0;i<3;i++) {
+            quizz(student1,true,false)
+            quizz(student2,true,true)
+        }
+
+        then: "an empty studentStats is updated"
+        studentStatsRepository.count() == 1L
+        def result = studentStatsRepository.findAll().get(0)
+
+        result.update()
+        result.getNumStudent() == 3
+        result.getNumMore75CorrectQuestions() == 1
+        result.getNumAtLeast3Quizzes() == 2
+    }
+
+    @Unroll
     def "create an empty StudentStats populate it with more than 75 acc within 3 quizzes"() {
         when: "a studentStats is created and the quizzes"
-        def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
-        //studentStatsRepository.save(studentStats)
-        teacherDashboard.addStudentStats(studentStats)
-        def student1 = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
-        userRepository.save(student1)
-        def student2 = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
-        student1.addCourse(externalCourseExecution)
-        student2.addCourse(externalCourseExecution)
-        def studentdashboard1 = new StudentDashboard(externalCourseExecution, student1)
-        def studentdashboard2 = new StudentDashboard(externalCourseExecution, student2)
-        studentDashboardRepository.save(studentdashboard1)
-        studentDashboardRepository.save(studentdashboard2)
-
-        for(int i=0;i<3;i++)
-        {
-            def question = createQuestion()
-            def quiz = createQuiz()
-            def quizQuestion = createQuizQuestion(quiz, question)
-            def quizzAnswer = answerQuiz(true, true, true, quizQuestion, quiz,student1)
-            studentdashboard1.statistics(quizzAnswer)
+        newStudentStats(teacherDashboard,externalCourseExecution)
+        def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+        newstudent(externalCourseExecution,"3")
+        for(int i=0;i<3;i++) {
+            quizz(student1,true,true)
+            quizz(student1,true,true)
+            quizz(student1,true,true)
+            quizz(student1,true,true)
+            quizz(student1,true,false)
+            quizz(student2,true,false)
         }
+
         then: "an empty studentStats is updated"
+        studentStatsRepository.count() == 1L
+        def result = studentStatsRepository.findAll().get(0)
 
-        def result = studentStats//studentStatsRepository.findAll().get(0)
-
-        studentStats.update()
-        result.getNumStudent() == 2
+        result.update()
+        result.getNumStudent() == 3
         result.getNumMore75CorrectQuestions() == 1
-        result.getNumAtLeast3Quizzes() == 1
+        result.getNumAtLeast3Quizzes() == 2
     }
 
 
