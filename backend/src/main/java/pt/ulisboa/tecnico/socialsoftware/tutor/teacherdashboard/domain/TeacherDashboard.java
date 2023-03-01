@@ -1,5 +1,7 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
@@ -71,7 +73,7 @@ public class TeacherDashboard implements DomainEntity {
     }
     public void addStudentStats(StudentStats studentStat) {
         if (studentStats.stream().anyMatch(studentStat1 -> studentStat1.getId() == studentStat.getId()) ) {
-            //throw new TutorException(ErrorMessage.FAILED_ANSWER_ALREADY_CREATED);
+            throw new TutorException(ErrorMessage.STUDENT_STATS_ALREADY_CREATED);
         }
         studentStats.add(studentStat);
     }

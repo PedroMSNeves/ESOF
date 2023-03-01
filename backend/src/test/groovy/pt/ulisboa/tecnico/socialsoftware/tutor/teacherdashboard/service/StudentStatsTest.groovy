@@ -39,7 +39,7 @@ class StudentStatsTest extends SpockTest {
         studentStatsRepository.save(studentStats)
         teacherDashboard.addStudentStats(studentStats)
         then: "an empty dashboard is created"
-        studentStatsRepository.count() == 1
+        studentStatsRepository.count() == 1L
         def result = studentStatsRepository.findAll().get(0)
         result.getId() != 0
         result.getCourseExecution().getId() == externalCourseExecution.getId()
@@ -138,13 +138,51 @@ class StudentStatsTest extends SpockTest {
         courseRepository.save(newCourse)
         def newCourseExecution  = new CourseExecution(newCourse, COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
         courseExecutionRepository.save(newCourseExecution)
-        then: "an empty studentStats is created and updated with empty course"
-        //studentStatsRepository.count() == 1L
+        then: "an empty studentStats is created and get from teacherdashboard with the course"
+        studentStatsRepository.count() == 1L
         def result = studentStatsRepository.findAll().get(0)
         teacherDashboard.getCourseExecutionStudentStats(externalCourseExecution)==result
         teacherDashboard.getCourseExecutionStudentStats(newCourseExecution)==null
     }
 
+    @Unroll
+    def "create an empty StudentStats and add it 2 times to teacherDashboard"() {
+        when: "a studentStats is created"
+        def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
+        studentStatsRepository.save(studentStats)
+        teacherDashboard.addStudentStats(studentStats)
+        then: "an empty dashboard is created"
+        studentStatsRepository.count() == 1L
+        def result = studentStatsRepository.findAll().get(0)
+        result ==studentStats
+        def c=0;
+        try {
+            teacherDashboard.addStudentStats(result)
+        }
+        catch(Exception STUDENT_STATS_ALREADY_CREATED) {
+            c=1
+        }
+        c==1
+
+    }
+    @Unroll
+    def "create 2 empty StudentStats and add them to teacherDashboard"() {
+        when: "a studentStats is created"
+        def studentStats1 = new StudentStats(externalCourseExecution, teacherDashboard)
+        studentStatsRepository.save(studentStats1)
+        def newCourse = new Course("123", Course.Type.TECNICO)
+        courseRepository.save(newCourse)
+        def newCourseExecution  = new CourseExecution(newCourse, COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
+        courseExecutionRepository.save(newCourseExecution)
+        def studentStats2 = new StudentStats(newCourseExecution, teacherDashboard)
+        studentStatsRepository.save(studentStats2)
+
+        then: "add to teacherDashboard"
+        teacherDashboard.addStudentStats(studentStats1)
+        teacherDashboard.addStudentStats(studentStats2)
+        teacherDashboard.getCourseExecutionStudentStats(externalCourseExecution)==studentStats1
+        teacherDashboard.getCourseExecutionStudentStats(newCourseExecution)==studentStats2
+    }
     /* @Unroll
      def "create an empty StudentStats and updated with course that has stats "() {
          when: "a studentStats is created"
