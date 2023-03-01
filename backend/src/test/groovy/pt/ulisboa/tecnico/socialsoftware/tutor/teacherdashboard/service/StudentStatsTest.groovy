@@ -27,6 +27,7 @@ class StudentStatsTest extends SpockTest {
     def setup() {
         createExternalCourseAndExecution()
         teacher = new Teacher(USER_1_NAME, false)
+        userRepository.save(teacher)
         teacherDashboard = new TeacherDashboard(externalCourseExecution, teacher)
         teacherDashboardRepository.save(teacherDashboard)
     }
@@ -35,11 +36,11 @@ class StudentStatsTest extends SpockTest {
     def "create an empty StudentStats"() {
         when: "a studentStats is created"
         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
-        //studentStatsRepository.save(studentStats)
+        studentStatsRepository.save(studentStats)
         teacherDashboard.addStudentStats(studentStats)
         then: "an empty dashboard is created"
-        //studentStatsRepository.count() == 1L
-        def result = studentStats//studentStatsRepository.findAll().get(0)
+        studentStatsRepository.count() == 1
+        def result = studentStatsRepository.findAll().get(0)
         result.getId() != 0
         result.getCourseExecution().getId() == externalCourseExecution.getId()
         result.getTeacherDashboard().getId() == teacherDashboard.getId()
@@ -124,34 +125,54 @@ class StudentStatsTest extends SpockTest {
         result.getNumMore75CorrectQuestions() == 0
         result.getNumAtLeast3Quizzes() == 0
     }
-   /* @Unroll
-    def "create an empty StudentStats and updated with course that has stats "() {
+
+
+
+    @Unroll
+    def "create an empty StudentStats and get from teacherdashboard with the course"() {
         when: "a studentStats is created"
         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
-        //studentStatsRepository.save(studentStats) perguntar
+        studentStatsRepository.save(studentStats)
         teacherDashboard.addStudentStats(studentStats)
-        def student1 = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
-        def student2 = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
-        student1.addCourse(externalCourseExecution)
-        student2.addCourse(externalCourseExecution)
-        def studentdashboard1 = new StudentDashboard(externalCourseExecution, student1)
-        def studentdashboard2 = new StudentDashboard(externalCourseExecution, student2)
-        studentDashboardRepository.save(studentdashboard1)
-        studentDashboardRepository.save(studentdashboard2)
-        def quiz = createQuiz()
-        def quizQuestion = createQuizQuestion(quiz, question)
-        def questionAnswer = answerQuiz(true, false, true, quizQuestion, quiz)
-        studentdashboard1.statistics(questionAnswer)
-        then: "an empty studentStats is created and updated course that as 1 empty student"
+        def newCourse = new Course("123", Course.Type.TECNICO)
+        courseRepository.save(newCourse)
+        def newCourseExecution  = new CourseExecution(newCourse, COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
+        courseExecutionRepository.save(newCourseExecution)
+        then: "an empty studentStats is created and updated with empty course"
         //studentStatsRepository.count() == 1L
+        def result = studentStatsRepository.findAll().get(0)
+        teacherDashboard.getCourseExecutionStudentStats(externalCourseExecution)==result
+        teacherDashboard.getCourseExecutionStudentStats(newCourseExecution)==null
+    }
 
-        def result = studentStats//studentStatsRepository.findAll().get(0)
+    /* @Unroll
+     def "create an empty StudentStats and updated with course that has stats "() {
+         when: "a studentStats is created"
+         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
+         //studentStatsRepository.save(studentStats) perguntar
+         teacherDashboard.addStudentStats(studentStats)
+         def student1 = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
+         def student2 = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
+         student1.addCourse(externalCourseExecution)
+         student2.addCourse(externalCourseExecution)
+         def studentdashboard1 = new StudentDashboard(externalCourseExecution, student1)
+         def studentdashboard2 = new StudentDashboard(externalCourseExecution, student2)
+         studentDashboardRepository.save(studentdashboard1)
+         studentDashboardRepository.save(studentdashboard2)
+         def quiz = createQuiz()
+         def quizQuestion = createQuizQuestion(quiz, question)
+         def questionAnswer = answerQuiz(true, false, true, quizQuestion, quiz)
+         studentdashboard1.statistics(questionAnswer)
+         then: "an empty studentStats is created and updated course that as 1 empty student"
+         //studentStatsRepository.count() == 1L
 
-        studentStats.update()
-        result.getNumStudent() == 2
-        result.getNumMore75CorrectQuestions() == 1
-        result.getNumAtLeast3Quizzes() == 0
-    }*/
+         def result = studentStats//studentStatsRepository.findAll().get(0)
+
+         studentStats.update()
+         result.getNumStudent() == 2
+         result.getNumMore75CorrectQuestions() == 1
+         result.getNumAtLeast3Quizzes() == 0
+     }*/
 
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}

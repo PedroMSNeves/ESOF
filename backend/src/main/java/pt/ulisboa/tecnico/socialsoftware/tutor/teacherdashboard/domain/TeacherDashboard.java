@@ -63,9 +63,9 @@ public class TeacherDashboard implements DomainEntity {
 
     public Set<StudentStats> getStudentStats(){ return this.studentStats; }
 
-    public StudentStats getCourseExecutionStudentStats(CourseExecution courseExecution) {
+    public StudentStats getCourseExecutionStudentStats(CourseExecution ce) {
         return getStudentStats().stream()
-                .filter(ss -> ss.getCourseExecution() == getCourseExecution())
+                .filter(ss -> ss.getCourseExecution() == ce)
                 .findAny()
                 .orElse(null);
     }
