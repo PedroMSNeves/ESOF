@@ -37,6 +37,10 @@ public class TeacherDashboard implements DomainEntity {
 
     public void remove() {
         teacher.getDashboards().remove(this);
+        for(StudentStats st: getStudentStats())//perguntar
+        {
+            st.remove();
+        }
         teacher = null;
     }
 

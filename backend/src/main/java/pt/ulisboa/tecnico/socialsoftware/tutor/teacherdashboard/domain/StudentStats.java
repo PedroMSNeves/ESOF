@@ -9,6 +9,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User;
 
+import java.util.Optional;
 import javax.persistence.*;
 import java.util.stream.Collectors;
 import java.util.*;
@@ -57,6 +58,9 @@ public class StudentStats implements DomainEntity {
     public void setNumStudent(int numstudents){
         this.numStudent= numstudents;
     }
+    public void addNumStudent(){
+        this.numStudent++;
+    }
     public int getNumMore75CorrectQuestions(){
         return this.numMore75CorrectQuestions;
     }
@@ -75,14 +79,13 @@ public class StudentStats implements DomainEntity {
     public void addNumAtLeast3Quizzes(){
         this.numAtLeast3Quizzes++;
     }
-    public LocalDateTime getEndDate()
+    /*public LocalDateTime getEndDate()
     {
         return this.courseExecution.getEndDate();
-    }
+    }*/
 
     public void remove() {
-        //this.courseExecution.getWeeklyScores().remove(this);
-        //this.teacherDashboard.getWeeklyScores().remove(this);                         //PERGUNTAR
+        getTeacherDashboard().getStudentStats().remove(this);
         this.courseExecution = null;
         this.teacherDashboard = null;
     }
@@ -92,16 +95,20 @@ public class StudentStats implements DomainEntity {
         this.setNumMore75CorrectQuestions(0);
 
         Set<Student> students = courseExecution.getStudents();
-        this.setNumStudent(courseExecution.getNumberOfActiveStudents());
+       // this.setNumStudent(courseExecution.getNumberOfActiveStudents());
 
         for (Student st : students) {
-            StudentDashboard stdb= st.getDashboards().stream().filter(dash -> dash.getCourseExecution().getId() == courseExecution.getId()).findFirst().get();
-
+            StudentDashboard stdb= st.getDashboards().stream()
+                    .filter(dash -> dash.getCourseExecution().getId() == courseExecution.getId())
+                    .findFirst().orElse(null);
+            if(stdb==null){continue;}
+            this.addNumStudent();
             if((stdb.getNumberOfTeacherQuizzes() + stdb.getNumberOfStudentQuizzes() + stdb.getNumberOfInClassQuizzes())>=3) {this.addNumAtLeast3Quizzes();}
 
-            if(((stdb.getNumberOfCorrectTeacherAnswers() + stdb.getNumberOfCorrectStudentAnswers() + stdb.getNumberOfCorrectInClassAnswers())*100/
+            if((stdb.getNumberOfTeacherAnswers() + stdb.getNumberOfStudentAnswers() + stdb.getNumberOfInClassAnswers()>0) &&
+                    (((stdb.getNumberOfCorrectTeacherAnswers() + stdb.getNumberOfCorrectStudentAnswers() + stdb.getNumberOfCorrectInClassAnswers())*100/
                     (stdb.getNumberOfTeacherAnswers() + stdb.getNumberOfStudentAnswers() + stdb.getNumberOfInClassAnswers()))
-                    >75) {this.addNumMore75CorrectQuestions();}
+                    >75)) {this.addNumMore75CorrectQuestions();}
         }
 
     }

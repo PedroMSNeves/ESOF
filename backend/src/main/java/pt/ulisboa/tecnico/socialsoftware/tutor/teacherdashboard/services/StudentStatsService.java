@@ -1,4 +1,4 @@
-package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.services;
+/*package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -57,5 +57,5 @@ public class StudentStatsService {
                     studentStat.update();//ness dar save() ou nao (int vs Integer)
                 });
     }
-}
+}*/
 
