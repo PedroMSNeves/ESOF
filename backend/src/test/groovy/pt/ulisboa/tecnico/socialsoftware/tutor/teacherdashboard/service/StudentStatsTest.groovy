@@ -53,7 +53,7 @@ class StudentStatsTest extends SpockTest {
     def "create an empty StudentStats and remove it"() {
         when: "a studentStats is created"
         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
-        //studentStatsRepository.save(studentStats) perguntar
+        //studentStatsRepository.save(studentStats)
         teacherDashboard.addStudentStats(studentStats)
         then: "an empty studentStats is created and deleted"
         //studentStatsRepository.count() == 1L
@@ -61,7 +61,7 @@ class StudentStatsTest extends SpockTest {
         result.getId() != 0
         result.getCourseExecution().getId() == externalCourseExecution.getId()
         result.getTeacherDashboard().getId() == teacherDashboard.getId()
-        teacherDashboard.remove()
+        studentStats.remove()
         and: "the teacherDashboard has no reference for the studentStats"
         teacherDashboard.getStudentStats().size() == 0
     }
@@ -70,7 +70,7 @@ class StudentStatsTest extends SpockTest {
     def "create an empty StudentStats and updated with empty course"() {
         when: "a studentStats is created"
         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
-        //studentStatsRepository.save(studentStats) perguntar
+        //studentStatsRepository.save(studentStats)
         teacherDashboard.addStudentStats(studentStats)
         then: "an empty studentStats is created and updated with empty course"
         //studentStatsRepository.count() == 1L
@@ -86,12 +86,12 @@ class StudentStatsTest extends SpockTest {
     def "create an empty StudentStats and updated with course that as 1 empty student"() {
         when: "a studentStats is created"
         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
-        //studentStatsRepository.save(studentStats) perguntar
+        //studentStatsRepository.save(studentStats)
         teacherDashboard.addStudentStats(studentStats)
         def student = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
         student.addCourse(externalCourseExecution)
-        def studentdashboard = new StudentDashboard(externalCourseExecution, student)
-        studentDashboardRepository.save(studentdashboard)
+        def studentDashboard = new StudentDashboard(externalCourseExecution, student)
+        studentDashboardRepository.save(studentDashboard)
         then: "an empty studentStats is created and updated course that as 1 empty student"
         //studentStatsRepository.count() == 1L
         def result = studentStats//studentStatsRepository.findAll().get(0)
@@ -104,9 +104,9 @@ class StudentStatsTest extends SpockTest {
 
     @Unroll
     def "create an empty StudentStats and updated with course that as 1 student but student does not have it"() {
-        when: "a studentStats is created and a studentdashboard"
+        when: "a studentStats is created and a studentDashboard"
         def studentStats = new StudentStats(externalCourseExecution, teacherDashboard)
-        //studentStatsRepository.save(studentStats) perguntar
+        //studentStatsRepository.save(studentStats)
         teacherDashboard.addStudentStats(studentStats)
         def student = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
         student.addCourse(externalCourseExecution)
