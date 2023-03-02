@@ -1,18 +1,15 @@
-package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.service
+package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain
 
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
-//import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
-//import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student
 import pt.ulisboa.tecnico.socialsoftware.tutor.studentdashboard.domain.StudentDashboard
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser
-//import pt.ulisboa.tecnico.socialsoftware.tutor.utils.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
 
@@ -56,9 +53,9 @@ class StudentStatsTest extends SpockTest {
         td.addStudentStats(studentStats)
         return studentStats
     }
-    def newCourseExecution()
+    def newCourseExecution(name)
     {
-        def newCourse = new Course("123", Course.Type.TECNICO)
+        def newCourse = new Course(name, Course.Type.TECNICO)
         courseRepository.save(newCourse)
         def newCE  = new CourseExecution(newCourse, COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
         courseExecutionRepository.save(newCE)
@@ -70,7 +67,7 @@ class StudentStatsTest extends SpockTest {
         when: "a studentStats is created"
         newStudentStats(teacherDashboard,externalCourseExecution)
 
-        then: "an empty dashboard is created"
+        then: "compare if created correctly"
         studentStatsRepository.count() == 1L
         def result = studentStatsRepository.findAll().get(0)
         result.getId() != 0
@@ -117,12 +114,12 @@ class StudentStatsTest extends SpockTest {
 
     @Unroll
     def "create an empty StudentStats and updated with course that as 1 empty student"() {
-        when: "a studentStats is created"
+        when: "a studentStats and student are created"
         newstudent(externalCourseExecution,"dadsad")
         newStudentStats(teacherDashboard,externalCourseExecution)
 
 
-        then: "an empty studentStats is created and updated course that as 1 empty student"
+        then: "an empty studentStats is created and updated with course that as 1 empty student"
         studentStatsRepository.count() == 1L
         def result = studentStatsRepository.findAll().get(0)
         result.update()
@@ -138,7 +135,7 @@ class StudentStatsTest extends SpockTest {
         def student = new Student(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
         student.addCourse(externalCourseExecution)
         userRepository.save(student)
-        def newCE = newCourseExecution()
+        def newCE = newCourseExecution("123")
         def studentdashboard = new StudentDashboard(newCE, student)
         studentDashboardRepository.save(studentdashboard)
 
@@ -155,10 +152,10 @@ class StudentStatsTest extends SpockTest {
 
 
     @Unroll
-    def "create an empty StudentStats and get from teacherdashboard with the course"() {
+    def "create an empty StudentStats and get it from teacherdashboard with the course"() {
         when: "a studentStats is created"
         newStudentStats(teacherDashboard,externalCourseExecution)
-        def newCE = newCourseExecution()
+        def newCE = newCourseExecution("123")
 
         then: "an empty studentStats is created and get from teacherdashboard with the course"
         studentStatsRepository.count() == 1L
@@ -172,7 +169,7 @@ class StudentStatsTest extends SpockTest {
         when: "a studentStats is created"
         newStudentStats(teacherDashboard,externalCourseExecution)
 
-        then: "an empty dashboard is created"
+        then: "try to add the StudenStats again"
         studentStatsRepository.count() == 1L
         def result = studentStatsRepository.findAll().get(0)
         def c=0;
@@ -190,7 +187,7 @@ class StudentStatsTest extends SpockTest {
     def "create 2 empty StudentStats and add them to teacherDashboard"() {
         when: "a studentStats is created and add to teacherDashboard"
         def studentStats1=newStudentStats(teacherDashboard,externalCourseExecution)
-        def newCE = newCourseExecution()
+        def newCE = newCourseExecution("123")
         def studentStats2=newStudentStats(teacherDashboard,newCE)
 
         then: "see if added"
@@ -311,7 +308,7 @@ class StudentStatsTest extends SpockTest {
      }
 
     @Unroll
-    def "create an empty StudentStats populate it with less than 75 acc within 3 quizzes in 2 quizzes"() {
+    def "create an empty StudentStats populate it with 2 students with 3 quizz each"() {
         when: "a studentStats is created and the quizzes"
         newStudentStats(teacherDashboard,externalCourseExecution)
         def student1 = newstudent(externalCourseExecution,"1")
@@ -333,17 +330,15 @@ class StudentStatsTest extends SpockTest {
     }
 
     @Unroll
-    def "create an empty StudentStats populate it with more than 75 acc within 3 quizzes"() {
+    def "create an empty StudentStats populate it with more than 75 acc within 15 quizzes quizzes from one student"() {
         when: "a studentStats is created and the quizzes"
         newStudentStats(teacherDashboard,externalCourseExecution)
         def student1 = newstudent(externalCourseExecution,"1")
         def student2 = newstudent(externalCourseExecution,"2")
         newstudent(externalCourseExecution,"3")
+
         for(int i=0;i<3;i++) {
-            quizz(student1,true,true)
-            quizz(student1,true,true)
-            quizz(student1,true,true)
-            quizz(student1,true,true)
+            for(int j=0;j<4;j++){quizz(student1,true,true)}
             quizz(student1,true,false)
             quizz(student2,true,false)
         }
