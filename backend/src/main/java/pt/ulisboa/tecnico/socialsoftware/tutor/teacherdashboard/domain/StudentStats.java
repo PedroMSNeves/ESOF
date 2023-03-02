@@ -13,8 +13,6 @@ import java.util.Optional;
 import javax.persistence.*;
 import java.util.stream.Collectors;
 import java.util.*;
-//import java.time.LocalDateTime;
-
 @Entity
 public class StudentStats implements DomainEntity {
     @Id
@@ -81,5 +79,20 @@ public class StudentStats implements DomainEntity {
     }
     public void accept(Visitor visitor) {
         // Only used for XML generation
+    }
+    public void remove() {
+        getTeacherDashboard().getStudentStats().remove(this);
+        this.courseExecution = null;
+        this.teacherDashboard = null;
+    }
+    @Override
+    public String toString() {
+        return "Dashboard{" +
+                "id=" + getId() +
+                ", courseExecution=" + getCourseExecution() +
+                ", teacherDashboard=" + getTeacherDashboard() +
+                ", numStudent=" + getNumStudent() +
+                ", numMore75CorrectQuestions=" + getNumMore75CorrectQuestions() +
+                ", numAtLeast3Quizzes=" + getNumAtLeast3Quizzes() + '}';
     }
 }
