@@ -19,6 +19,16 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser
 import pt.ulisboa.tecnico.socialsoftware.tutor.utils.DateHandler
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.MultipleChoiceQuestion
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Option
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Question
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.Quiz
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.MultipleChoiceAnswer
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer
+import pt.ulisboa.tecnico.socialsoftware.tutor.utils.DateHandler
+
 import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course
 
 import spock.lang.Unroll
@@ -54,6 +64,20 @@ class QuestionStatsTest extends SpockTest {
         return student
     }
     
+    def newQuestionStats(ce, td) {
+   		def questionStats = new QuestionStats(ce, td)
+   		questionStatsRepository.save(questionStats)
+   		td.addQuestionStats(questionStats)
+   		return questionStats
+    }
+
+    
+    def newQuestionSubmission(courseExecution, student, question){
+        def questionSubmission = new QuestionSubmission(courseExecution, question, student)
+        questionSubmissionRepository.save(questionSubmission)
+        return questionSubmission
+    }
+
     def createQuestion() {
         def newQuestion = new Question()
         newQuestion.setTitle("Question Title")
@@ -75,25 +99,63 @@ class QuestionStatsTest extends SpockTest {
         optionKO.setQuestionDetails(questionDetails)
         optionRepository.save(optionKO)
 
-        return newQuestion
-    }
-    
-    def newQuestionStats(ce, td) {
-   		def questionStats = new QuestionStats(ce, td)
-   		questionStatsRepository.save(questionStats)
-   		td.addQuestionStats(questionStats)
-   		return questionStats
+        return newQuestion;
     }
 
-    
-    def newQuestionSubmission(courseExecution, student, question){
-        def questionSubmission = new QuestionSubmission(courseExecution, question, student)
-        questionSubmissionRepository.save(questionSubmission)
-        return questionSubmission
+    def createQuiz(type = Quiz.QuizType.PROPOSED.toString()) {
+        def quiz = new Quiz()
+        quiz.setTitle("Quiz Title")
+        quiz.setType(type)
+        quiz.setCourseExecution(externalCourseExecution)
+        quiz.setCreationDate(DateHandler.now())
+        quiz.setAvailableDate(DateHandler.now())
+        quizRepository.save(quiz)
+        return quiz
     }
 
-    
+    def createQuizQuestion(quiz, question) {
+        def quizQuestion = new QuizQuestion(quiz, question, 0)
+        quizQuestionRepository.save(quizQuestion)
+        return quizQuestion
+    }
 
+    def answerQuiz(answered, correct, completed, quizQuestion, quiz,student ,date = DateHandler.now()) {
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setCompleted(completed)
+        quizAnswer.setCreationDate(date)
+        quizAnswer.setAnswerDate(date)
+        quizAnswer.setStudent(student)
+        quizAnswer.setQuiz(quiz)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setTimeTaken(1)
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        questionAnswerRepository.save(questionAnswer)
+
+        def answerDetails
+        def correctOption = quizQuestion.getQuestion().getQuestionDetails().getCorrectOption()
+        def incorrectOption = quizQuestion.getQuestion().getQuestionDetails().getOptions().stream().filter(option -> option != correctOption).findAny().orElse(null)
+        if (answered && correct) answerDetails = new MultipleChoiceAnswer(questionAnswer, correctOption)
+        else if (answered && !correct) answerDetails = new MultipleChoiceAnswer(questionAnswer, incorrectOption)
+        else {
+            questionAnswerRepository.save(questionAnswer)
+            return quizAnswer
+        }
+        questionAnswer.setAnswerDetails(answerDetails)
+        answerDetailsRepository.save(answerDetails)
+        return quizAnswer
+    }
+    def quizz(student,answered,correct)
+    {
+        def question = createQuestion()
+        def quiz = createQuiz()
+        def quizQuestion = createQuizQuestion(quiz, question)
+        def quizzAnswer = answerQuiz(answered, correct, true, quizQuestion, quiz,student)
+        student.getCourseExecutionDashboard(externalCourseExecution).statistics(quizzAnswer)
+    }
+    
 
     //mudar o spocktest.groovy
     @Unroll
@@ -139,18 +201,19 @@ class QuestionStatsTest extends SpockTest {
         
         externalCourseExecution.addUser(student1)
         
-        def question = createQuestion()
-        def question_submission1 = newQuestionSubmission(externalCourseExecution, student1, question)
-        def question_submission2 = newQuestionSubmission(externalCourseExecution, student2, question)
+       	quizz(student1,true,false)
+       	quizz(student2,false,false)
+        //def question_submission1 = newQuestionSubmission(externalCourseExecution, student1, question)
+        //def question_submission2 = newQuestionSubmission(externalCourseExecution, student2, question)
         
         then: "an empty questionStats is created and updated course that as 1 empty question"
-        externalCourseExecution.addQuestionSubmission(question_submission1)
-        externalCourseExecution.addQuestionSubmission(question_submission2)
+        //externalCourseExecution.addQuestionSubmission(question_submission1)
+        //externalCourseExecution.addQuestionSubmission(question_submission2)
         
         def result = questionStats//QuestionStatsRepository.findAll().get(0)
 
         result.update()
-        result.getNumQuestionsAvailable() == 1
+        result.getNumQuestionsAvailable() == 2
         result.getNumQuestionsAnsweredUniq() == 2
         result.getAverageQuestionsAnsweredUniq() == 1
     }

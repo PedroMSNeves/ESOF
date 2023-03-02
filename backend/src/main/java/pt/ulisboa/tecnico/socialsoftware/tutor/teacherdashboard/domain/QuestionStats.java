@@ -9,6 +9,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuestionAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
+import pt.ulisboa.tecnico.socialsoftware.tutor.quiz.domain.QuizQuestion;
 import javax.persistence.*;
 import java.util.stream.Collectors;
 import java.util.*;
@@ -102,16 +105,21 @@ public class QuestionStats implements DomainEntity {
         this.setNumQuestionsAnsweredUniq(0);
         this.setAverageQuestionsAnsweredUniq(0);
         int count = 0;
-        float average = 0;// arredonda-se ou nao ????
+        float average = 0;
 
         this.setNumQuestionsAvailable(this.courseExecution.getNumberOfQuestions());
         Set<Student> students = this.courseExecution.getStudents();
         if (students.size() != 0) {
         	for (Student stu : students) {
-        		Set<QuestionSubmission> questionSub = stu.getQuestionSubmissions();
+        		Set<QuizAnswer> quizAnswers = stu.getQuizAnswers();
         		Set<Question> questions = new HashSet<>();
-        		for (QuestionSubmission qt : questionSub) {
-        			questions.add(qt.getQuestion());
+        		for (QuizAnswer qt : quizAnswers) {
+        			List<QuestionAnswer> questionAnswers = qt.getQuestionAnswers();
+        			for(QuestionAnswer qa: questionAnswers) {
+        				QuizQuestion quizQuestion = qa.getQuizQuestion();
+        				Question question = quizQuestion.getQuestion();
+        				questions.add(question);
+        			}
         		}
         		count += questions.size();
         	}
