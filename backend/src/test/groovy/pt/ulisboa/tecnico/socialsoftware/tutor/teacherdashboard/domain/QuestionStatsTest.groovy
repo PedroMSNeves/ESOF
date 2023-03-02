@@ -31,13 +31,14 @@ class QuestionStatsTest extends SpockTest {
     def setup() {
         createExternalCourseAndExecution()
         teacher = new Teacher(USER_1_NAME, false)
+        userRepository.save(teacher)
         teacherDashboard = new TeacherDashboard(externalCourseExecution, teacher)
         teacherDashboardRepository.save(teacherDashboard)
     }
     
-    def newCourseExecution()
+    def newCourseExecution(name)
     {
-        def newCourse = new Course("123", Course.Type.TECNICO)
+        def newCourse = new Course(name, Course.Type.TECNICO)
         courseRepository.save(newCourse)
         def newCE  = new CourseExecution(newCourse, COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
         courseExecutionRepository.save(newCE)
@@ -78,17 +79,17 @@ class QuestionStatsTest extends SpockTest {
     }
     
     def newQuestionStats(ce, td) {
-   		def questionstats = new QuestionStats(ce, td)
-   		questionStatsRepository.save(questionstats)
-   		td.addQuestionStats(studentstats)
-   		return questionstats
+   		def questionStats = new QuestionStats(ce, td)
+   		questionStatsRepository.save(questionStats)
+   		td.addQuestionStats(questionStats)
+   		return questionStats
     }
 
     
     def newQuestionSubmission(courseExecution, student, question){
-        def QuestionSubmission = new QuestionSubmission(question,student,coursExecution,IN_REVIEW, false, false, [])
-        questionRepository.save(QuestionSubmission)
-        return QuestionSubmission
+        def questionSubmission = new QuestionSubmission(courseExecution, question, student)
+        questionSubmissionRepository.save(questionSubmission)
+        return questionSubmission
     }
 
     
@@ -123,9 +124,9 @@ class QuestionStatsTest extends SpockTest {
         result.getId() != 0
         result.getCourseExecution().getId() == externalCourseExecution.getId()
         result.getTeacherDashboard().getId() == teacherDashboard.getId()
-        teacherDashboard.remove()
+        result.remove()
         and: "the teacherDashboard has no reference for the questionStats"
-        teacherDashboard.getStudentStats().size() == 0
+        teacherDashboard.getQuestionStats().size() == 0
     }
 
     @Unroll
@@ -134,17 +135,23 @@ class QuestionStatsTest extends SpockTest {
         def questionStats = newQuestionStats(externalCourseExecution, teacherDashboard)
         
         def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+        
         externalCourseExecution.addUser(student1)
+        
         def question = createQuestion()
-        def question_submission = newQuestionSubmission(externalCourseExecution, student1, question)
+        def question_submission1 = newQuestionSubmission(externalCourseExecution, student1, question)
+        def question_submission2 = newQuestionSubmission(externalCourseExecution, student2, question)
         
         then: "an empty questionStats is created and updated course that as 1 empty question"
-        externalCourseExecution.addQuestionSubmission(question_submission)
+        externalCourseExecution.addQuestionSubmission(question_submission1)
+        externalCourseExecution.addQuestionSubmission(question_submission2)
+        
         def result = questionStats//QuestionStatsRepository.findAll().get(0)
 
         result.update()
         result.getNumQuestionsAvailable() == 1
-        result.getNumQuestionsAnsweredUniq() == 1
+        result.getNumQuestionsAnsweredUniq() == 2
         result.getAverageQuestionsAnsweredUniq() == 1
     }
 
@@ -152,19 +159,10 @@ class QuestionStatsTest extends SpockTest {
     def "create an empty QuestionStats and updated with course that as 1 question but question does not have it"() {
         when: "a QuestionStats is created and a studentDashboard"
         def questionStats = newQuestionStats(externalCourseExecution, teacherDashboard)
-
-        def qst = new Question(externalCourseExecution, student)
-        student.addCourse(externalCourseExecution)
-        def newCourse = new Course(COURSE_1_NAME, Course.Type.TECNICO)
-        def newCourseExecution = new CourseExecution(newCourse, COURSE_1_ACRONYM, COURSE_1_ACADEMIC_TERM, Course.Type.TECNICO, LOCAL_DATE_TODAY)
-
-        def studentdashboard = new StudentDashboard(newCourseExecution, student)
-        studentDashboardRepository.save(studentdashboard)
-        then: "an empty questionStats is created and updated course that as 1 question but question does not have it"
-        //studentStatsRepository.count() == 1L
-        def result = questionStats//QuestionStatsRepository.findAll().get(0)
-
-        QuestionStats.update()
+		
+		then: ""
+		def result = questionStats
+        questionStats.update()
         result.getNumQuestionsAvailable() == 0
         result.getNumQuestionsAnsweredUniq() == 0
         result.getAverageQuestionsAnsweredUniq() == 0
@@ -173,18 +171,35 @@ class QuestionStatsTest extends SpockTest {
 	@Unroll
 	def "create empty QuestionStats and use toString"() {
         when: "a QuestionStats is created"
+        
         def newTeacher = new Teacher(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
         userRepository.save(newTeacher)
+        
         def td = new TeacherDashboard(externalCourseExecution, newTeacher)
         teacherDashboardRepository.save(td)
-        newQuestionStats(td,externalCourseExecution)
+        newQuestionStats(externalCourseExecution, td)
 
         then: "compare toString"
         questionStatsRepository.count() == 1L
         def result = questionStatsRepository.findAll().get(0)
-        result.toString()==td.getCourseExecutionStudentStats(externalCourseExecution).toString()
+        result.toString()==td.getCourseExecutionQuestionStats(externalCourseExecution).toString()
     }
-	
+    
+    @Unroll
+    def "create an empty StudentStats and get it from teacherdashboard with the course"() {
+        when: "a studentStats is created"
+        newQuestionStats(externalCourseExecution, teacherDashboard)
+        def newCE = newCourseExecution("123")
 
+        then: "an empty studentStats is created and get from teacherdashboard with the course"
+        questionStatsRepository.count() == 1L
+        def result = questionStatsRepository.findAll().get(0)
+        teacherDashboard.getCourseExecutionQuestionStats(externalCourseExecution)==result
+        teacherDashboard.getCourseExecutionQuestionStats(newCE)==null
+    }
+    
+	
+	@TestConfiguration
+    static class LocalBeanConfiguration extends BeanConfiguration {}
 
 }

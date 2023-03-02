@@ -38,6 +38,12 @@ public class TeacherDashboard implements DomainEntity {
     public Set<QuestionStats> getQuestionStats(){
         return this.questionStats;
     }
+    
+    public QuestionStats getCourseExecutionQuestionStats(CourseExecution ce) {
+    	return this.getQuestionStats().stream()
+    			.filter(ss -> ss.getCourseExecution() == ce)
+    			.findAny().orElse(null);
+    }
 
     public void addQuestionStats(QuestionStats qst){
         this.questionStats.add(qst);

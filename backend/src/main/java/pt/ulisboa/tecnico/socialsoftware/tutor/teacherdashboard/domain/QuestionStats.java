@@ -15,7 +15,8 @@ import java.util.*;
 
 @Entity
 public class QuestionStats implements DomainEntity {
-    @Id
+    
+	@Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
@@ -39,7 +40,7 @@ public class QuestionStats implements DomainEntity {
     }
 
     // GET
-    public int getId() {
+    public Integer getId() {
         return this.id;
     }
 
@@ -64,10 +65,6 @@ public class QuestionStats implements DomainEntity {
     }
 
     // SET
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
 
     public void setNumQuestionsAvailable(int numQuestionsavailable) {
         this.numQuestionsAvailable = numQuestionsavailable;
@@ -94,6 +91,7 @@ public class QuestionStats implements DomainEntity {
     }
 
     public void remove() {
+    	this.getTeacherDashboard().getQuestionStats().remove(this);
         this.courseExecution = null;
         this.teacherDashboard = null;
         // ver se precisamos de adicionar mais ?
@@ -108,19 +106,22 @@ public class QuestionStats implements DomainEntity {
 
         this.setNumQuestionsAvailable(this.courseExecution.getNumberOfQuestions());
         Set<Student> students = this.courseExecution.getStudents();
-
-        for (Student stu : students) {
-            Set<QuestionSubmission> questionSub = stu.getQuestionSubmissions();
-            Set<Question> questions = new HashSet<>();
-            for (QuestionSubmission qt : questionSub) {
-                questions.add(qt.getQuestion());
-            }
-            count += questions.size();
+        if (students.size() != 0) {
+        	for (Student stu : students) {
+        		Set<QuestionSubmission> questionSub = stu.getQuestionSubmissions();
+        		Set<Question> questions = new HashSet<>();
+        		for (QuestionSubmission qt : questionSub) {
+        			questions.add(qt.getQuestion());
+        		}
+        		count += questions.size();
+        	}
+        	this.setNumQuestionsAnsweredUniq(count);
+        	average =  count / (students.size());
+        	this.setAverageQuestionsAnsweredUniq(average);
+        } else {
+        	this.setNumQuestionsAnsweredUniq(0);
+        	this.setAverageQuestionsAnsweredUniq(0);
         }
-        this.setNumQuestionsAnsweredUniq(count);
-        average =  count / (students.size());
-        this.setAverageQuestionsAnsweredUniq(average);
-
     }
 
     @Override
