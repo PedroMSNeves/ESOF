@@ -352,6 +352,30 @@ class StudentStatsTest extends SpockTest {
         result.getNumAtLeast3Quizzes() == 2
     }
 
+    @Unroll
+    def "create an empty StudentStats and update it from teacherDashboard"() {
+        when: "a studentStats is created and the quizzes"
+        newStudentStats(teacherDashboard,externalCourseExecution)
+        def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+        newstudent(externalCourseExecution,"3")
+
+        for(int i=0;i<3;i++) {
+            for(int j=0;j<4;j++){quizz(student1,true,false)}
+            quizz(student1,true,true)
+            quizz(student2,true,true)
+        }
+
+        then: "an empty studentStats is updated"
+        studentStatsRepository.count() == 1L
+        def result = studentStatsRepository.findAll().get(0)
+
+        teacherDashboard.update()
+        result.getNumStudent() == 3
+        result.getNumMore75CorrectQuestions() == 1
+        result.getNumAtLeast3Quizzes() == 2
+    }
+
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
 }
