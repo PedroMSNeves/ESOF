@@ -85,6 +85,25 @@ public class StudentStats implements DomainEntity {
         this.courseExecution = null;
         this.teacherDashboard = null;
     }
+    public void update() {
+        this.setNumStudent(0);
+        this.setNumAtLeast3Quizzes(0);
+        this.setNumMore75CorrectQuestions(0);
+        Set<Student> students = courseExecution.getStudents();
+
+        for (Student st : students) {
+            StudentDashboard stdb= st.getCourseExecutionDashboard(getCourseExecution());
+            if(stdb==null){continue;}
+
+            this.addNumStudent();
+            if((stdb.getNumberOfTeacherQuizzes() + stdb.getNumberOfStudentQuizzes() + stdb.getNumberOfInClassQuizzes())>=3) {this.addNumAtLeast3Quizzes();}
+
+            if((stdb.getNumberOfTeacherAnswers() + stdb.getNumberOfStudentAnswers() + stdb.getNumberOfInClassAnswers()>0) &&
+                    (((stdb.getNumberOfCorrectTeacherAnswers() + stdb.getNumberOfCorrectStudentAnswers() + stdb.getNumberOfCorrectInClassAnswers())*100/
+                            (stdb.getNumberOfTeacherAnswers() + stdb.getNumberOfStudentAnswers() + stdb.getNumberOfInClassAnswers()))
+                            >75)) {this.addNumMore75CorrectQuestions();}
+        }
+    }
     @Override
     public String toString() {
         return "Dashboard{" +
