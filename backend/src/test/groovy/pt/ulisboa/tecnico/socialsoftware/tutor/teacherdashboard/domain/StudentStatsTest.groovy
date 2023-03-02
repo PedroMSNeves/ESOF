@@ -163,6 +163,194 @@ class StudentStatsTest extends SpockTest {
         teacherDashboard.getCourseExecutionStudentStats(externalCourseExecution)==result
         teacherDashboard.getCourseExecutionStudentStats(newCE)==null
     }
+    @Unroll
+    def "create an empty StudentStats and add it 2 times to teacherDashboard"() {
+        when: "a studentStats is created"
+        newStudentStats(teacherDashboard,externalCourseExecution)
+
+        then: "try to add the StudenStats again"
+        studentStatsRepository.count() == 1L
+        def result = studentStatsRepository.findAll().get(0)
+        def c=0;
+
+        try {
+            teacherDashboard.addStudentStats(result)
+        }
+        catch(Exception STUDENT_STATS_ALREADY_CREATED) {
+            c=1
+        }
+        c==1
+    }
+
+    @Unroll
+    def "create 2 empty StudentStats and add them to teacherDashboard"() {
+        when: "a studentStats is created and add to teacherDashboard"
+        def studentStats1=newStudentStats(teacherDashboard,externalCourseExecution)
+        def newCE = newCourseExecution("123")
+        def studentStats2=newStudentStats(teacherDashboard,newCE)
+
+        then: "see if added"
+        teacherDashboard.getCourseExecutionStudentStats(externalCourseExecution)==studentStats1
+        teacherDashboard.getCourseExecutionStudentStats(newCE)==studentStats2
+    }
+
+    @Unroll
+    def "create empty studentStats and use toString"() {
+        when: "a studentStats is created"
+        def newTeacher = new Teacher(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
+        userRepository.save(newTeacher)
+        def td = new TeacherDashboard(externalCourseExecution, newTeacher)
+        teacherDashboardRepository.save(td)
+        newStudentStats(td,externalCourseExecution)
+
+        then: "compare toString"
+        studentStatsRepository.count() == 1L
+        def result = studentStatsRepository.findAll().get(0)
+        result.toString()==td.getCourseExecutionStudentStats(externalCourseExecution).toString()
+    }
+
+    def createQuestion() {
+        def newQuestion = new Question()
+        newQuestion.setTitle("Question Title")
+        newQuestion.setCourse(externalCourse)
+        def questionDetails = new MultipleChoiceQuestion()
+        newQuestion.setQuestionDetails(questionDetails)
+        questionRepository.save(newQuestion)
+
+        def option = new Option()
+        option.setContent("Option Content")
+        option.setCorrect(true)
+        option.setSequence(0)
+        option.setQuestionDetails(questionDetails)
+        optionRepository.save(option)
+        def optionKO = new Option()
+        optionKO.setContent("Option Content")
+        optionKO.setCorrect(false)
+        optionKO.setSequence(1)
+        optionKO.setQuestionDetails(questionDetails)
+        optionRepository.save(optionKO)
+
+        return newQuestion;
+    }
+
+    def createQuiz(type = Quiz.QuizType.PROPOSED.toString()) {
+        def quiz = new Quiz()
+        quiz.setTitle("Quiz Title")
+        quiz.setType(type)
+        quiz.setCourseExecution(externalCourseExecution)
+        quiz.setCreationDate(DateHandler.now())
+        quiz.setAvailableDate(DateHandler.now())
+        quizRepository.save(quiz)
+        return quiz
+    }
+
+    def createQuizQuestion(quiz, question) {
+        def quizQuestion = new QuizQuestion(quiz, question, 0)
+        quizQuestionRepository.save(quizQuestion)
+        return quizQuestion
+    }
+
+    def answerQuiz(answered, correct, completed, quizQuestion, quiz,student ,date = DateHandler.now()) {
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setCompleted(completed)
+        quizAnswer.setCreationDate(date)
+        quizAnswer.setAnswerDate(date)
+        quizAnswer.setStudent(student)
+        quizAnswer.setQuiz(quiz)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setTimeTaken(1)
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        questionAnswerRepository.save(questionAnswer)
+
+        def answerDetails
+        def correctOption = quizQuestion.getQuestion().getQuestionDetails().getCorrectOption()
+        def incorrectOption = quizQuestion.getQuestion().getQuestionDetails().getOptions().stream().filter(option -> option != correctOption).findAny().orElse(null)
+        if (answered && correct) answerDetails = new MultipleChoiceAnswer(questionAnswer, correctOption)
+        else if (answered && !correct) answerDetails = new MultipleChoiceAnswer(questionAnswer, incorrectOption)
+        else {
+            questionAnswerRepository.save(questionAnswer)
+            return quizAnswer
+        }
+        questionAnswer.setAnswerDetails(answerDetails)
+        answerDetailsRepository.save(answerDetails)
+        return quizAnswer
+    }
+    def quizz(student,answered,correct)
+    {
+        def question = createQuestion()
+        def quiz = createQuiz()
+        def quizQuestion = createQuizQuestion(quiz, question)
+        def quizzAnswer = answerQuiz(answered, correct, true, quizQuestion, quiz,student)
+        student.getCourseExecutionDashboard(externalCourseExecution).statistics(quizzAnswer)
+    }
+    @Unroll
+    def "create an empty StudentStats populate it with less than 75 acc within 3 quizzes"() {
+        when: "a studentStats is created and the quizzes"
+        newStudentStats(teacherDashboard,externalCourseExecution)
+        def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+        for(int i=0;i<3;i++) {
+            quizz(student1,true,false)
+        }
+
+        then: "an empty studentStats is updated"
+        studentStatsRepository.count() == 1L
+        def result = studentStatsRepository.findAll().get(0)
+
+        result.update()
+        result.getNumStudent() == 2
+        result.getNumMore75CorrectQuestions() == 0
+        result.getNumAtLeast3Quizzes() == 1
+    }
+
+    @Unroll
+    def "create an empty StudentStats populate it with 2 students with 3 quizz each"() {
+        when: "a studentStats is created and the quizzes"
+        newStudentStats(teacherDashboard,externalCourseExecution)
+        def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+        newstudent(externalCourseExecution,"3")
+        for(int i=0;i<3;i++) {
+            quizz(student1,true,false)
+            quizz(student2,true,true)
+        }
+
+        then: "an empty studentStats is updated"
+        studentStatsRepository.count() == 1L
+        def result = studentStatsRepository.findAll().get(0)
+
+        result.update()
+        result.getNumStudent() == 3
+        result.getNumMore75CorrectQuestions() == 1
+        result.getNumAtLeast3Quizzes() == 2
+    }
+
+    @Unroll
+    def "create an empty StudentStats populate it with more than 75 acc within 15 quizzes quizzes from one student"() {
+        when: "a studentStats is created and the quizzes"
+        newStudentStats(teacherDashboard,externalCourseExecution)
+        def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+        newstudent(externalCourseExecution,"3")
+
+        for(int i=0;i<3;i++) {
+            for(int j=0;j<4;j++){quizz(student1,true,true)}
+            quizz(student1,true,false)
+            quizz(student2,true,false)
+        }
+
+        then: "an empty studentStats is updated"
+        studentStatsRepository.count() == 1L
+        def result = studentStatsRepository.findAll().get(0)
+
+        result.update()
+        result.getNumStudent() == 3
+        result.getNumMore75CorrectQuestions() == 1
+        result.getNumAtLeast3Quizzes() == 2
+    }
 
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
