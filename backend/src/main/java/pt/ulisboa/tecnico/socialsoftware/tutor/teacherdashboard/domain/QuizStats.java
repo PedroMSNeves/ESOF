@@ -1,5 +1,5 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain;
-
+ 
 import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
