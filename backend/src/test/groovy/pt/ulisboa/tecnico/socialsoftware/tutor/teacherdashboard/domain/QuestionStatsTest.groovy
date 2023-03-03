@@ -173,6 +173,23 @@ class QuestionStatsTest extends SpockTest {
         teacherDashboard.getQuestionStats().size() == 1
         teacherDashboard.getQuestionStats().contains(result)
     }
+    
+    @Unroll
+    def "create an empty QuestionStats and remove it"() {
+        when: "a QuestionStats is created"
+        def questionStats = newQuestionStats(externalCourseExecution, teacherDashboard)
+
+        then: "an empty questionStats is created and deleted"
+        //QestionStatsRepository.count() == 1L
+        def result = questionStats//studentStatsRepository.findAll().get(0)
+        result.getId() != 0
+        result.getCourseExecution().getId() == externalCourseExecution.getId()
+        result.getTeacherDashboard().getId() == teacherDashboard.getId()
+        result.remove()
+        and: "the teacherDashboard has no reference for the questionStats"
+        teacherDashboard.getQuestionStats().size() == 0
+    }
+    
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
 
