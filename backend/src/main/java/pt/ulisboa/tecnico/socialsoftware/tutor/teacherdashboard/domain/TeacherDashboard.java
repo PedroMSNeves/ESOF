@@ -51,7 +51,7 @@ public class TeacherDashboard implements DomainEntity {
 
     public void addQuestionStats(QuestionStats qst){
         if (questionStats.stream().anyMatch(questionStat1 -> questionStat1.getId() == qst.getId()) ) {
-            throw new TutorException(ErrorMessage.STUDENT_STATS_ALREADY_CREATED);
+            throw new TutorException(ErrorMessage.QUESTION_STAT_ALREADY_EXISTS);
         }
 
         this.questionStats.add(qst);

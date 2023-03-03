@@ -200,15 +200,12 @@ class QuestionStatsTest extends SpockTest {
         def student2 = newstudent(externalCourseExecution,"2")
         
         externalCourseExecution.addUser(student1)
+        externalCourseExecution.addUser(student2)
         
        	quizz(student1,true,false)
        	quizz(student2,false,false)
-        //def question_submission1 = newQuestionSubmission(externalCourseExecution, student1, question)
-        //def question_submission2 = newQuestionSubmission(externalCourseExecution, student2, question)
         
         then: "an empty questionStats is created and updated course that as 1 empty question"
-        //externalCourseExecution.addQuestionSubmission(question_submission1)
-        //externalCourseExecution.addQuestionSubmission(question_submission2)
         
         def result = questionStats//QuestionStatsRepository.findAll().get(0)
 
@@ -259,6 +256,61 @@ class QuestionStatsTest extends SpockTest {
         def result = questionStatsRepository.findAll().get(0)
         teacherDashboard.getCourseExecutionQuestionStats(externalCourseExecution)==result
         teacherDashboard.getCourseExecutionQuestionStats(newCE)==null
+    }
+    
+    @Unroll
+    def "create an empty QuestionStats and add it 2 times to teacherDashboard"() {
+        when: "a questionStats is created"
+        newQuestionStats(externalCourseExecution, teacherDashboard)
+
+        then: "try to add the StudenStats again"
+        questionStatsRepository.count() == 1L
+        def result = questionStatsRepository.findAll().get(0)
+        def c=0;
+
+        try {
+            teacherDashboard.addQuestionStats(result)
+        }
+        catch(Exception QUESTION_STAT_ALREADY_EXISTS) {
+            c=1
+        }
+        c==1
+    }
+    
+    @Unroll
+    def "create an empty QuestionStats and add it 2 times to teacherDashboard"() {
+        when: "a questionStats is created"
+        newQuestionStats(externalCourseExecution, teacherDashboard)
+        newQuestionStats(externalCourseExecution, teacherDashboard)
+
+        then: "try to add the StudenStats again"
+        questionStatsRepository.count() == 2L
+    }
+    
+    @Unroll
+    def "create an empty QuestionStats and update it from teacherDashboard"() {
+        when: "a questionStats is created and the quizzes"
+        newQuestionStats(externalCourseExecution, teacherDashboard)
+        def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+        newstudent(externalCourseExecution,"3")
+
+        for(int i=0;i<3;i++) {
+            for(int j=0;j<4;j++){
+            	quizz(student1,true,false)
+            }
+            quizz(student1,true,true)
+            quizz(student2,true,true)
+        }
+
+        then: "an empty studentStats is updated"
+        questionStatsRepository.count() == 1L
+        def result = questionStatsRepository.findAll().get(0)
+
+        teacherDashboard.update()
+        result.getNumQuestionsAvailable() == 18
+        result.getNumQuestionsAnsweredUniq() == 18
+        result.getAverageQuestionsAnsweredUniq() == 6
     }
     
 	
