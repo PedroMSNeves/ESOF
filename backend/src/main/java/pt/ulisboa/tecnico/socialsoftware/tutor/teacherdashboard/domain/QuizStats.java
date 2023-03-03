@@ -18,6 +18,7 @@ public class QuizStats implements DomainEntity {
     private Integer id;
     
     private int numQuizzes = 0;
+    private int uniqueQuizzesSolved = 0;
 
     @OneToOne
     private CourseExecution courseExecution;
@@ -51,6 +52,11 @@ public class QuizStats implements DomainEntity {
     }    
     public void setNumQuizzes(int value) {this.numQuizzes = value;}
 
+    public int getUniqueQuizzesSolved() {
+        return this.uniqueQuizzesSolved;
+    }
+    public void setUniqueQuizzesSolved(int value) {this.uniqueQuizzesSolved = value;}
+
     public void remove() {
         this.teacherDashboard.getQuizStats().remove(this);
         this.courseExecution = null;
@@ -66,7 +72,8 @@ public class QuizStats implements DomainEntity {
                 "id=" + getId() +
                 ", courseExecution=" + getCourseExecution() +
                 ", teacherDashboard=" + getTeacherDashboard() +
-                ", numQuiz=" + getNumQuizzes() + '}';
+                ", numQuiz=" + getNumQuizzes() + 
+                ", numUniqueQuizzes=" + getUniqueQuizzesSolved() +'}';
 
     }
 }
