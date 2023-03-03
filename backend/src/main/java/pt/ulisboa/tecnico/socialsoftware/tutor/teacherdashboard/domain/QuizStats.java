@@ -22,16 +22,24 @@ public class QuizStats implements DomainEntity {
     @OneToOne
     private CourseExecution courseExecution;
 
+    @ManyToOne
+    private TeacherDashboard teacherDashboard;
+
     public QuizStats() {
     }
 
     public QuizStats(CourseExecution courseExecution, TeacherDashboard teacherDashboard) {
         setCourseExecution(courseExecution);
+        setTeacherDashboard(teacherDashboard);        
     }
 
     public CourseExecution getCourseExecution(){ return courseExecution; }
     public void setCourseExecution(CourseExecution courseExecution) {
         this.courseExecution = courseExecution;
+    }
+    public TeacherDashboard getTeacherDashboard(){ return teacherDashboard; }
+    public void setTeacherDashboard(TeacherDashboard teacherDashboard){
+        this.teacherDashboard = teacherDashboard;
     }
 
     public Integer getId() {
@@ -44,8 +52,11 @@ public class QuizStats implements DomainEntity {
     public void setNumQuizzes(int value) {this.numQuizzes = value;}
 
     public void remove() {
+        this.teacherDashboard.getQuizStats().remove(this);
         this.courseExecution = null;
+        this.teacherDashboard = null;
     }
+
     public void accept(Visitor visitor) {
     }
 
@@ -54,6 +65,7 @@ public class QuizStats implements DomainEntity {
         return "QuizzesStats{" +
                 "id=" + getId() +
                 ", courseExecution=" + getCourseExecution() +
+                ", teacherDashboard=" + getTeacherDashboard() +
                 ", numQuiz=" + getNumQuizzes() + '}';
 
     }
