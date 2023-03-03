@@ -1,9 +1,16 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+
+
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuestionStats;
+import java.util.HashSet;
+import java.util.Set;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
 import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
@@ -26,6 +33,9 @@ public class TeacherDashboard implements DomainEntity {
 
     @ManyToOne
     private Teacher teacher;
+    
+    @OneToMany
+    private final Set<QuestionStats> questionStats = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacherDashboard", orphanRemoval = true)
     private final Set<StudentStats> studentStats = new HashSet<>();
@@ -106,6 +116,17 @@ public class TeacherDashboard implements DomainEntity {
     public void accept(Visitor visitor) {
         // Only used for XML generation
     }
+    
+    public Set<QuestionStats> getQuestionStats(){
+        return this.questionStats;
+    }
+    
+    public QuestionStats getCourseExecutionQuestionStats(CourseExecution ce) {
+    	return this.getQuestionStats().stream()
+    			.filter(ss -> ss.getCourseExecution() == ce)
+    			.findAny().orElse(null);
+    }
+
 
     @Override
     public String toString() {
