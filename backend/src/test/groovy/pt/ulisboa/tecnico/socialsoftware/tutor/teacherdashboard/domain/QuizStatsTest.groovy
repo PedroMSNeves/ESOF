@@ -277,6 +277,85 @@ class QuizStatsTest extends SpockTest {
         result.getUniqueQuizzesSolved() == 1
         result.getAverageQuizzesSolved() == 1
     }
+
+    @Unroll
+    def "create two quizzes for two students"() {
+        when: "the quizStats are created"
+        newQuizStats(teacherDashboard, externalCourseExecution)
+        def quiz = newQuiz(externalCourseExecution)
+        def quiz2 = newQuiz(externalCourseExecution)
+        def student = newStudent(externalCourseExecution,"toni")
+        def student2 = newStudent(externalCourseExecution,"inot")
+        def quizAnswer = createQuizAnswer(student, quiz)
+        def quizAnser2 = createQuizAnswer(student2, quiz2)
+        
+        then: "compare and update the course with one quiz"
+        quizStatsRepository.count() == 1L
+        def result = quizStatsRepository.findAll().get(0)
+        result.update()
+        result.getNumQuizzes() == 2
+        result.getUniqueQuizzesSolved() == 2
+        result.getAverageQuizzesSolved() == 1
+    }
+	
+	@Unroll
+	def "create two quizzes and add them to one student"() {
+		when: "the quizStats are created"
+		newQuizStats(teacherDashboard, externalCourseExecution)
+		def quiz = newQuiz(externalCourseExecution)
+		def quiz2 = newQuiz(externalCourseExecution)
+		def student = newStudent(externalCourseExecution,"toni")
+		def quizAnswer = createQuizAnswer(student, quiz)
+		def quizAnswer2 = createQuizAnswer(student, quiz2)
+		
+		then: "compare and update the course"
+		quizStatsRepository.count() == 1L
+		def result = quizStatsRepository.findAll().get(0)
+		result.update()
+		result.getNumQuizzes() == 2
+		result.getUniqueQuizzesSolved() == 2
+		result.getAverageQuizzesSolved() == 2
+	}
+
+    @Unroll
+    def "create two quizzes for a student and another student with no quizzes"() {
+        when: "the quizStats are created"
+		newQuizStats(teacherDashboard, externalCourseExecution)
+		def quiz = newQuiz(externalCourseExecution)
+		def quiz2 = newQuiz(externalCourseExecution)
+		def student = newStudent(externalCourseExecution,"toni")
+        def student2 = newStudent(externalCourseExecution,"inot")
+		def quizAnswer = createQuizAnswer(student, quiz)
+		def quizAnswer2 = createQuizAnswer(student, quiz2)
+		
+		then: "compare and update the course"
+		quizStatsRepository.count() == 1L
+		def result = quizStatsRepository.findAll().get(0)
+		result.update()
+		result.getNumQuizzes() == 2
+		result.getUniqueQuizzesSolved() == 2
+		result.getAverageQuizzesSolved() == 1
+    }
+
+    @Unroll
+    def "create a quiz for a student not in the course and one in the course"() {
+        when: "the quizStats is created"
+        newQuizStats(teacherDashboard, externalCourseExecution)
+		def quiz = newQuiz(externalCourseExecution)
+        def ce = newCourseExecution("456")
+		def quiz2 = newQuiz(ce)
+		def student = newStudent(externalCourseExecution,"toni")
+		def quizAnswer = createQuizAnswer(student, quiz)
+		def quizAnswer2 = createQuizAnswer(student, quiz2)
+		
+		then: "compare and update the course"
+		quizStatsRepository.count() == 1L
+		def result = quizStatsRepository.findAll().get(0)
+		result.update()
+		result.getNumQuizzes() == 1
+		result.getUniqueQuizzesSolved() == 1
+		result.getAverageQuizzesSolved() == 1
+    }
         
     @Unroll
     def "create a quizStats and update it using teacherDashboard"() {
