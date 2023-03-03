@@ -114,6 +114,9 @@ public class TeacherDashboard implements DomainEntity {
         for(QuizStats quizStats: getQuizStats()) {
             quizStats.update();
         }
+        for(QuestionStats qst: getQuestionStats()) {
+            qst.update();
+        }
     }
 
     public Set<QuizStats> getQuizStats() {return this.quizStats;}
@@ -129,12 +132,6 @@ public class TeacherDashboard implements DomainEntity {
                 .filter(ss -> ss.getCourseExecution() == courseExecution)
                 .findAny()
                 .orElse(null);
-    }
-
-    public void update() {
-        for(QuestionStats qst: getQuestionStats()) {
-            qst.update();
-        }
     }
 
     public void accept(Visitor visitor) {
