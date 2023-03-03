@@ -94,6 +94,13 @@ public class TeacherDashboard implements DomainEntity {
                 .orElse(null);
     }
 
+    public void addQuizStats(QuizStats value) {
+        if(quizStats.stream().anyMatch(quizStat1 -> quizStat1.getId() == value.getId())) {
+            throw new TutorException(ErrorMessage.QUIZ_STATS_ALREADY_CREATED);
+        }
+        quizStats.add(value);
+    }
+
     public void accept(Visitor visitor) {
         // Only used for XML generation
     }
@@ -108,3 +115,4 @@ public class TeacherDashboard implements DomainEntity {
     }
 
 }
+
