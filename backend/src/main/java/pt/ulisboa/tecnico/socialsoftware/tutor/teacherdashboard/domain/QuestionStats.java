@@ -24,6 +24,8 @@ public class QuestionStats implements DomainEntity {
     private Integer id;
 
     private int numQuestionsAvailable = 0;
+
+    private int numQuestionsAnswersuniq = 0;
     
     @OneToOne
     private CourseExecution courseExecution;
@@ -58,19 +60,30 @@ public class QuestionStats implements DomainEntity {
         return this.teacherDashboard;
     }
 
+    public int getNumQuestionsAnswersuniq(){
+        return this.numQuestionsAnswersuniq;
+    }
+
     
     //SET
     public void setNumQuestionsAvailable(int numQuestionsavailable) {
         this.numQuestionsAvailable = numQuestionsavailable;
     }
 
+    public void setNumQuestionsAnswersuniq(int numQuestionsAnswersuniq) {
+        this.numQuestionsAnswersuniq = numQuestionsAnswersuniq;
+    }
+
     public void setCourseExecution(CourseExecution courseExecution) {
         this.courseExecution = courseExecution;
     }
 
+
     public void setTeacherDashboard(TeacherDashboard teacherDashboard) {
         this.teacherDashboard = teacherDashboard;
     }
+
+
 
     public void accept(Visitor visitor) {
         // Only used for XML generation
