@@ -54,6 +54,8 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.utils.Mailer
 import spock.lang.Shared
 import spock.lang.Specification
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.QuizStatsRepository
+
 import java.time.LocalDateTime
 
 class SpockTest extends Specification {
@@ -297,9 +299,13 @@ class SpockTest extends Specification {
     @Autowired
     DemoService demoService
 
+    @Autowired
+    QuizStatsRepository quizStatsRepository
+
     Course externalCourse
     @Shared
     CourseExecution externalCourseExecution
+
 
     def createExternalCourseAndExecution() {
         externalCourse = new Course(COURSE_1_NAME, Course.Type.TECNICO)
@@ -342,3 +348,4 @@ class SpockTest extends Specification {
         restClient.headers['Authorization'] = "Bearer " + loggedUser.data.token
     }
 }
+

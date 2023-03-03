@@ -4,6 +4,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage;
+import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException;
+
 import java.util.Set;
 import java.util.HashSet;
 
@@ -67,6 +70,13 @@ public class TeacherDashboard implements DomainEntity {
                 .filter(ss -> ss.getCourseExecution() == courseExecution)
                 .findAny()
                 .orElse(null);
+    }
+
+    public void addQuizStats(QuizStats value) {
+        if(quizStats.stream().anyMatch(quizStat1 -> quizStat1.getId() == value.getId())) {
+            throw new TutorException(ErrorMessage.QUIZ_STATS_ALREADY_CREATED);
+        }
+        quizStats.add(value);
     }
 
     public void accept(Visitor visitor) {
