@@ -60,7 +60,7 @@ public class QuestionStats implements DomainEntity {
         return this.teacherDashboard;
     }
 
-    public int getNumQuestionsAnswersuniq(){
+    public int getNumQuestionsAnswersedUniq(){
         return this.numQuestionsAnswersuniq;
     }
 
@@ -98,7 +98,8 @@ public class QuestionStats implements DomainEntity {
     @Override
     public String toString() {
         return "QuestionStats{" + "id = " + getId() + ",courseExecution = " + getCourseExecution() + ",teacherDashboard = "
-                + getTeacherDashboard() + ",NumQuestionsAvailable = " + getNumQuestionsAvailable() + "}";
+                + getTeacherDashboard() + ",NumQuestionsAvailable = " + getNumQuestionsAvailable()
+                + ",NumQuestionsAnsweredUniq = " + getNumQuestionsAnswersedUniq() + "}";
     }
 
 

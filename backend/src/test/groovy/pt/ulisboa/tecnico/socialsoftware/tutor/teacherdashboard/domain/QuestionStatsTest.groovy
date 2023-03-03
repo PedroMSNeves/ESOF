@@ -166,6 +166,8 @@ class QuestionStatsTest extends SpockTest {
         //QuestionStatsRepository.count() == 1L
         def result = questionStats//studentStatsRepository.findAll().get(0)
         result.getId() != 0
+        result.getNumQuestionsAvailable() == 0
+        result.getNumQuestionsAnswersedUniq() == 0
         result.getCourseExecution().getId() == externalCourseExecution.getId()
         result.getTeacherDashboard().getId() == teacherDashboard.getId()
 
