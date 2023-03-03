@@ -229,8 +229,94 @@ class QuestionStatsTest extends SpockTest {
         result.getNumQuestionsAnsweredUniq() == 0
         result.getAverageQuestionsAnsweredUniq() == 0
     }
-    
-    
+
+    @Unroll
+    def "create empty QuestionStats and use toString"() {
+        when: "a QuestionStats is created"
+
+        def newTeacher = new Teacher(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
+        userRepository.save(newTeacher)
+
+        def td = new TeacherDashboard(externalCourseExecution, newTeacher)
+        teacherDashboardRepository.save(td)
+        newQuestionStats(externalCourseExecution, td)
+
+        then: "compare toString"
+        questionStatsRepository.count() == 1L
+        def result = questionStatsRepository.findAll().get(0)
+        result.toString()==td.getCourseExecutionQuestionStats(externalCourseExecution).toString()
+    }
+
+    @Unroll
+    def "create an empty StudentStats and get it from teacherdashboard with the course"() {
+        when: "a studentStats is created"
+        newQuestionStats(externalCourseExecution, teacherDashboard)
+        def newCE = newCourseExecution("123")
+
+        then: "an empty studentStats is created and get from teacherdashboard with the course"
+        questionStatsRepository.count() == 1L
+        def result = questionStatsRepository.findAll().get(0)
+        teacherDashboard.getCourseExecutionQuestionStats(externalCourseExecution)==result
+        teacherDashboard.getCourseExecutionQuestionStats(newCE)==null
+    }
+
+    @Unroll
+    def "create an empty QuestionStats and add it 2 times to teacherDashboard"() {
+        when: "a questionStats is created"
+        newQuestionStats(externalCourseExecution, teacherDashboard)
+
+        then: "try to add the StudenStats again"
+        questionStatsRepository.count() == 1L
+        def result = questionStatsRepository.findAll().get(0)
+        def c=0;
+
+        try {
+            teacherDashboard.addQuestionStats(result)
+        }
+        catch(Exception QUESTION_STAT_ALREADY_EXISTS) {
+            c=1
+        }
+        c==1
+    }
+
+    @Unroll
+    def "create 2 empty QuestionStats and add it 2 times to teacherDashboard"() {
+        when: "a questionStats is created"
+        newQuestionStats(externalCourseExecution, teacherDashboard)
+        newQuestionStats(externalCourseExecution, teacherDashboard)
+
+        then: "try to add the StudenStats again"
+        questionStatsRepository.count() == 2L
+    }
+
+    @Unroll
+    def "create an empty QuestionStats and update it from teacherDashboard"() {
+        when: "a questionStats is created and the quizzes"
+        newQuestionStats(externalCourseExecution, teacherDashboard)
+        def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+        newstudent(externalCourseExecution,"3")
+
+        for(int i=0;i<3;i++) {
+            for(int j=0;j<4;j++){
+                quizz(student1,true,false)
+            }
+            quizz(student1,true,true)
+            quizz(student2,true,true)
+        }
+
+        then: "an empty studentStats is updated"
+        questionStatsRepository.count() == 1L
+        def result = questionStatsRepository.findAll().get(0)
+
+        teacherDashboard.update()
+        result.getNumQuestionsAvailable() == 18
+        result.getNumQuestionsAnsweredUniq() == 18
+        result.getAverageQuestionsAnsweredUniq() == 6
+    }
+
+
+
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
 
