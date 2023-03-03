@@ -83,6 +83,9 @@ public class TeacherDashboard implements DomainEntity {
         for(StudentStats st: getStudentStats()) {
             st.update();
         }
+        for(QuizStats quizStats: getQuizStats()) {
+            quizStats.update();
+        }
     }
 
     public Set<QuizStats> getQuizStats() {return this.quizStats;}
@@ -93,13 +96,6 @@ public class TeacherDashboard implements DomainEntity {
         }
         quizStats.add(value);
     }
-
-    public void update() {
-        for(QuizStats quizStats: this.quizStats) {
-            quizStats.update();
-        }
-    }
-
     public QuizStats getCourseExecutionQuizStats(CourseExecution courseExecution) {
         return getQuizStats().stream()
                 .filter(ss -> ss.getCourseExecution() == courseExecution)
