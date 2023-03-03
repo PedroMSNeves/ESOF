@@ -96,6 +96,64 @@ class QuizStatsTest extends SpockTest {
         teacherDashboard.getCourseExecutionQuizStats(newCE)==null
     }
 
+    @Unroll
+    def "create an empty QuizStats and alter it"() {
+        when: "a quizStats is created"
+        def quizStats = newQuizStats(teacherDashboard, externalCourseExecution)
+        quizStats.setNumQuizzes(4)
+        then: "compare if is created correctly"
+        quizStatsRepository.count() == 1L
+        def result = quizStatsRepository.findAll().get(0)
+        result.getNumQuizzes() == 4
+    }
+
+    @Unroll
+    def "create an empty QuizStats and add it 2 times to teacherDashboard"() {
+        when: "a quizStats is created"
+        newQuizStats(teacherDashboard,externalCourseExecution)
+
+        then: "try to add the quizStats again"
+        quizStatsRepository.count() == 1L
+        def result = quizStatsRepository.findAll().get(0)
+        def c=0;
+
+        try {
+            teacherDashboard.addQuizStats(result)
+        }
+        catch(Exception QUIZ_STATS_ALREADY_CREATED) {
+            c=1
+        }
+        c==1
+    }
+
+    @Unroll
+    def "create 2 empty QuizStats and add them to teacherDashboard"() {
+        when: "a quizStats is created and add to teacherDashboard"
+        def quizStats1=newQuizStats(teacherDashboard,externalCourseExecution)
+        def newCE = newCourseExecution("321")
+        def quizStats2=newQuizStats(teacherDashboard,newCE)
+
+        then: "see if added"
+        teacherDashboard.getCourseExecutionQuizStats(externalCourseExecution)==quizStats1
+        teacherDashboard.getCourseExecutionQuizStats(newCE)==quizStats2
+    }
+
+    @Unroll
+    def "create empty quizStats and use toString"() {
+        when: "a quizStats is created"
+        def newTeacher = new Teacher(USER_1_NAME, USER_1_USERNAME, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
+        userRepository.save(newTeacher)
+        def td = new TeacherDashboard(externalCourseExecution, newTeacher)
+        teacherDashboardRepository.save(td)
+        newQuizStats(td,externalCourseExecution)
+
+        then: "compare toString"
+        quizStatsRepository.count() == 1L
+        def result = quizStatsRepository.findAll().get(0)
+        result.toString()==td.getCourseExecutionQuizStats(externalCourseExecution).toString()
+    }
+
+    
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
 }
