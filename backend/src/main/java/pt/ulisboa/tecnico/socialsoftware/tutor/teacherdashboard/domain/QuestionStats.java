@@ -75,5 +75,18 @@ public class QuestionStats implements DomainEntity {
     public void accept(Visitor visitor) {
         // Only used for XML generation
     }
+    
+    public void remove() {
+    	this.getTeacherDashboard().getQuestionStats().remove(this);
+        this.courseExecution = null;
+        this.teacherDashboard = null;
+    }
+    
+    @Override
+    public String toString() {
+        return "QuestionStats{" + "id = " + getId() + ",courseExecution = " + getCourseExecution() + ",teacherDashboard = "
+                + getTeacherDashboard() + ",NumQuestionsAvailable = " + getNumQuestionsAvailable() + "}";
+    }
+
 
 }
