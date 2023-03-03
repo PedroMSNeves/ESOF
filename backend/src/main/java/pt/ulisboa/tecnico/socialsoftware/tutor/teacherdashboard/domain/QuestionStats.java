@@ -26,6 +26,8 @@ public class QuestionStats implements DomainEntity {
     private int numQuestionsAvailable = 0;
 
     private int numQuestionsAnswersuniq = 0;
+
+    private float averageQuestionsAnsweredUniq = 0;
     
     @OneToOne
     private CourseExecution courseExecution;
@@ -64,7 +66,10 @@ public class QuestionStats implements DomainEntity {
         return this.numQuestionsAnswersuniq;
     }
 
-    
+    public float getAverageQuestionsAnsweredUniq() {
+        return this.averageQuestionsAnsweredUniq;
+    }
+
     //SET
     public void setNumQuestionsAvailable(int numQuestionsavailable) {
         this.numQuestionsAvailable = numQuestionsavailable;
@@ -72,6 +77,10 @@ public class QuestionStats implements DomainEntity {
 
     public void setNumQuestionsAnswersuniq(int numQuestionsAnswersuniq) {
         this.numQuestionsAnswersuniq = numQuestionsAnswersuniq;
+    }
+
+    public void setAverageQuestionsAnsweredUniq(float averageQuestionsAnsweredUniq) {
+        this.averageQuestionsAnsweredUniq = averageQuestionsAnsweredUniq;
     }
 
     public void setCourseExecution(CourseExecution courseExecution) {
