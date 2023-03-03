@@ -62,7 +62,7 @@ public class QuestionStats implements DomainEntity {
         return this.teacherDashboard;
     }
 
-    public int getNumQuestionsAnswersedUniq(){
+    public int getNumQuestionsAnsweredUniq(){
         return this.numQuestionsAnswersuniq;
     }
 
@@ -75,7 +75,7 @@ public class QuestionStats implements DomainEntity {
         this.numQuestionsAvailable = numQuestionsavailable;
     }
 
-    public void setNumQuestionsAnswersuniq(int numQuestionsAnswersuniq) {
+    public void setNumQuestionsAnsweredUniq(int numQuestionsAnswersuniq) {
         this.numQuestionsAnswersuniq = numQuestionsAnswersuniq;
     }
 
@@ -104,11 +104,43 @@ public class QuestionStats implements DomainEntity {
         this.teacherDashboard = null;
     }
     
+    public void update() {
+    	this.setNumQuestionsAvailable(0);
+    	this.setNumQuestionsAnsweredUniq(0);
+    	this.setAverageQuestionsAnsweredUniq(0);
+    	int count = 0;
+        float average = 0;
+
+        this.setNumQuestionsAvailable(this.courseExecution.getNumberOfQuestions());
+        Set<Student> students = this.courseExecution.getStudents();
+        if (students.size() != 0) {
+        	for (Student stu : students) {
+        		Set<QuizAnswer> quizAnswers = stu.getQuizAnswers();
+        		Set<Question> questions = new HashSet<>();
+        		for (QuizAnswer qt : quizAnswers) {
+        			List<QuestionAnswer> questionAnswers = qt.getQuestionAnswers();
+        			for(QuestionAnswer qa: questionAnswers) {
+        				QuizQuestion quizQuestion = qa.getQuizQuestion();
+        				Question question = quizQuestion.getQuestion();
+        				questions.add(question);
+        			}
+        		}
+        		count += questions.size();
+        	}
+        	this.setNumQuestionsAnsweredUniq(count);
+        	average =  count / (students.size());
+        	this.setAverageQuestionsAnsweredUniq(average);
+        } else {
+        	this.setNumQuestionsAnsweredUniq(0);
+        	this.setAverageQuestionsAnsweredUniq(0);
+        }
+    }
+    
     @Override
     public String toString() {
         return "QuestionStats{" + "id = " + getId() + ",courseExecution = " + getCourseExecution() + ",teacherDashboard = "
                 + getTeacherDashboard() + ",NumQuestionsAvailable = " + getNumQuestionsAvailable()
-                + ",NumQuestionsAnsweredUniq = " + getNumQuestionsAnswersedUniq() + "}";
+                + ",NumQuestionsAnsweredUniq = " + getNumQuestionsAnsweredUniq() + "}";
     }
 
 

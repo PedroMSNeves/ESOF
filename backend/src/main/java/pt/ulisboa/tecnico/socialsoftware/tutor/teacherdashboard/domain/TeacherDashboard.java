@@ -33,7 +33,7 @@ public class TeacherDashboard implements DomainEntity {
 
     @ManyToOne
     private Teacher teacher;
-    
+
     @OneToMany
     private final Set<QuestionStats> questionStats = new HashSet<>();
 
@@ -49,6 +49,24 @@ public class TeacherDashboard implements DomainEntity {
     public TeacherDashboard(CourseExecution courseExecution, Teacher teacher) {
         setCourseExecution(courseExecution);
         setTeacher(teacher);
+    }
+
+    public Set<QuestionStats> getQuestionStats(){
+        return this.questionStats;
+    }
+    
+    public QuestionStats getCourseExecutionQuestionStats(CourseExecution ce) {
+    	return this.getQuestionStats().stream()
+    			.filter(ss -> ss.getCourseExecution() == ce)
+    			.findAny().orElse(null);
+    }
+
+    public void addQuestionStats(QuestionStats qst){
+        if (questionStats.stream().anyMatch(questionStat1 -> questionStat1.getId() == qst.getId()) ) {
+            throw new TutorException(ErrorMessage.QUESTIONS_STATS_ALREADY_STORED);
+        }
+
+        this.questionStats.add(qst);
     }
 
     public void remove() {
@@ -113,29 +131,15 @@ public class TeacherDashboard implements DomainEntity {
                 .orElse(null);
     }
 
+    public void update() {
+        for(QuestionStats qst: getQuestionStats()) {
+            qst.update();
+        }
+    }
+
     public void accept(Visitor visitor) {
         // Only used for XML generation
     }
-    
-    public Set<QuestionStats> getQuestionStats(){
-        return this.questionStats;
-    }
-    
-    public QuestionStats getCourseExecutionQuestionStats(CourseExecution ce) {
-    	return this.getQuestionStats().stream()
-    			.filter(ss -> ss.getCourseExecution() == ce)
-    			.findAny().orElse(null);
-    }
-
-    public void addQuestionStats(QuestionStats qst){
-        if (questionStats.stream().anyMatch(questionStat1 -> questionStat1.getId() == qst.getId()) ) {
-            throw new TutorException(ErrorMessage.QUESTIONS_STATS_ALREADY_STORED);
-        }
-
-        this.questionStats.add(qst);
-    }
-
-
 
     @Override
     public String toString() {
