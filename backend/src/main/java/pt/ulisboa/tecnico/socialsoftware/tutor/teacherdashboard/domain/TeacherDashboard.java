@@ -79,6 +79,15 @@ public class TeacherDashboard implements DomainEntity {
     			.findAny().orElse(null);
     }
 
+    public void addQuestionStats(QuestionStats qst){
+        if (questionStats.stream().anyMatch(questionStat1 -> questionStat1.getId() == qst.getId()) ) {
+            throw new TutorException(ErrorMessage.QUESTIONS_STATS_ALREADY_STORED);
+        }
+
+        this.questionStats.add(qst);
+    }
+
+
 
     @Override
     public String toString() {
