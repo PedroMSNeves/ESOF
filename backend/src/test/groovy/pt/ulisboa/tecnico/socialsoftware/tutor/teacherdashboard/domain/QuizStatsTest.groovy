@@ -101,10 +101,14 @@ class QuizStatsTest extends SpockTest {
         when: "a quizStats is created"
         def quizStats = newQuizStats(teacherDashboard, externalCourseExecution)
         quizStats.setNumQuizzes(4)
+        quizStats.setUniqueQuizzesSolved(3)
+        quizStats.setAverageQuizzesSolved(0.5) 
         then: "compare if is created correctly"
         quizStatsRepository.count() == 1L
         def result = quizStatsRepository.findAll().get(0)
         result.getNumQuizzes() == 4
+        result.getUniqueQuizzesSolved() == 3
+        result.getAverageQuizzesSolved() == 0.5
     }
 
     @Unroll
