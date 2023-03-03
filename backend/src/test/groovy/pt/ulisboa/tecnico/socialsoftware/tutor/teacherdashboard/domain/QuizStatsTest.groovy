@@ -356,6 +356,21 @@ class QuizStatsTest extends SpockTest {
 		result.getUniqueQuizzesSolved() == 1
 		result.getAverageQuizzesSolved() == 1
     }
+    
+    @Unroll
+    def "create a quizStats and update it using teacherDashboard"() {
+        when: "a quizStats is created"
+        newQuizStats(teacherDashboard, externalCourseExecution) 
+        def quiz = newQuiz(externalCourseExecution)
+        then: "compare and update the course that has 1 empty quiz"
+        quizStatsRepository.count() == 1L
+        def result = quizStatsRepository.findAll().get(0)
+        teacherDashboard.update()
+        result.getNumQuizzes() == 1
+        result.getUniqueQuizzesSolved() == 0
+        result.getAverageQuizzesSolved() == 0
+    }
+    
 
 
     @TestConfiguration
