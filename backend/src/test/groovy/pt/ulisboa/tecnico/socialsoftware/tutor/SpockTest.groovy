@@ -12,6 +12,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.auth.AuthUserService
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.dto.AuthPasswordDto
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.repository.AuthUserRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.studentdashboard.repository.StudentDashboardRepository
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.QuestionStatsRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.TeacherDashboardRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.studentdashboard.repository.DifficultQuestionRepository
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.StudentStatsRepository
@@ -306,10 +307,12 @@ class SpockTest extends Specification {
     @Autowired
     QuizStatsRepository quizStatsRepository
 
+    @Autowired
+    QuestionStatsRepository questionStatsRepository
+
     Course externalCourse
     @Shared
     CourseExecution externalCourseExecution
-
 
     def createExternalCourseAndExecution() {
         externalCourse = new Course(COURSE_1_NAME, Course.Type.TECNICO)
@@ -352,4 +355,3 @@ class SpockTest extends Specification {
         restClient.headers['Authorization'] = "Bearer " + loggedUser.data.token
     }
 }
-

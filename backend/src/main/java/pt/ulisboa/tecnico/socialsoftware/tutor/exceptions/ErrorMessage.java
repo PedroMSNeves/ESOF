@@ -176,9 +176,8 @@ public enum ErrorMessage {
     CANNOT_CREATE_FAILED_ANSWER("Cannot create failed answer"),
     CANNOT_REMOVE_FAILED_ANSWER("Cannot remove failed answer"),
     STUDENT_STATS_ALREADY_CREATED("StudentStats already added"),
-    QUIZ_STATS_ALREADY_CREATED("QuizStats already created");
-
-
+    QUIZ_STATS_ALREADY_CREATED("QuizStats already created"),
+    QUESTIONS_STATS_ALREADY_STORED("QuestionsStats already exists");
 
     public final String label;
 
