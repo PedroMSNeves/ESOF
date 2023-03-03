@@ -65,18 +65,24 @@ public class TeacherDashboard implements DomainEntity {
 
     public Set<QuizStats> getQuizStats() {return this.quizStats;}
 
-    public QuizStats getCourseExecutionQuizStats(CourseExecution courseExecution) {
-        return getQuizStats().stream()
-                .filter(ss -> ss.getCourseExecution() == courseExecution)
-                .findAny()
-                .orElse(null);
-    }
-
     public void addQuizStats(QuizStats value) {
         if(quizStats.stream().anyMatch(quizStat1 -> quizStat1.getId() == value.getId())) {
             throw new TutorException(ErrorMessage.QUIZ_STATS_ALREADY_CREATED);
         }
         quizStats.add(value);
+    }
+
+    public void update() {
+        for(QuizStats quizStats: this.quizStats) {
+            quizStats.update();
+        }
+    }
+
+    public QuizStats getCourseExecutionQuizStats(CourseExecution courseExecution) {
+        return getQuizStats().stream()
+                .filter(ss -> ss.getCourseExecution() == courseExecution)
+                .findAny()
+                .orElse(null);
     }
 
     public void accept(Visitor visitor) {
