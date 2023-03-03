@@ -29,6 +29,10 @@ public class TeacherDashboard implements DomainEntity {
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacherDashboard", orphanRemoval = true)
     private final Set<StudentStats> studentStats = new HashSet<>();
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacherDashboard", orphanRemoval = true)
+    private final Set<QuizStats> quizStats = new HashSet<>();
+
     public TeacherDashboard() {
     }
 
@@ -79,6 +83,15 @@ public class TeacherDashboard implements DomainEntity {
         for(StudentStats st: getStudentStats()) {
             st.update();
         }
+    }
+
+    public Set<QuizStats> getQuizStats() {return this.quizStats;}
+
+    public QuizStats getCourseExecutionQuizStats(CourseExecution courseExecution) {
+        return getQuizStats().stream()
+                .filter(ss -> ss.getCourseExecution() == courseExecution)
+                .findAny()
+                .orElse(null);
     }
 
     public void accept(Visitor visitor) {
