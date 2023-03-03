@@ -167,7 +167,8 @@ class QuestionStatsTest extends SpockTest {
         def result = questionStats//studentStatsRepository.findAll().get(0)
         result.getId() != 0
         result.getNumQuestionsAvailable() == 0
-        result.getNumQuestionsAnswersedUniq() == 0
+        result.getNumQuestionsAnsweredUniq() == 0
+        result.getAverageQuestionsAnsweredUniq() == 0
         result.getCourseExecution().getId() == externalCourseExecution.getId()
         result.getTeacherDashboard().getId() == teacherDashboard.getId()
 
@@ -191,6 +192,44 @@ class QuestionStatsTest extends SpockTest {
         and: "the teacherDashboard has no reference for the questionStats"
         teacherDashboard.getQuestionStats().size() == 0
     }
+    
+    @Unroll
+    def "create an empty QuestionStats and updated with course that as 1 empty question"() {
+        when: "a questionStats is created"
+        def questionStats = newQuestionStats(externalCourseExecution, teacherDashboard)
+        
+        def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+        
+        externalCourseExecution.addUser(student1)
+        externalCourseExecution.addUser(student2)
+        
+       	quizz(student1,true,false)
+       	quizz(student2,false,false)
+        
+        then: "an empty questionStats is created and updated course that as 1 empty question"
+        
+        def result = questionStats//QuestionStatsRepository.findAll().get(0)
+
+        result.update()
+        result.getNumQuestionsAvailable() == 2
+        result.getNumQuestionsAnsweredUniq() == 2
+        result.getAverageQuestionsAnsweredUniq() == 1
+    }
+
+    @Unroll
+    def "create an empty QuestionStats and updated with course that as 1 question but question does not have it"() {
+        when: "a QuestionStats is created and a studentDashboard"
+        def questionStats = newQuestionStats(externalCourseExecution, teacherDashboard)
+		
+		then: ""
+		def result = questionStats
+        questionStats.update()
+        result.getNumQuestionsAvailable() == 0
+        result.getNumQuestionsAnsweredUniq() == 0
+        result.getAverageQuestionsAnsweredUniq() == 0
+    }
+    
     
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
