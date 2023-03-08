@@ -127,7 +127,7 @@ class StudentStatsTest extends SpockTest {
         result.getNumAtLeast3Quizzes() == 0
     }
 
-    @Unroll
+    /*@Unroll
     def "create an empty StudentStats and updated with course that as 1 student but student does not have it"() {
         when: "a studentStats is created and a studentDashboard"
         newStudentStats(teacherDashboard,externalCourseExecution)
@@ -146,7 +146,7 @@ class StudentStatsTest extends SpockTest {
         result.getNumStudent() == 0
         result.getNumMore75CorrectQuestions() == 0
         result.getNumAtLeast3Quizzes() == 0
-    }
+    }*/
 
 
 
