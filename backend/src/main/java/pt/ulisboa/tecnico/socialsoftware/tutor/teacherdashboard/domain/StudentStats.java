@@ -35,6 +35,7 @@ public class StudentStats implements DomainEntity {
     public StudentStats(CourseExecution courseExecution, TeacherDashboard teacherDashboard) {
         setCourseExecution(courseExecution);
         setTeacherDashboard(teacherDashboard);
+        teacherDashboard.addStudentStats(this);
     }
 
     public CourseExecution getCourseExecution(){ return courseExecution; }
@@ -93,7 +94,7 @@ public class StudentStats implements DomainEntity {
 
         for (Student st : students) {
             StudentDashboard stdb= st.getCourseExecutionDashboard(getCourseExecution());
-            if(stdb==null){continue;}
+            if(stdb==null){continue;}//ir pelo student
 
             this.addNumStudent();
             if((stdb.getNumberOfTeacherQuizzes() + stdb.getNumberOfStudentQuizzes() + stdb.getNumberOfInClassQuizzes())>=3) {this.addNumAtLeast3Quizzes();}
