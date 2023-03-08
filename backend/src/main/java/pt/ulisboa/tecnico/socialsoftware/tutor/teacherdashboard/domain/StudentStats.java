@@ -8,6 +8,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.DomainEntity;
 import pt.ulisboa.tecnico.socialsoftware.tutor.impexp.domain.Visitor;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User;
+import pt.ulisboa.tecnico.socialsoftware.tutor.answer.domain.QuizAnswer;
 
 import java.util.Optional;
 import javax.persistence.*;
@@ -93,16 +94,21 @@ public class StudentStats implements DomainEntity {
         Set<Student> students = courseExecution.getStudents();
 
         for (Student st : students) {
-            StudentDashboard stdb= st.getCourseExecutionDashboard(getCourseExecution());
-            if(stdb==null){continue;}//ir pelo student
-
+            int totalq=0;
+            int trueq=0;
             this.addNumStudent();
-            if((stdb.getNumberOfTeacherQuizzes() + stdb.getNumberOfStudentQuizzes() + stdb.getNumberOfInClassQuizzes())>=3) {this.addNumAtLeast3Quizzes();}
-
-            if((stdb.getNumberOfTeacherAnswers() + stdb.getNumberOfStudentAnswers() + stdb.getNumberOfInClassAnswers()>0) &&
-                    (((stdb.getNumberOfCorrectTeacherAnswers() + stdb.getNumberOfCorrectStudentAnswers() + stdb.getNumberOfCorrectInClassAnswers())*100/
-                            (stdb.getNumberOfTeacherAnswers() + stdb.getNumberOfStudentAnswers() + stdb.getNumberOfInClassAnswers()))
-                            >75)) {this.addNumMore75CorrectQuestions();}
+            Set<QuizAnswer> quizAnswer= st.getQuizAnswers();
+            for(QuizAnswer qa :quizAnswer){
+                totalq+=qa.getQuiz().getQuizQuestionsNumber();
+                trueq+=qa.getNumberOfCorrectAnswers();
+            }
+            if(totalq>0 && (trueq*100/totalq)>75) {
+                this.addNumMore75CorrectQuestions();
+            }
+            System.out.println(totalq + "+"+ trueq);
+            if(quizAnswer.stream().distinct().count() >= 3) {
+                this.addNumAtLeast3Quizzes();
+            }
         }
     }
     @Override
