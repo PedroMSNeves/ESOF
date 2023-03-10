@@ -34,7 +34,7 @@ public class TeacherDashboard implements DomainEntity {
     @ManyToOne
     private Teacher teacher;
 
-    @OneToMany
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacherDashboard", orphanRemoval = true)
     private final Set<QuestionStats> questionStats = new HashSet<>();
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "teacherDashboard", orphanRemoval = true)
@@ -72,6 +72,9 @@ public class TeacherDashboard implements DomainEntity {
     public void remove() {
         teacher.getDashboards().remove(this);
         teacher = null;
+        questionStats = null;
+        studentStats = null;
+        quizStats = null;
     }
 
     public Integer getId() {
