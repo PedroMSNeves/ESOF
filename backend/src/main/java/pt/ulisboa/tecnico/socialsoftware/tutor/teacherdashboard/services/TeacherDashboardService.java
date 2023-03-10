@@ -92,6 +92,14 @@ public class TeacherDashboardService {
         teacherDashboardRepository.save(teacherDashboard);
     }
 
+    public void updateAllTeacherDashboards() {
+        Iterable<TeacherDashboard> teacherDashboards = teacherDashboardRepository.findAll();
+        teacherDashboards.forEach(td -> {
+            td.update();
+            teacherDashboardRepository.save(td);
+        });
+    }
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void removeTeacherDashboard(Integer dashboardId) {
         if (dashboardId == null)
