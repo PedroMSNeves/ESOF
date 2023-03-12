@@ -23,7 +23,7 @@ public class QuestionStatsDto implements Serializable {
     }
 
     // GET
-    public int getId() {
+    public Integer getId() {
         return this.id;
     }
 

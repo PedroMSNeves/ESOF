@@ -1,10 +1,14 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class TeacherDashboardDto {
     private Integer id;
     private Integer numberOfStudents;
+
+    private List<QuestionStatsDto> questionStatsDto;
 
     public TeacherDashboardDto() {
     }
@@ -13,6 +17,15 @@ public class TeacherDashboardDto {
         this.id = teacherDashboard.getId();
         // For the number of students, we consider only active students
         this.numberOfStudents = teacherDashboard.getCourseExecution().getNumberOfActiveStudents();
+        setQuestionStatsDto(teacherDashboard.getQuestionStats().stream().map(QuestionStats -> new QuestionStatsDto(QuestionStats)).collect(Collectors.toList()));
+    }
+
+    public List<QuestionStatsDto> getQuestionStatsDto() {
+        return questionStatsDto;
+    }
+
+    public void setQuestionStatsDto(List<QuestionStatsDto> questionStatsDto) {
+        this.questionStatsDto = questionStatsDto;
     }
 
     public Integer getId() {
@@ -36,6 +49,7 @@ public class TeacherDashboardDto {
         return "TeacherDashboardDto{" +
                 "id=" + id +
                 ", numberOfStudents=" + this.getNumberOfStudents() +
+                ", QuestionStatsDto" + this.getQuestionStatsDto() +
                 "}";
     }
 }
