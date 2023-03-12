@@ -1,31 +1,36 @@
 package pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto;
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto.StudentStatsDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.dto.QuizStatsDto;
+
 import java.util.List;
 import java.util.stream.Collectors;
-
 public class TeacherDashboardDto {
     private Integer id;
-    private Integer numberOfStudents;
-
-    private List<QuestionStatsDto> questionStatsDto;
-
+    private List<QuizStatsDto> quizStatsDtos;
+    private List<StudentStatsDto> studentStatsDtos;
     public TeacherDashboardDto() {
     }
 
     public TeacherDashboardDto(TeacherDashboard teacherDashboard) {
         this.id = teacherDashboard.getId();
-        // For the number of students, we consider only active students
-        this.numberOfStudents = teacherDashboard.getCourseExecution().getNumberOfActiveStudents();
-        setQuestionStatsDto(teacherDashboard.getQuestionStats().stream().map(QuestionStats -> new QuestionStatsDto(QuestionStats)).collect(Collectors.toList()));
+        setStudentStatsDtos(teacherDashboard.getStudentStats().stream().map(st -> new StudentStatsDto(st)).collect(Collectors.toList()));
+        setQuizStatsDtos(teacherDashboard.getQuizStats().stream().map(QuizStatsDto::new).collect(Collectors.toList()));
+    }
+    public List<StudentStatsDto> getStudentStatsDtos() {
+        return studentStatsDtos;
+    }
+    public void setStudentStatsDtos(List<StudentStatsDto> studentStatsDtos) {
+        this.studentStatsDtos = studentStatsDtos;
     }
 
-    public List<QuestionStatsDto> getQuestionStatsDto() {
-        return questionStatsDto;
+    public List<QuizStatsDto> getQuizStatsDtos() {
+        return quizStatsDtos;
     }
 
-    public void setQuestionStatsDto(List<QuestionStatsDto> questionStatsDto) {
-        this.questionStatsDto = questionStatsDto;
+    public void setQuizStatsDtos(List<QuizStatsDto> quizStatsDtos) {
+        this.quizStatsDtos = quizStatsDtos;
     }
 
     public Integer getId() {
@@ -36,20 +41,12 @@ public class TeacherDashboardDto {
         this.id = id;
     }
 
-    public Integer getNumberOfStudents() {
-        return numberOfStudents;
-    }
-
-    public void setNumberOfStudents(Integer numberOfStudents) {
-        this.numberOfStudents = numberOfStudents;
-    }
-
     @Override
     public String toString() {
         return "TeacherDashboardDto{" +
                 "id=" + id +
-                ", numberOfStudents=" + this.getNumberOfStudents() +
-                ", QuestionStatsDto" + this.getQuestionStatsDto() +
+                ", quizStatsDtos=" + this.getQuizStatsDtos() +
+                ", studentStatsDtos=" + this.getStudentStatsDtos() +
                 "}";
     }
 }
