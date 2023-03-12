@@ -41,6 +41,7 @@ public class QuestionStats implements DomainEntity {
     }
 
     public QuestionStats(CourseExecution course_execution, TeacherDashboard teacher_dashboard) {
+        teacher_dashboard.addQuestionStats(this);
         setCourseExecution(course_execution);
         setTeacherDashboard(teacher_dashboard);
     }
