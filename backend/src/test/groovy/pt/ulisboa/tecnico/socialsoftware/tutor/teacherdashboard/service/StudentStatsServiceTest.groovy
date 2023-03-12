@@ -155,10 +155,6 @@ class StudentStatsServiceTest extends SpockTest {
         studentStatsRepository.count() == 0L
         teacherDashboardRepository.count() == 0L
     }
-
-<<<<<<< HEAD
-
-=======
     @Unroll
     def "create an empty dashboard and update it"() {
         when: "a dashboard is created"
@@ -400,7 +396,6 @@ class StudentStatsServiceTest extends SpockTest {
         def quizzAnswer = answerQuiz(answered, correct, true, quizQuestion, quiz,student)
         student.getCourseExecutionDashboard(ce).statistics(quizzAnswer)
     }
->>>>>>> 7e311a05 (feat: more tests for TeacherDashboardService)
 
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
