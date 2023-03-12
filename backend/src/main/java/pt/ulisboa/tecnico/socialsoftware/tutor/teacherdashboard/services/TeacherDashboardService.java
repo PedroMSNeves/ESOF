@@ -13,6 +13,9 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.Teach
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.repository.TeacherRepository;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.QuestionStatsRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuestionStats;
+
 import java.util.*;
 
 import static pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage.*;
@@ -28,6 +31,9 @@ public class TeacherDashboardService {
 
     @Autowired
     private TeacherDashboardRepository teacherDashboardRepository;
+
+    @Autowired
+    private QuestionStatsRepository questionStatsRepository;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public TeacherDashboardDto getTeacherDashboard(int courseExecutionId, int teacherId) {
@@ -66,10 +72,35 @@ public class TeacherDashboardService {
 
     private TeacherDashboardDto createAndReturnTeacherDashboardDto(CourseExecution courseExecution, Teacher teacher) {
         TeacherDashboard teacherDashboard = new TeacherDashboard(courseExecution, teacher);
+        this.addLast3YearExecutions(teacherDashboard);
         teacherDashboardRepository.save(teacherDashboard);
 
         return new TeacherDashboardDto(teacherDashboard);
     }
+
+    private void addLast3YearExecutions(TeacherDashboard teacherDashboard) {
+        int thisyear;
+        try{
+            thisyear= teacherDashboard.getCourseExecution().getEndDate().getYear();
+        } catch (Exception e)
+        {// if it does not have an date, ignore
+            return;
+        }
+
+        QuestionStats now =new QuestionStats(teacherDashboard.getCourseExecution(),teacherDashboard);
+        questionStatsRepository.save(now);
+        teacherDashboard.addQuestionStats(now);
+
+        teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().forEach(ce -> {
+                int i = ce.getEndDate().getYear();
+                if(i==thisyear-1 || i==thisyear-2) {
+                    QuestionStats st = new QuestionStats(ce, teacherDashboard);
+                    questionStatsRepository.save(st);
+                    teacherDashboard.addQuestionStats(st);
+                }
+        });
+    }
+
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void removeTeacherDashboard(Integer dashboardId) {
