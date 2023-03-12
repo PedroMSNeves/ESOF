@@ -156,7 +156,251 @@ class StudentStatsServiceTest extends SpockTest {
         teacherDashboardRepository.count() == 0L
     }
 
+<<<<<<< HEAD
 
+=======
+    @Unroll
+    def "create an empty dashboard and update it"() {
+        when: "a dashboard is created"
+        CourseExecution newce = newCourseExecution(2023)
+        teacher.addCourse(newce)
+        newCourseExecution(2021)
+        newCourseExecution(2020)
+        teacherDashboardService.getTeacherDashboard(newce.getId(), teacher.getId())
+        quizz(newStudent(newce,"rasputin"),true,true,newce)
+
+        then: "an empty dashboard is created with 2 courseExecution"
+        teacherDashboardRepository.count() == 1L
+        studentStatsRepository.count() == 2L
+        def td = teacherDashboardRepository.findAll().get(0)
+        def studentS
+        studentStatsRepository.findAll().forEach(st -> {
+            if (st.getCourseExecution().getId() == newce.getId())
+                studentS = st
+        })
+        td.getId() != 0
+        compareStudentStats(studentS,0,0,0)
+        teacherDashboardService.updateTeacherDashboard(td.getId())
+        def studentS1
+        def studentS2
+        studentStatsRepository.findAll().forEach(st -> {
+            if (st.getCourseExecution().getId() == newce.getId())
+                studentS1 = st
+            else
+                studentS2 = st
+        })
+        compareStudentStats(studentS1,1,1,0)
+        compareStudentStats(studentS2,0,0,0)
+    }
+
+    @Unroll
+    def "try to update a dashboard that does not exist"() {
+        when: "flag created"
+        def e=0
+
+        then: "update a dashboard that does not exist"
+        try {
+            teacherDashboardService.updateTeacherDashboard(1)
+        }
+        catch(Exception ex) {
+            e=1
+        }
+        e==1
+    }
+
+    @Unroll
+    def "create 2 dashboards and update them"() {
+        when: "a dashboard is created"
+        //newCourseExecution(2020)
+        CourseExecution newce1 = newCourseExecution(2021)
+        teacher.addCourse(newce1)
+        teacherDashboardService.getTeacherDashboard(newce1.getId(), teacher.getId())
+        CourseExecution newce2 = newCourseExecution(2023)
+        teacher.addCourse(newce2)
+        teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+
+        quizz(newStudent(newce1,"rasputin1"),true,true,newce1)
+        quizz(newStudent(newce2,"rasputin2"),true,false,newce2)
+        then: "update 2 dashboards"
+        teacherDashboardRepository.count() == 2L
+        studentStatsRepository.count() == 3L
+        def td1
+        def td2
+        teacherDashboardRepository.findAll().forEach(td ->{
+            if(td.getCourseExecution().getId() == newce1.getId())
+                td1=td
+            if(td.getCourseExecution().getId() == newce2.getId())
+                td2=td
+        })
+        td1.getId() != 0
+        td2.getId() != 0
+        def studentS1
+        def studentS2
+        def studentS3
+
+        teacherDashboardService.updateAllTeacherDashboards()
+        studentStatsRepository.findAll().forEach(st -> {
+            if (st.getTeacherDashboard().getId() == td1.getId())
+                studentS1=st
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce1.getId())
+                studentS2=st
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce2.getId())
+                studentS3=st
+        })
+
+        compareStudentStats(studentS1,1,1,0)
+        compareStudentStats(studentS2,1,1,0)
+        compareStudentStats(studentS3,1,0,0)
+    }
+
+
+    @Unroll
+    def "create a 2 empty dashboard and update them with 2 courses execution each"() {
+        when: "a dashboard is created"
+        CourseExecution newce0 = newCourseExecution(2020)
+        CourseExecution newce1 = newCourseExecution(2021)
+        teacher.addCourse(newce1)
+        teacherDashboardService.getTeacherDashboard(newce1.getId(), teacher.getId())
+        CourseExecution newce2 = newCourseExecution(2023)
+        teacher.addCourse(newce2)
+        teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+        def rp0 =newStudent(newce0,"rasputin0")
+        newStudent(newce0,"bot0")
+        def rp1 =newStudent(newce1,"rasputin1")
+        for(int i=1;i<3;i++){ newStudent(newce1,"bot"+i)}
+        def rp2 =newStudent(newce2,"rasputin2")
+        for(int i=3;i<7;i++){ newStudent(newce2,"bot"+i)}
+
+        for(int i =0;i<3;i++) {
+            for(int j =0;j<4;j++) {quizz(rp0,true,true,newce0)}
+            quizz(rp0,true,false,newce0)
+            for(int j =0;j<4;j++) {quizz(rp1,true,false,newce1)}
+            quizz(rp1,true,true,newce1)
+        }
+        quizz(rp2,true,true,newce2)
+        then: "an empty dashboard is created with 1 courseExecution"
+        teacherDashboardRepository.count() == 2L
+        studentStatsRepository.count() == 4L
+        def td1
+        def td2
+        teacherDashboardRepository.findAll().forEach(td ->{
+            if(td.getCourseExecution().getId() == newce1.getId())
+                td1=td
+            if(td.getCourseExecution().getId() == newce2.getId())
+                td2=td
+        })
+        td1.getId() != 0
+        td2.getId() != 0
+        def studentS0
+        def studentS1
+        def studentS2
+        def studentS3
+
+        teacherDashboardService.updateAllTeacherDashboards()
+        studentStatsRepository.findAll().forEach(st -> {
+            if (st.getTeacherDashboard().getId() == td1.getId() && st.getCourseExecution().getId() == newce0.getId())
+                studentS0=st
+            if (st.getTeacherDashboard().getId() == td1.getId() && st.getCourseExecution().getId() == newce1.getId())
+                studentS1=st
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce1.getId())
+                studentS2=st
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce2.getId())
+                studentS3=st
+        })
+        compareStudentStats(studentS0,2,1,1)
+        compareStudentStats(studentS1,3,0,1)
+        compareStudentStats(studentS2,3,0,1)
+        compareStudentStats(studentS3,5,1,0)
+    }
+
+    // Method for creating a newStudent with a courseExecution
+    def newStudent(courseExecution,username){
+        def student = new Student(username, username, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
+        student.addCourse(courseExecution)
+        userRepository.save(student)
+        def studentDashboard = new StudentDashboard(courseExecution, student)
+        studentDashboardRepository.save(studentDashboard)
+        return student
+    }
+    // Methods for creating a quiz
+    def createQuestion() {
+        def newQuestion = new Question()
+        newQuestion.setTitle("Question Title")
+        newQuestion.setCourse(course)
+        def questionDetails = new MultipleChoiceQuestion()
+        newQuestion.setQuestionDetails(questionDetails)
+        questionRepository.save(newQuestion)
+
+        def option = new Option()
+        option.setContent("Option Content")
+        option.setCorrect(true)
+        option.setSequence(0)
+        option.setQuestionDetails(questionDetails)
+        optionRepository.save(option)
+        def optionKO = new Option()
+        optionKO.setContent("Option Content")
+        optionKO.setCorrect(false)
+        optionKO.setSequence(1)
+        optionKO.setQuestionDetails(questionDetails)
+        optionRepository.save(optionKO)
+
+        return newQuestion;
+    }
+
+    def createQuiz(ce,type = Quiz.QuizType.PROPOSED.toString()) {
+        def quiz = new Quiz()
+        quiz.setTitle("Quiz Title")
+        quiz.setType(type)
+        quiz.setCourseExecution(ce)
+        quiz.setCreationDate(DateHandler.now())
+        quiz.setAvailableDate(DateHandler.now())
+        quizRepository.save(quiz)
+        return quiz
+    }
+
+    def createQuizQuestion(quiz, question) {
+        def quizQuestion = new QuizQuestion(quiz, question, 0)
+        quizQuestionRepository.save(quizQuestion)
+        return quizQuestion
+    }
+
+    def answerQuiz(answered, correct, completed, quizQuestion, quiz,student ,date = DateHandler.now()) {
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setCompleted(completed)
+        quizAnswer.setCreationDate(date)
+        quizAnswer.setAnswerDate(date)
+        quizAnswer.setStudent(student)
+        quizAnswer.setQuiz(quiz)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setTimeTaken(1)
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        questionAnswerRepository.save(questionAnswer)
+
+        def answerDetails
+        def correctOption = quizQuestion.getQuestion().getQuestionDetails().getCorrectOption()
+        def incorrectOption = quizQuestion.getQuestion().getQuestionDetails().getOptions().stream().filter(option -> option != correctOption).findAny().orElse(null)
+        if (answered && correct) answerDetails = new MultipleChoiceAnswer(questionAnswer, correctOption)
+        else if (answered && !correct) answerDetails = new MultipleChoiceAnswer(questionAnswer, incorrectOption)
+        else {
+            questionAnswerRepository.save(questionAnswer)
+            return quizAnswer
+        }
+        questionAnswer.setAnswerDetails(answerDetails)
+        answerDetailsRepository.save(answerDetails)
+        return quizAnswer
+    }
+    def quizz(student,answered,correct, ce)
+    {
+        def question = createQuestion()
+        def quiz = createQuiz(ce)
+        def quizQuestion = createQuizQuestion(quiz, question)
+        def quizzAnswer = answerQuiz(answered, correct, true, quizQuestion, quiz,student)
+        student.getCourseExecutionDashboard(ce).statistics(quizzAnswer)
+    }
+>>>>>>> 7e311a05 (feat: more tests for TeacherDashboardService)
 
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
