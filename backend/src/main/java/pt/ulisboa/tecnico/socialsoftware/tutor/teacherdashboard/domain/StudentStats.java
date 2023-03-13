@@ -45,6 +45,7 @@ public class StudentStats implements DomainEntity {
     public TeacherDashboard getTeacherDashboard(){ return teacherDashboard; }
     public void setTeacherDashboard(TeacherDashboard teacherDashboard){
         this.teacherDashboard = teacherDashboard;
+        this.teacherDashboard.addStudentStats(this);
     }
 
     public Integer getId() {
@@ -104,7 +105,7 @@ public class StudentStats implements DomainEntity {
             if(totalq>0 && (trueq*100/totalq)>75) {
                 this.addNumMore75CorrectQuestions();
             }
-            System.out.println(totalq + "+"+ trueq);
+            //System.out.println(totalq + "+"+ trueq);
             if(quizAnswer.stream().distinct().count() >= 3) {
                 this.addNumAtLeast3Quizzes();
             }

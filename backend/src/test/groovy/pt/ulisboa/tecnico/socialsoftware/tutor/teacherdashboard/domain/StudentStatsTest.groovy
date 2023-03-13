@@ -50,7 +50,6 @@ class StudentStatsTest extends SpockTest {
     def newStudentStats(td,ce){
         def studentStats = new StudentStats(ce, td)
         studentStatsRepository.save(studentStats)
-        td.addStudentStats(studentStats)
         return studentStats
     }
     def newCourseExecution(name)

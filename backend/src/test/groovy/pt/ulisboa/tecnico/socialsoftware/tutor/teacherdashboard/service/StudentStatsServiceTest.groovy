@@ -46,6 +46,10 @@ class StudentStatsServiceTest extends SpockTest {
         return LocalDateTime.of(year, 3, 29, 19, 30, 40);
     }
 
+    def tt(st,a1,a2,a3){
+        return st.getCourseExecution().getEndDate().getYear()==a1 ||st.getCourseExecution().getEndDate().getYear()==a2 || st.getCourseExecution().getEndDate().getYear()==a3
+    }
+
     def newCourseExecution(year) {
         def newCE  = new CourseExecution(course, COURSE_1_ACRONYM, "1 Semestre "+year-1+"/"+year, Course.Type.TECNICO, localDateTime(year))
         courseExecutionRepository.save(newCE)
@@ -78,15 +82,16 @@ class StudentStatsServiceTest extends SpockTest {
         result.getStudentStats()[0].getCourseExecution().getEndDate().getYear()==2023
     }
     @Unroll
-    def "create an empty dashboard with 3 courseExecution"() {
+    def "create an empty dashboard with 3 courseExecution and one that does not enter the list"() {
         when: "a dashboard is created"
         CourseExecution newce = newCourseExecution(2023)
         teacher.addCourse(newce)
         newCourseExecution(2022)
         newCourseExecution(2021)
+        newCourseExecution(2020)
         teacherDashboardService.getTeacherDashboard(newce.getId(), teacher.getId())
 
-        then: "an empty dashboard is created with 1 courseExecution"
+        then: "an empty dashboard is created with 3 courseExecution"
         teacherDashboardRepository.count() == 1L
         def result = teacherDashboardRepository.findAll().get(0)
         result.getId() != 0
@@ -94,11 +99,9 @@ class StudentStatsServiceTest extends SpockTest {
         result.getTeacher().getId() == teacher.getId()
 
         result.getStudentStats().size()==3
-        result.getStudentStats().forEach(st ->
-                        st.getCourseExecution().getEndDate().getYear()==2023 ||
-                        st.getCourseExecution().getEndDate().getYear()==2022 ||
-                        st.getCourseExecution().getEndDate().getYear()==2021
-        )
+        result.getStudentStats().stream().filter(st ->
+                tt(st,2023,2022,2021)
+        ).count() == 3
     }
 
     @Unroll
@@ -117,13 +120,12 @@ class StudentStatsServiceTest extends SpockTest {
         result.getCourseExecution().getId() == newce.getId()
         result.getTeacher().getId() == teacher.getId()
 
-        result.getStudentStats().size()==2
-        result.getStudentStats().forEach(st ->
-                st.getCourseExecution().getEndDate().getYear()==2023 ||
-                        st.getCourseExecution().getEndDate().getYear()==2022 ||
-                        st.getCourseExecution().getEndDate().getYear()==2021
-        )
+        result.getStudentStats().size()==3
+        result.getStudentStats().stream().filter(st ->
+                tt(st,2023,2022,2021)
+        ).count() == 2
     }
+
     @Unroll
     def "create a Dashboard with 2 CourseExecutions and remove it"() {
         when: "a dashboard is created"
@@ -135,21 +137,20 @@ class StudentStatsServiceTest extends SpockTest {
 
         then: "a dashboard is created with 2 courseExecution and remove it"
         teacherDashboardRepository.count() == 1L
-        studentStatsRepository.count() == 2L
+        studentStatsRepository.count() == 3L
         def td = teacherDashboardRepository.findAll().get(0)
         def studentS = studentStatsRepository.findAll().get(0)
         td.getId() != 0
         td.getCourseExecution().getId() == newce.getId()
         td.getTeacher().getId() == teacher.getId()
-        td.getStudentStats().size()==2
-        td.getStudentStats().forEach(st ->
-                st.getCourseExecution().getEndDate().getYear()==2023 ||
-                        st.getCourseExecution().getEndDate().getYear()==2022 ||
-                        st.getCourseExecution().getEndDate().getYear()==2021
-        )
+        td.getStudentStats().size()==3
+        td.getStudentStats().stream().filter(st ->
+                tt(st,2023,2022,2021)
+        ).count() == 2
         studentS.getTeacherDashboard().getId() == td.getId()
         studentS.getCourseExecution().getId() == td.getStudentStats()[0].getCourseExecution().getId() ||
-        studentS.getCourseExecution().getId() == td.getStudentStats()[1].getCourseExecution().getId()
+        studentS.getCourseExecution().getId() == td.getStudentStats()[1].getCourseExecution().getId() ||
+        studentS.getCourseExecution().getId() == td.getStudentStats()[2].getCourseExecution().getId()
 
         teacherDashboardService.removeTeacherDashboard(td.getId())
         studentStatsRepository.count() == 0L
@@ -160,14 +161,14 @@ class StudentStatsServiceTest extends SpockTest {
         when: "a dashboard is created"
         CourseExecution newce = newCourseExecution(2023)
         teacher.addCourse(newce)
-        newCourseExecution(2021)
+        CourseExecution newce2 = newCourseExecution(2021)
         newCourseExecution(2020)
         teacherDashboardService.getTeacherDashboard(newce.getId(), teacher.getId())
         quizz(newStudent(newce,"rasputin"),true,true,newce)
 
         then: "an empty dashboard is created with 2 courseExecution"
         teacherDashboardRepository.count() == 1L
-        studentStatsRepository.count() == 2L
+        studentStatsRepository.count() == 3L
         def td = teacherDashboardRepository.findAll().get(0)
         def studentS
         studentStatsRepository.findAll().forEach(st -> {
@@ -179,14 +180,18 @@ class StudentStatsServiceTest extends SpockTest {
         teacherDashboardService.updateTeacherDashboard(td.getId())
         def studentS1
         def studentS2
+        def studentS3
         studentStatsRepository.findAll().forEach(st -> {
             if (st.getCourseExecution().getId() == newce.getId())
                 studentS1 = st
-            else
+            else if (st.getCourseExecution().getId() == newce2.getId())
                 studentS2 = st
+            else
+                studentS3 = st
         })
         compareStudentStats(studentS1,1,1,0)
         compareStudentStats(studentS2,0,0,0)
+        compareStudentStats(studentS3,0,0,0)
     }
 
     @Unroll
@@ -207,7 +212,7 @@ class StudentStatsServiceTest extends SpockTest {
     @Unroll
     def "create 2 dashboards and update them"() {
         when: "a dashboard is created"
-        //newCourseExecution(2020)
+
         CourseExecution newce1 = newCourseExecution(2021)
         teacher.addCourse(newce1)
         teacherDashboardService.getTeacherDashboard(newce1.getId(), teacher.getId())
@@ -276,7 +281,7 @@ class StudentStatsServiceTest extends SpockTest {
         quizz(rp2,true,true,newce2)
         then: "an empty dashboard is created with 1 courseExecution"
         teacherDashboardRepository.count() == 2L
-        studentStatsRepository.count() == 4L
+        studentStatsRepository.count() == 5L
         def td1
         def td2
         teacherDashboardRepository.findAll().forEach(td ->{
@@ -291,6 +296,7 @@ class StudentStatsServiceTest extends SpockTest {
         def studentS1
         def studentS2
         def studentS3
+        def studentS4
 
         teacherDashboardService.updateAllTeacherDashboards()
         studentStatsRepository.findAll().forEach(st -> {
@@ -302,11 +308,14 @@ class StudentStatsServiceTest extends SpockTest {
                 studentS2=st
             if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce2.getId())
                 studentS3=st
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce0.getId())
+                studentS4=st
         })
         compareStudentStats(studentS0,2,1,1)
         compareStudentStats(studentS1,3,0,1)
         compareStudentStats(studentS2,3,0,1)
         compareStudentStats(studentS3,5,1,0)
+        compareStudentStats(studentS4,2,1,1)
     }
 
     // Method for creating a newStudent with a courseExecution
