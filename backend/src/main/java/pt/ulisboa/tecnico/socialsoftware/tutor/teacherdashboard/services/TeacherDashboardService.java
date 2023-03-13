@@ -15,6 +15,7 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.repository.TeacherRepository
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats;
 import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.StudentStatsRepository;
+import java.time.LocalDateTime;
 
 import java.util.*;
 
@@ -72,7 +73,7 @@ public class TeacherDashboardService {
 
     private TeacherDashboardDto createAndReturnTeacherDashboardDto(CourseExecution courseExecution, Teacher teacher) {
         TeacherDashboard teacherDashboard = new TeacherDashboard(courseExecution, teacher);//ir buscar os 3 ultimos
-        this.addLast3YearExecutions(teacherDashboard);
+        this.addLast3Executions(teacherDashboard);
         teacherDashboardRepository.save(teacherDashboard);
 
         return new TeacherDashboardDto(teacherDashboard);
@@ -93,27 +94,15 @@ public class TeacherDashboardService {
 
 
 
-    private void addLast3YearExecutions(TeacherDashboard teacherDashboard) {
-        int thisyear;
+    private void addLast3Executions(TeacherDashboard teacherDashboard) {
         try{
-            thisyear= teacherDashboard.getCourseExecution().getEndDate().getYear();
-        } catch (Exception e)
-        {// if it does not have an date, ignore
-            return;
+            teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().stream()
+                    .sorted(Comparator.comparing(CourseExecution::getEndDate).reversed()).limit(3).forEach(ce -> {
+                        StudentStats st = new StudentStats(ce, teacherDashboard);
+                        studentStatsRepository.save(st);
+                    });
+        } catch (Exception e) {// if it does not have an date, ignore
         }
-
-        StudentStats now =new StudentStats(teacherDashboard.getCourseExecution(),teacherDashboard);
-        studentStatsRepository.save(now);
-        teacherDashboard.addStudentStats(now);
-
-        teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().forEach(ce -> {
-                int i = ce.getEndDate().getYear();
-                if(i==thisyear-1 || i==thisyear-2) {
-                    StudentStats st = new StudentStats(ce, teacherDashboard);
-                    studentStatsRepository.save(st);
-                    teacherDashboard.addStudentStats(st);
-                }
-        });
     }
     public void updateTeacherDashboard(int dashboardId) {
         TeacherDashboard teacherDashboard = teacherDashboardRepository.findById(dashboardId).orElseThrow(() -> new TutorException(DASHBOARD_NOT_FOUND, dashboardId));
