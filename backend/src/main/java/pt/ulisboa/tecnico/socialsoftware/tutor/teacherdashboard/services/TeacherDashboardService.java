@@ -95,7 +95,7 @@ public class TeacherDashboardService {
 
 
     private void addLast3Executions(TeacherDashboard teacherDashboard) {
-        try{
+        try{ // a ce que estamos a usar e a mais recente? estamos a assumir que sim //o try catch assim ja nao é ness
             teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().stream()
                     .sorted(Comparator.comparing(CourseExecution::getEndDate).reversed()).limit(3).forEach(ce -> {
                         StudentStats st = new StudentStats(ce, teacherDashboard);
