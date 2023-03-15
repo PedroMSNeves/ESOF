@@ -71,6 +71,15 @@ public class TeacherDashboardService {
         return new TeacherDashboardDto(teacherDashboard);
     }
 
+    public void updateAllTeacherDashboard(){
+        Iterable<TeacherDashboard> teacherDashboards = teacherDashboardRepository.findAll();
+        for (TeacherDashboard td : teacherDashboards){
+            td.update();
+            teacherDashboardRepository.save(td);
+        }
+    }
+
+
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void removeTeacherDashboard(Integer dashboardId) {
         if (dashboardId == null)

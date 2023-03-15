@@ -66,7 +66,7 @@ class QuestionStatsTest extends SpockTest {
     def newQuestionStats(ce, td) {
         def questionStats = new QuestionStats(ce, td)
         questionStatsRepository.save(questionStats)
-        td.addQuestionStats(questionStats)
+        //td.addQuestionStats(questionStats)
         return questionStats
     }
 

@@ -87,12 +87,10 @@ public class QuestionStats implements DomainEntity {
         this.courseExecution = courseExecution;
     }
 
-
     public void setTeacherDashboard(TeacherDashboard teacherDashboard) {
         this.teacherDashboard = teacherDashboard;
+        this.teacherDashboard.addQuestionStats(this);
     }
-
-
 
     public void accept(Visitor visitor) {
         // Only used for XML generation
