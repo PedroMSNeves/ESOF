@@ -79,26 +79,15 @@ public class TeacherDashboardService {
     }
 
     private void addLast3YearExecutions(TeacherDashboard teacherDashboard) {
-        int thisyear;
-        try{
-            thisyear= teacherDashboard.getCourseExecution().getEndDate().getYear();
-        } catch (Exception e)
-        {// if it does not have an date, ignore
-            return;
+        try {
+            teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().stream()
+                    .sorted(Comparator.comparing(CourseExecution::getEndDate).reversed()).limit(3).forEach(ce -> {
+                        QuestionStats qt = new QuestionStats(ce, teacherDashboard);
+                        questionStatsRepository.save(qt);
+                    });
+        } catch (Exception e) {
+
         }
-
-        QuestionStats now =new QuestionStats(teacherDashboard.getCourseExecution(),teacherDashboard);
-        questionStatsRepository.save(now);
-        teacherDashboard.addQuestionStats(now);
-
-        teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().forEach(ce -> {
-                int i = ce.getEndDate().getYear();
-                if(i==thisyear-1 || i==thisyear-2) {
-                    QuestionStats st = new QuestionStats(ce, teacherDashboard);
-                    questionStatsRepository.save(st);
-                    teacherDashboard.addQuestionStats(st);
-                }
-        });
     }
 
 
