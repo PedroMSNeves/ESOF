@@ -17,7 +17,7 @@ public class StudentStatsDto implements Serializable {
                 this.setId(studentStats.getId());
                 this.setNumStudent(studentStats.getNumStudent());
                 this.setNumMore75CorrectQuestions(studentStats.getNumMore75CorrectQuestions());
-                this.setNumAtLeast3Quizzes(getNumAtLeast3Quizzes());
+                this.setNumAtLeast3Quizzes(studentStats.getNumAtLeast3Quizzes());
         }
 
         public Integer getId() {
