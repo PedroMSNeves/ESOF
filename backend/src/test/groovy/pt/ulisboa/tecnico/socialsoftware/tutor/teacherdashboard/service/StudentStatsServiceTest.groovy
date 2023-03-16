@@ -133,7 +133,7 @@ class StudentStatsServiceTest extends SpockTest {
         teacher.addCourse(newce)
         newCourseExecution(2021)
         newCourseExecution(2020)
-        teacherDashboardService.getTeacherDashboard(newce.getId(), teacher.getId())
+        teacherDashboardService.createTeacherDashboard(newce.getId(), teacher.getId())
 
         then: "a dashboard is created with 3 courseExecution and remove it"
         teacherDashboardRepository.count() == 1L
@@ -401,7 +401,6 @@ class StudentStatsServiceTest extends SpockTest {
         CourseExecution newce1 = newCourseExecution(2021)
         CourseExecution newce2 = newCourseExecution(2023)
         teacher.addCourse(newce2)
-        teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
         def rp1 =newStudent(newce1,"rasputin1")
         for(int i=1;i<3;i++){ newStudent(newce1,"bot"+i)}
         def rp2 =newStudent(newce2,"rasputin2")
@@ -413,14 +412,19 @@ class StudentStatsServiceTest extends SpockTest {
         }
         quizz(rp2,true,true,newce2)
         then: "an dashboard is created with 2 courseExecution"
+        teacherDashboardRepository.count() == 0L
+        studentStatsRepository.count() == 0L
+
+
+        teacherDashboardService.updateAllTeacherDashboards()
         teacherDashboardRepository.count() == 1L
         studentStatsRepository.count() == 2L
+
         def td2 = teacherDashboardRepository.findAll().get(0)
         td2.getId() != 0
         def studentS2
         def studentS3
 
-        teacherDashboardService.updateAllTeacherDashboards()
         studentStatsRepository.findAll().forEach(st -> {
             if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce1.getId())
                 studentS2=st
