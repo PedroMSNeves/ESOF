@@ -383,7 +383,7 @@ class StudentStatsServiceTest extends SpockTest {
         testToString(studentS2,studentStatsDto1)
         testToString(studentS3,studentStatsDto2)
         testToString(studentS4,studentStatsDto3)
-        and: "testCreateBy and a StudentStatsDto"
+        and: "testCreateByHand a StudentStatsDto"
         def manual = new StudentStatsDto()
         manual.setId(studentS2.getId())
         manual.setNumStudent(studentS2.getNumStudent());
