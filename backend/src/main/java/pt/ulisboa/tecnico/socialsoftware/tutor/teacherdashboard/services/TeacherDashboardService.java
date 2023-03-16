@@ -90,6 +90,21 @@ public class TeacherDashboardService {
         }
     }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void updateAllTeacherDashboard() {
+        Iterable<Teacher> teachers = teacherRepository.findAll();
+        teachers.forEach(t -> {
+            t.getCourseExecutions().forEach(ex -> {
+                if(!t.getDashboards().stream().anyMatch(dashboard -> dashboard.getCourseExecution().equals(ex)))
+                    createAndReturnTeacherDashboardDto(ex,t);
+
+                t.getCourseExecutionDashboard(ex).update();
+                teacherDashboardRepository.save(t.getCourseExecutionDashboard(ex));
+            });
+            teacherRepository.save(t);
+        });
+    }
+
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void removeTeacherDashboard(Integer dashboardId) {

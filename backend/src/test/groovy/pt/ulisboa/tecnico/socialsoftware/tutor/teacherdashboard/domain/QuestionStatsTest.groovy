@@ -66,7 +66,6 @@ class QuestionStatsTest extends SpockTest {
     def newQuestionStats(ce, td) {
         def questionStats = new QuestionStats(ce, td)
         questionStatsRepository.save(questionStats)
-        td.addQuestionStats(questionStats)
         return questionStats
     }
 
@@ -176,7 +175,7 @@ class QuestionStatsTest extends SpockTest {
         teacherDashboard.getQuestionStats().size() == 1
         teacherDashboard.getQuestionStats().contains(result)
     }
-    
+
     @Unroll
     def "create an empty QuestionStats and remove it"() {
         when: "a QuestionStats is created"
@@ -192,23 +191,23 @@ class QuestionStatsTest extends SpockTest {
         and: "the teacherDashboard has no reference for the questionStats"
         teacherDashboard.getQuestionStats().size() == 0
     }
-    
+
     @Unroll
     def "create an empty QuestionStats and updated with course that as 1 empty question"() {
         when: "a questionStats is created"
         def questionStats = newQuestionStats(externalCourseExecution, teacherDashboard)
-        
+
         def student1 = newstudent(externalCourseExecution,"1")
         def student2 = newstudent(externalCourseExecution,"2")
-        
+
         externalCourseExecution.addUser(student1)
         externalCourseExecution.addUser(student2)
-        
+
        	quizz(student1,true,false)
        	quizz(student2,false,false)
-        
+
         then: "an empty questionStats is created and updated course that as 1 empty question"
-        
+
         def result = questionStats//QuestionStatsRepository.findAll().get(0)
 
         result.update()
@@ -221,7 +220,7 @@ class QuestionStatsTest extends SpockTest {
     def "create an empty QuestionStats and updated with course that as 1 question but question does not have it"() {
         when: "a QuestionStats is created and a studentDashboard"
         def questionStats = newQuestionStats(externalCourseExecution, teacherDashboard)
-		
+
 		then: ""
 		def result = questionStats
         questionStats.update()

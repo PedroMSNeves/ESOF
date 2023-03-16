@@ -28,5 +28,4 @@ public class TeacherDashboardController {
 
         return teacherDashboardService.getTeacherDashboard(courseExecutionId, teacherId);
     }
-
 }
