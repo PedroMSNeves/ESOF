@@ -70,7 +70,7 @@ public class TeacherDashboardService {
 
         return new TeacherDashboardDto(teacherDashboard);
     }
-
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateAllTeacherDashboards() {
         Iterable<Teacher> teacher = teacherRepository.findAll();
         teacher.forEach(t -> {
