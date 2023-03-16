@@ -4,8 +4,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest
 import org.springframework.boot.test.context.TestConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.BeanConfiguration
 import pt.ulisboa.tecnico.socialsoftware.tutor.SpockTest
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.ErrorMessage
-import pt.ulisboa.tecnico.socialsoftware.tutor.exceptions.TutorException
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher
 
 import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution
@@ -258,7 +256,7 @@ class StudentStatsServiceTest extends SpockTest {
 
 
     @Unroll
-    def "create a 2 empty dashboard and update them with 2 courses execution each"() {
+    def "create a 2 empty dashboard and update them"() {
         when: "a dashboard is created"
         CourseExecution newce0 = newCourseExecution(2020)
         CourseExecution newce1 = newCourseExecution(2021)
@@ -324,7 +322,7 @@ class StudentStatsServiceTest extends SpockTest {
 
 
     @Unroll
-    def "create a 2 empty dashboard and update them with 2 courses execution each to see Dto"() {
+    def "create an empty dashboard and update them with 3 courses execution each to see Dto"() {
         when: "a dashboard is created"
         CourseExecution newce0 = newCourseExecution(2020)
         CourseExecution newce1 = newCourseExecution(2021)
@@ -391,6 +389,61 @@ class StudentStatsServiceTest extends SpockTest {
         manual.setNumAtLeast3Quizzes(studentS2.getNumAtLeast3Quizzes());
         manual.toString()== studentStatsDto1.toString()
     }
+
+
+    @Unroll
+    def "create a dashboard with a course that has a courseExecution with null date"() {
+        when: "a dashboard is created"
+        CourseExecution newCE = newCourseExecution(2020)
+        newCE.setEndDate(null)
+        courseExecutionRepository.save(newCE)
+
+        CourseExecution newce1 = newCourseExecution(2021)
+        CourseExecution newce2 = newCourseExecution(2023)
+        teacher.addCourse(newce2)
+        teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+        def rp1 =newStudent(newce1,"rasputin1")
+        for(int i=1;i<3;i++){ newStudent(newce1,"bot"+i)}
+        def rp2 =newStudent(newce2,"rasputin2")
+        for(int i=3;i<7;i++){ newStudent(newce2,"bot"+i)}
+
+        for(int i =0;i<3;i++) {
+            for(int j =0;j<4;j++) {quizz(rp1,true,false,newce1)}
+            quizz(rp1,true,true,newce1)
+        }
+        quizz(rp2,true,true,newce2)
+        then: "an empty dashboard is created with 2 courseExecution"
+        teacherDashboardRepository.count() == 1L
+        studentStatsRepository.count() == 2L
+        def td2 = teacherDashboardRepository.findAll().get(0)
+        td2.getId() != 0
+        def studentS2
+        def studentS3
+
+        teacherDashboardService.updateAllTeacherDashboards()
+        studentStatsRepository.findAll().forEach(st -> {
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce1.getId())
+                studentS2=st
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce2.getId())
+                studentS3=st
+        })
+        def teacherDashboardDto = teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+        def studentStatsDto1
+        def studentStatsDto2
+        teacherDashboardDto.getStudentStatsDtos().stream().forEach(stDto ->{
+            if(stDto.getId()== studentS2.getId())
+                studentStatsDto1=stDto
+            else if (stDto.getId()== studentS3.getId())
+                studentStatsDto2=stDto
+        })
+
+        compareStudentStatsandDto(studentS2,studentStatsDto1,3,0,1)
+        compareStudentStatsandDto(studentS3,studentStatsDto2,5,1,0)
+        System.out.println(studentS2.getCourseExecution().getEndDate().getYear()+"  "+studentS3.getCourseExecution().getEndDate().getYear())
+    }
+
+
+
 
     def testToString(st,stdto)
     {
