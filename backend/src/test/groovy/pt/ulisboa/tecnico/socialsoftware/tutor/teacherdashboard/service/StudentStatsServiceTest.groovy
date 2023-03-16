@@ -113,7 +113,7 @@ class StudentStatsServiceTest extends SpockTest {
         newCourseExecution(2020)
         teacherDashboardService.getTeacherDashboard(newce.getId(), teacher.getId())
 
-        then: "an empty dashboard is created with 2 courseExecution"
+        then: "an empty dashboard is created with 3 courseExecution"
         teacherDashboardRepository.count() == 1L
         def result = teacherDashboardRepository.findAll().get(0)
         result.getId() != 0
@@ -127,7 +127,7 @@ class StudentStatsServiceTest extends SpockTest {
     }
 
     @Unroll
-    def "create a Dashboard with 2 CourseExecutions and remove it"() {
+    def "create a Dashboard with 3 CourseExecutions and remove it"() {
         when: "a dashboard is created"
         CourseExecution newce = newCourseExecution(2023)
         teacher.addCourse(newce)
@@ -135,7 +135,7 @@ class StudentStatsServiceTest extends SpockTest {
         newCourseExecution(2020)
         teacherDashboardService.getTeacherDashboard(newce.getId(), teacher.getId())
 
-        then: "a dashboard is created with 2 courseExecution and remove it"
+        then: "a dashboard is created with 3 courseExecution and remove it"
         teacherDashboardRepository.count() == 1L
         studentStatsRepository.count() == 3L
         def td = teacherDashboardRepository.findAll().get(0)
@@ -166,7 +166,7 @@ class StudentStatsServiceTest extends SpockTest {
         teacherDashboardService.getTeacherDashboard(newce.getId(), teacher.getId())
         quizz(newStudent(newce,"rasputin"),true,true,newce)
 
-        then: "an empty dashboard is created with 2 courseExecution"
+        then: "an empty dashboard is created with 3 courseExecution"
         teacherDashboardRepository.count() == 1L
         studentStatsRepository.count() == 3L
         def td = teacherDashboardRepository.findAll().get(0)
@@ -256,7 +256,7 @@ class StudentStatsServiceTest extends SpockTest {
 
 
     @Unroll
-    def "create a 2 empty dashboard and update them"() {
+    def "create a 2 empty dashboard and update them: complex edition"() {
         when: "a dashboard is created"
         CourseExecution newce0 = newCourseExecution(2020)
         CourseExecution newce1 = newCourseExecution(2021)
@@ -279,7 +279,7 @@ class StudentStatsServiceTest extends SpockTest {
             quizz(rp1,true,true,newce1)
         }
         quizz(rp2,true,true,newce2)
-        then: "an empty dashboard is created with 1 courseExecution"
+        then: "update 2 dashboards"
         teacherDashboardRepository.count() == 2L
         studentStatsRepository.count() == 5L
         def td1
@@ -343,7 +343,7 @@ class StudentStatsServiceTest extends SpockTest {
             quizz(rp1,true,true,newce1)
         }
         quizz(rp2,true,true,newce2)
-        then: "an empty dashboard is created with 1 courseExecution"
+        then: "update a dashboard and compare the Dto"
         teacherDashboardRepository.count() == 1L
         studentStatsRepository.count() == 3L
         def td2 = teacherDashboardRepository.findAll().get(0)
@@ -412,7 +412,7 @@ class StudentStatsServiceTest extends SpockTest {
             quizz(rp1,true,true,newce1)
         }
         quizz(rp2,true,true,newce2)
-        then: "an empty dashboard is created with 2 courseExecution"
+        then: "an dashboard is created with 2 courseExecution"
         teacherDashboardRepository.count() == 1L
         studentStatsRepository.count() == 2L
         def td2 = teacherDashboardRepository.findAll().get(0)
