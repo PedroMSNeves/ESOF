@@ -72,7 +72,7 @@ public class TeacherDashboardService {
     }
 
     private TeacherDashboardDto createAndReturnTeacherDashboardDto(CourseExecution courseExecution, Teacher teacher) {
-        TeacherDashboard teacherDashboard = new TeacherDashboard(courseExecution, teacher);//ir buscar os 3 ultimos
+        TeacherDashboard teacherDashboard = new TeacherDashboard(courseExecution, teacher);
         this.addLast3Executions(teacherDashboard);
         teacherDashboardRepository.save(teacherDashboard);
 
@@ -95,7 +95,6 @@ public class TeacherDashboardService {
 
 
     private void addLast3Executions(TeacherDashboard teacherDashboard) {
-        // a ce que estamos a usar e a mais recente? estamos a assumir que sim
             teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().stream()
                     .sorted(Comparator.comparing(CourseExecution::getEndDate,Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).limit(3).forEach(ce -> {
                         if(ce.getEndDate()!=null) {
@@ -103,26 +102,13 @@ public class TeacherDashboardService {
                             st.update();
                             studentStatsRepository.save(st);
                         }
-                    });//testar
+                    });
     }
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateTeacherDashboard(int dashboardId) {
         TeacherDashboard teacherDashboard = teacherDashboardRepository.findById(dashboardId).orElseThrow(() -> new TutorException(DASHBOARD_NOT_FOUND, dashboardId));
         teacherDashboard.update();
         teacherDashboardRepository.save(teacherDashboard);
-    }
-    @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void updateAllTeacherDashboards() {
-        Iterable<Teacher> teacher = teacherRepository.findAll();
-        teacher.forEach(t -> {
-            t.getCourseExecutions().forEach(ex -> {
-                if (!t.getDashboards().stream().anyMatch(dashboard -> dashboard.getCourseExecution().equals(ex)))
-                    createAndReturnTeacherDashboardDto(ex,t);
-                t.getCourseExecutionDashboard(ex).update();
-                teacherDashboardRepository.save(t.getCourseExecutionDashboard(ex));
-            });
-            teacherRepository.save(t);
-        });
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
