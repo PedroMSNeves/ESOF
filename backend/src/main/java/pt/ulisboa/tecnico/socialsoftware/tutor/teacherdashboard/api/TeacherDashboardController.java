@@ -17,7 +17,7 @@ import java.security.Principal;
 public class TeacherDashboardController {
     @Autowired
     private TeacherDashboardService teacherDashboardService;
-PutMapping
+
     TeacherDashboardController(TeacherDashboardService teacherDashboardService) {
         this.teacherDashboardService = teacherDashboardService;
     }
