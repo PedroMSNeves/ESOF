@@ -100,6 +100,7 @@ public class TeacherDashboardService {
                     .sorted(Comparator.comparing(CourseExecution::getEndDate,Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).limit(3).forEach(ce -> {
                         if(ce.getEndDate()!=null) {
                             StudentStats st = new StudentStats(ce, teacherDashboard);
+                            st.update();
                             studentStatsRepository.save(st);
                         }
                     });//testar

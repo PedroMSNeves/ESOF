@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser;
@@ -16,7 +17,7 @@ import java.security.Principal;
 public class TeacherDashboardController {
     @Autowired
     private TeacherDashboardService teacherDashboardService;
-
+PutMapping
     TeacherDashboardController(TeacherDashboardService teacherDashboardService) {
         this.teacherDashboardService = teacherDashboardService;
     }
@@ -29,7 +30,7 @@ public class TeacherDashboardController {
         return teacherDashboardService.getTeacherDashboard(courseExecutionId, teacherId);
     }
 
-    @GetMapping("/teachers/dashboards/{teacherDashboardId}")
+    @PutMapping("/teachers/dashboards/{teacherDashboardId}")
     @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#teacherDashboardId, 'TEACHERDASHBOARD.ACCESS')")
     public void updateTeacherDashboard(@PathVariable int teacherDashboardId) {
         this.teacherDashboardService.updateTeacherDashboard(teacherDashboardId);
