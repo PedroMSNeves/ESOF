@@ -95,14 +95,14 @@ public class TeacherDashboardService {
 
 
     private void addLast3Executions(TeacherDashboard teacherDashboard) {
-        try{ // a ce que estamos a usar e a mais recente? estamos a assumir que sim //o try catch assim ja nao é ness
+        // a ce que estamos a usar e a mais recente? estamos a assumir que sim
             teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().stream()
-                    .sorted(Comparator.comparing(CourseExecution::getEndDate).reversed()).limit(3).forEach(ce -> {
-                        StudentStats st = new StudentStats(ce, teacherDashboard);
-                        studentStatsRepository.save(st);
-                    });
-        } catch (Exception e) {// if it does not have an date, ignore
-        }
+                    .sorted(Comparator.comparing(CourseExecution::getEndDate,Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).limit(3).forEach(ce -> {
+                        if(ce.getEndDate()!=null) {
+                            StudentStats st = new StudentStats(ce, teacherDashboard);
+                            studentStatsRepository.save(st);
+                        }
+                    });//testar
     }
     public void updateTeacherDashboard(int dashboardId) {
         TeacherDashboard teacherDashboard = teacherDashboardRepository.findById(dashboardId).orElseThrow(() -> new TutorException(DASHBOARD_NOT_FOUND, dashboardId));
@@ -111,10 +111,15 @@ public class TeacherDashboardService {
     }
 
     public void updateAllTeacherDashboards() {
-        Iterable<TeacherDashboard> teacherDashboards = teacherDashboardRepository.findAll();
-        teacherDashboards.forEach(td -> {
-            td.update();
-            teacherDashboardRepository.save(td);
+        Iterable<Teacher> teacher = teacherRepository.findAll();
+        teacher.forEach(t -> {
+            t.getCourseExecutions().forEach(ex -> {
+                if (!t.getDashboards().stream().anyMatch(dashboard -> dashboard.getCourseExecution().equals(ex)))
+                    createAndReturnTeacherDashboardDto(ex,t);
+                t.getCourseExecutionDashboard(ex).update();
+                teacherDashboardRepository.save(t.getCourseExecutionDashboard(ex));
+            });
+            teacherRepository.save(t);
         });
     }
 
