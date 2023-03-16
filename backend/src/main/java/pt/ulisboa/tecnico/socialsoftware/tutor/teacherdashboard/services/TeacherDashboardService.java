@@ -71,13 +71,19 @@ public class TeacherDashboardService {
         return new TeacherDashboardDto(teacherDashboard);
     }
 
-    public void updateAllTeacherDashboard(){
-        Iterable<TeacherDashboard> teacherDashboards = teacherDashboardRepository.findAll();
-        for (TeacherDashboard td : teacherDashboards){
-            td.update();
-            teacherDashboardRepository.save(td);
-        }
+    public void updateAllTeacherDashboards() {
+        Iterable<Teacher> teacher = teacherRepository.findAll();
+        teacher.forEach(t -> {
+            t.getCourseExecutions().forEach(ex -> {
+                if (!t.getDashboards().stream().anyMatch(dashboard -> dashboard.getCourseExecution().equals(ex)))
+                    createAndReturnTeacherDashboardDto(ex,t);
+                t.getCourseExecutionDashboard(ex).update();
+                teacherDashboardRepository.save(t.getCourseExecutionDashboard(ex));
+            });
+            teacherRepository.save(t);
+        });
     }
+
 
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
