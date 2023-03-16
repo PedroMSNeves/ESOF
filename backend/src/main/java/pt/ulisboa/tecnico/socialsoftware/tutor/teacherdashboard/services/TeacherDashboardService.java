@@ -104,12 +104,13 @@ public class TeacherDashboardService {
                         }
                     });//testar
     }
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateTeacherDashboard(int dashboardId) {
         TeacherDashboard teacherDashboard = teacherDashboardRepository.findById(dashboardId).orElseThrow(() -> new TutorException(DASHBOARD_NOT_FOUND, dashboardId));
         teacherDashboard.update();
         teacherDashboardRepository.save(teacherDashboard);
     }
-
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateAllTeacherDashboards() {
         Iterable<Teacher> teacher = teacherRepository.findAll();
         teacher.forEach(t -> {
