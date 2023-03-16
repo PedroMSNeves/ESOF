@@ -20,7 +20,7 @@ public class TeacherDashboardDto {
         // For the number of students, we consider only active students
         this.numberOfStudents = teacherDashboard.getCourseExecution().getNumberOfActiveStudents();
 
-        setStudentStatsDtos(teacherDashboard.getStudentStats().stream().map(StudentStatsDto::new).collect(Collectors.toList()));
+        setStudentStatsDtos(teacherDashboard.getStudentStats().stream().map(st -> new StudentStatsDto(st)).collect(Collectors.toList()));
     }
     public List<StudentStatsDto> getStudentStatsDtos() {
         return studentStatsDtos;
