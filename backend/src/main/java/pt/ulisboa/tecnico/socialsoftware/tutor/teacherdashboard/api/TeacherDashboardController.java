@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RestController;
 import pt.ulisboa.tecnico.socialsoftware.tutor.auth.domain.AuthUser;
@@ -29,12 +30,9 @@ public class TeacherDashboardController {
         return teacherDashboardService.getTeacherDashboard(courseExecutionId, teacherId);
     }
 
-    @GetMapping("/teachers/dashboards/{teacherDashboardId}")
-    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#courseExecutionId, 'EXECUTION.ACCESS')")
-    public void removeTeacherDashboard(Principal principal, @PathVariable int teacherDashboardId) {
-        int teacherId = ((AuthUser) ((Authentication) principal).getPrincipal()).getUser().getId();
-
-    
+    @DeleteMapping("/teachers/dashboards/{teacherDashboardId}")
+    @PreAuthorize("hasRole('ROLE_TEACHER') and hasPermission(#teacherDashboardId, 'TEACHERDASHBOARD.ACCESS')")
+    public void removeTeacherDashboard(@PathVariable int teacherDashboardId) {
         teacherDashboardService.removeTeacherDashboard(teacherDashboardId); 
     }
 
