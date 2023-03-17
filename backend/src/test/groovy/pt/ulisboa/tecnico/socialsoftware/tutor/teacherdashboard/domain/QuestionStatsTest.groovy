@@ -296,6 +296,36 @@ class QuestionStatsTest extends SpockTest {
         result.getAverageQuestionsAnsweredUniq() == 1
         
     }
+    
+    def "create 2 empty QuestionStats and update it with quizzes that have available questions"() {
+        when: "a questionStats is created"
+        
+        def questionStats = newQuestionStats(externalCourseExecution, teacherDashboard)
+
+        def student1 = newstudent(externalCourseExecution,"1")
+
+        externalCourseExecution.addUser(student1)
+        
+        for (int i = 0; i < 5; i++) {
+            def question = createQuestion()
+            def quiz1 = createQuiz()
+            def quizQuestion1 = createQuizQuestion(quiz1, question)
+            def quizzAnswer1 = answerQuiz(false, false, true, quizQuestion1, quiz1, student1)
+            student1.getCourseExecutionDashboard(externalCourseExecution).statistics(quizzAnswer1)
+            question.setStatus(Question.Status.REMOVED);
+        }
+        
+        
+        then: "an empty questionStats is created and updated"
+        
+        def result = questionStats
+
+        result.update()
+        result.getNumQuestionsAvailable() == 0
+        result.getNumQuestionsAnsweredUniq() == 5
+        result.getAverageQuestionsAnsweredUniq() == 5
+        
+    }
 
     @Unroll
     def "create an empty QuestionStats and updated with course that as 1 question but question does not have it"() {

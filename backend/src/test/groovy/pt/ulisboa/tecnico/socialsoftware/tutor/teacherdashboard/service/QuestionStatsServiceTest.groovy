@@ -318,8 +318,9 @@ class QuestionStatsServiceTest extends SpockTest {
         question2.getAverageQuestionsAnsweredUniq() == 1
 
     }
+    
 
-     @Unroll
+    @Unroll
     def "try to update a dashboard that does not exist"() {
         when: "flag created"
         def e=0
