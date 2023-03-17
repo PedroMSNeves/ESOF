@@ -59,12 +59,103 @@ class QuestionStatsServiceTest extends SpockTest {
         return newCE
     }
 
-    def compareStudentStats(st,num,val1,val2)
+    def compareQuestionStats(qt,num,val1,val2)
     {
-        return st.getNumStudent() == num &&
-        st.getNumMore75CorrectQuestions() == val1 &&
-        st.getNumAtLeast3Quizzes() == val2
+        return qt.getNumQuestionsAvailable() == num &&
+        qt.getNumQuestionsAnsweredUniq() == val1 &&
+        qt.getAverageQuestionsAnsweredUniq() == val2
     }
+
+    // Method for creating a newStudent with a courseExecution
+    def newStudent(courseExecution,username){
+        def student = new Student(username, username, USER_1_EMAIL, false, AuthUser.Type.TECNICO)
+        student.addCourse(courseExecution)
+        userRepository.save(student)
+        def studentDashboard = new StudentDashboard(courseExecution, student)
+        studentDashboardRepository.save(studentDashboard)
+        return student
+    }
+
+    // Methods for creating a quiz
+    def createQuestion() {
+        def newQuestion = new Question()
+        newQuestion.setTitle("Question Title")
+        newQuestion.setCourse(course)
+        def questionDetails = new MultipleChoiceQuestion()
+        newQuestion.setQuestionDetails(questionDetails)
+        questionRepository.save(newQuestion)
+
+        def option = new Option()
+        option.setContent("Option Content")
+        option.setCorrect(true)
+        option.setSequence(0)
+        option.setQuestionDetails(questionDetails)
+        optionRepository.save(option)
+        def optionKO = new Option()
+        optionKO.setContent("Option Content")
+        optionKO.setCorrect(false)
+        optionKO.setSequence(1)
+        optionKO.setQuestionDetails(questionDetails)
+        optionRepository.save(optionKO)
+
+        return newQuestion;
+    }
+
+    def createQuiz(ce,type = Quiz.QuizType.PROPOSED.toString()) {
+        def quiz = new Quiz()
+        quiz.setTitle("Quiz Title")
+        quiz.setType(type)
+        quiz.setCourseExecution(ce)
+        quiz.setCreationDate(DateHandler.now())
+        quiz.setAvailableDate(DateHandler.now())
+        quizRepository.save(quiz)
+        return quiz
+    }
+
+    def createQuizQuestion(quiz, question) {
+        def quizQuestion = new QuizQuestion(quiz, question, 0)
+        quizQuestionRepository.save(quizQuestion)
+        return quizQuestion
+    }
+
+    def answerQuiz(answered, correct, completed, quizQuestion, quiz,student ,date = DateHandler.now()) {
+        def quizAnswer = new QuizAnswer()
+        quizAnswer.setCompleted(completed)
+        quizAnswer.setCreationDate(date)
+        quizAnswer.setAnswerDate(date)
+        quizAnswer.setStudent(student)
+        quizAnswer.setQuiz(quiz)
+        quizAnswerRepository.save(quizAnswer)
+
+        def questionAnswer = new QuestionAnswer()
+        questionAnswer.setTimeTaken(1)
+        questionAnswer.setQuizAnswer(quizAnswer)
+        questionAnswer.setQuizQuestion(quizQuestion)
+        questionAnswerRepository.save(questionAnswer)
+
+        def answerDetails
+        def correctOption = quizQuestion.getQuestion().getQuestionDetails().getCorrectOption()
+        def incorrectOption = quizQuestion.getQuestion().getQuestionDetails().getOptions().stream().filter(option -> option != correctOption).findAny().orElse(null)
+        if (answered && correct) answerDetails = new MultipleChoiceAnswer(questionAnswer, correctOption)
+        else if (answered && !correct) answerDetails = new MultipleChoiceAnswer(questionAnswer, incorrectOption)
+        else {
+            questionAnswerRepository.save(questionAnswer)
+            return quizAnswer
+        }
+        questionAnswer.setAnswerDetails(answerDetails)
+        answerDetailsRepository.save(answerDetails)
+        return quizAnswer
+    }
+    def quizz(student,answered,correct, ce)
+    {
+        def question = createQuestion()
+        def quiz = createQuiz(ce)
+        def quizQuestion = createQuizQuestion(quiz, question)
+        def quizzAnswer = answerQuiz(answered, correct, true, quizQuestion, quiz,student)
+        student.getCourseExecutionDashboard(ce).statistics(quizzAnswer)
+    }
+
+
 
     @Unroll
     def "create an empty dashboard with 1 courseExecution" () {
@@ -125,8 +216,8 @@ class QuestionStatsServiceTest extends SpockTest {
         result.getCourseExecution().getId() == newce.getId()
         result.getTeacher().getId() == teacher.getId()
 
-        result.getStudentStats().size()==3
-        result.getStudentStats().stream().filter(st ->
+        result.getQuestionStats().size()==3
+        result.getQuestionStats().stream().filter(st ->
                 tt(st,2023,2022,2021)
         ).count() == 2
     }
@@ -161,6 +252,170 @@ class QuestionStatsServiceTest extends SpockTest {
         questionStatsRepository.count() == 0L
         teacherDashboardRepository.count() == 0L
     }
+
+    @Unroll
+    def "create an empty dashboard and update it"() {
+        when: "a dashboard is created"
+        CourseExecution newce = newCourseExecution(2023)
+        teacher.addCourse(newce)
+        CourseExecution newce2 = newCourseExecution(2021)
+        newCourseExecution(2020)
+        teacherDashboardService.getTeacherDashboard(newce.getId(), teacher.getId())
+        quizz(newStudent(newce,"rasputin"),true,true,newce)
+        quizz(newStudent(newce2, "moreira"), true, false, newce2)
+        quizz(newStudent(newce2, "Diogo Luis"), true, false, newce2)
+
+        then: "an empty dashboard is created with 2 courseExecution"
+        teacherDashboardRepository.count() == 1L
+        questionStatsRepository.count() == 3L
+        def td = teacherDashboardRepository.findAll().get(0)
+        def questions
+        questionStatsRepository.findAll().forEach(qt -> {
+            if (qt.getCourseExecution().getId() == newce.getId())
+                questions = qt
+        })
+        td.getId() != 0
+        compareQuestionStats(questions,0,0,0)
+        teacherDashboardService.updateAllTeacherDashboard()
+        def question1
+        def question2
+        def question3
+        questionStatsRepository.findAll().forEach(qt -> {
+            if (qt.getCourseExecution().getId() == newce.getId())
+                question1 = qt
+            else if (qt.getCourseExecution().getId() == newce2.getId())
+                question2 = qt
+            else
+                question3 = qt
+        })
+
+        question1.getNumQuestionsAnsweredUniq() == 1 &&
+        question1.getNumQuestionsAvailable() == 0 &&
+
+        question1.getAverageQuestionsAnsweredUniq() == 1
+
+        question2.getNumQuestionsAvailable() == 0 &&
+        question2.getNumQuestionsAnsweredUniq() == 2 &&
+        question2.getAverageQuestionsAnsweredUniq() == 1
+
+    }
+
+     @Unroll
+    def "try to update a dashboard that does not exist"() {
+        when: "flag created"
+        def e=0
+
+        then: "update a dashboard that does not exist"
+        try {
+            teacherDashboardService.updateTeacherDashboard(1)
+        }
+        catch(Exception ex) {
+            e=1
+        }
+        e==1
+    }
+
+    @Unroll
+    def "create 2 dashboards and update them"() {
+        when: "a dashboard is created"
+
+        CourseExecution newce1 = newCourseExecution(2021)
+        teacher.addCourse(newce1)
+        teacherDashboardService.getTeacherDashboard(newce1.getId(), teacher.getId())
+        CourseExecution newce2 = newCourseExecution(2023)
+        teacher.addCourse(newce2)
+        teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+
+        quizz(newStudent(newce1,"rasputin1"),true,true,newce1)
+        quizz(newStudent(newce2,"rasputin2"),true,false,newce2)
+        then: "update 2 dashboards"
+        teacherDashboardRepository.count() == 2L
+        questionStatsRepository.count() == 3L
+        def td1
+        def td2
+        teacherDashboardRepository.findAll().forEach(td ->{
+            if(td.getCourseExecution().getId() == newce1.getId())
+                td1=td
+            if(td.getCourseExecution().getId() == newce2.getId())
+                td2=td
+        })
+        td1.getId() != 0
+        td2.getId() != 0
+        def question1
+        def question2
+        def question3
+
+        teacherDashboardService.updateAllTeacherDashboard()
+        questionStatsRepository.findAll().forEach(qt -> {
+            if (qt.getTeacherDashboard().getId() == td1.getId())
+                question1=qt
+            if (qt.getTeacherDashboard().getId() == td2.getId() && qt.getCourseExecution().getId() == newce1.getId())
+                question2=qt
+            if (qt.getTeacherDashboard().getId() == td2.getId() && qt.getCourseExecution().getId() == newce2.getId())
+                question3=qt
+        })
+
+        compareQuestionStats(question1,1,1,1)
+        compareQuestionStats(question2,1,1,1)
+        compareQuestionStats(question3,0,0,0)
+    }
+
+    @Unroll
+    def "create a 2 empty dashboard and update them with 2 courses execution each"() {
+        when: "a dashboard is created"
+        CourseExecution newce0 = newCourseExecution(2020)
+        CourseExecution newce1 = newCourseExecution(2021)
+        teacher.addCourse(newce1)
+        teacherDashboardService.getTeacherDashboard(newce1.getId(), teacher.getId())
+        CourseExecution newce2 = newCourseExecution(2023)
+        teacher.addCourse(newce2)
+        teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+        def rp0 =newStudent(newce0,"rasputin0")
+        newStudent(newce0,"bot0")
+        def rp1 =newStudent(newce1,"rasputin1")
+        for(int i=1;i<3;i++){ newStudent(newce1,"bot"+i)}
+        def rp2 =newStudent(newce2,"rasputin2")
+        for(int i=3;i<7;i++){ newStudent(newce2,"bot"+i)}
+
+        for(int i =0;i<3;i++) {
+            for(int j =0;j<4;j++) {quizz(rp0,true,true,newce0)}
+            quizz(rp0,true,false,newce0)
+            for(int j =0;j<4;j++) {quizz(rp1,true,false,newce1)}
+            quizz(rp1,true,true,newce1)
+        }
+        quizz(rp2,true,true,newce2)
+        then: "an empty dashboard is created with 1 courseExecution"
+        teacherDashboardRepository.count() == 2L
+        questionStatsRepository.count() == 5L
+        def td1
+        def td2
+        teacherDashboardRepository.findAll().forEach(td ->{
+            if(td.getCourseExecution().getId() == newce1.getId())
+                td1=td
+            if(td.getCourseExecution().getId() == newce2.getId())
+                td2=td
+        })
+        td1.getId() != 0
+        td2.getId() != 0
+        def question0
+        def question1
+        def question2
+        def question3
+        def question4
+
+        teacherDashboardService.updateAllTeacherDashboard()
+        questionStatsRepository.findAll().forEach(qt -> {
+            if (qt.getTeacherDashboard().getId() == td1.getId() && qt.getCourseExecution().getId() == newce0.getId())
+                question0=qt
+            if (qt.getTeacherDashboard().getId() == td2.getId() && qt.getCourseExecution().getId() == newce1.getId())
+                question2=qt
+        })
+        compareQuestionStats(question0,15,15,7.5)
+        compareQuestionStats(question2,1,1,0.2)
+    }
+
+    @TestConfiguration
+    static class LocalBeanConfiguration extends BeanConfiguration {}
 
 
 }
