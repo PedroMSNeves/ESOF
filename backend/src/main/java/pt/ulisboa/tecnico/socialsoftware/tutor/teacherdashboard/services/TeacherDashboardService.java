@@ -91,7 +91,7 @@ public class TeacherDashboardService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void updateAllTeacherDashboard() {
+    public void updateAllTeacherDashboards() {
         Iterable<Teacher> teachers = teacherRepository.findAll();
         teachers.forEach(t -> {
             t.getCourseExecutions().forEach(ex -> {

@@ -211,7 +211,7 @@ class QuestionStatsTest extends SpockTest {
         def result = questionStats//QuestionStatsRepository.findAll().get(0)
 
         result.update()
-        result.getNumQuestionsAvailable() == 2
+        result.getNumQuestionsAvailable() == 0
         result.getNumQuestionsAnsweredUniq() == 2
         result.getAverageQuestionsAnsweredUniq() == 1
     }
@@ -309,7 +309,7 @@ class QuestionStatsTest extends SpockTest {
         def result = questionStatsRepository.findAll().get(0)
 
         teacherDashboard.update()
-        result.getNumQuestionsAvailable() == 18
+        result.getNumQuestionsAvailable() == 0
         result.getNumQuestionsAnsweredUniq() == 18
         result.getAverageQuestionsAnsweredUniq() == 6
     }

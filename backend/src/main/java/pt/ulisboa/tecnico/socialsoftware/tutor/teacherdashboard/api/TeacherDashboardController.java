@@ -28,4 +28,11 @@ public class TeacherDashboardController {
 
         return teacherDashboardService.getTeacherDashboard(courseExecutionId, teacherId);
     }
+
+    @GetMapping("/teachers/dashboards/udateAllTeacherDashboards")
+    @PreAuthorize("hasRole('ROLE_ADMIN') or hasRole('ROLE_DEMO_ADMIN')")
+    public void updateAllTeacherDashboards() {
+        teacherDashboardService.updateAllTeacherDashboards();
+    }
+
 }
