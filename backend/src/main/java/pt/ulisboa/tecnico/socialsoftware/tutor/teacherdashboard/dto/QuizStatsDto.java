@@ -52,4 +52,13 @@ public class QuizStatsDto {
     public void setAverageQuizzesSolved(float averageQuizzesSolved){
         this.averageQuizzesSolved=averageQuizzesSolved;
     } 
+
+    @Override
+    public String toString(){
+        return "QuizStatsDto{"+"id="+getId()+", numQuizzes="+getNumQuizzes()
+        + ", uniqueQuizzesSolved="+getUniqueQuizzesSolved()+", averageQuizzesSolved="+
+        getAverageQuizzesSolved()+'}';
+    }
+
+
 }
