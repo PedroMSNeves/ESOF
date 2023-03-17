@@ -104,8 +104,8 @@ class QuizStatsServiceTest extends SpockTest {
 
     def testToString(qs,qsdto) {
         return qsdto.toString() == "QuizStatsDto{" + "id=" + qs.getId() + ", numQuizzes=" + qs.getNumQuizzes() +
-                ", numUniqueQuizzesSolved=" + qs.getUniqueQuizzesSolved() +
-                ", numAverageQuizzesSolved=" + qs.getAverageQuizzesSolved() + '}'
+                ", uniqueQuizzesSolved=" + qs.getUniqueQuizzesSolved() +
+                ", averageQuizzesSolved=" + qs.getAverageQuizzesSolved() + '}'
     }
 
     @Unroll
@@ -202,6 +202,7 @@ class QuizStatsServiceTest extends SpockTest {
         teacherDashboardRepository.count() == 0L
     }
 
+    //CHANGE IT TO HAVE QUIZZES STATS
     @Unroll
     def "create an empty dashboard and update it"() {
         when: "a dashboard is created"
@@ -240,6 +241,224 @@ class QuizStatsServiceTest extends SpockTest {
         compareQuizStats(quizS2, 0, 0, 0)
         compareQuizStats(quizS3, 0, 0, 0)
     }
+
+    @Unroll
+    def "try to update a dashboard that does not exist"() {
+        when: "flag created"
+        def e=0
+
+        then: "update a dashboard that does not exist"
+        try {
+            teacherDashboardService.updateTeacherDashboard(1)
+        }
+        catch(Exception ex) {
+            e=1
+        }
+        e==1
+    }
+
+    //CHANGE IT TO HAVE QUIZ
+    @Unroll
+    def "create 2 dashboards and update them"() {
+        when: "a dashboard is created"
+
+        CourseExecution newce1 = newCourseExecution(2021)
+        teacher.addCourse(newce1)
+        teacherDashboardService.getTeacherDashboard(newce1.getId(), teacher.getId())
+        CourseExecution newce2 = newCourseExecution(2023)
+        teacher.addCourse(newce2)
+        teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+
+        def quiz = newQuiz(newce1)
+        def student = newStudent(newce1,"toni")
+        createQuizAnswer(student, quiz)
+
+        def student2 = newStudent(newce2,"inot")
+        createQuizAnswer(student2, newQuiz(newce2))
+        createQuizAnswer(student2, newQuiz(newce2))
+
+        then: "update 2 dashboards"
+        teacherDashboardRepository.count() == 2L
+        quizStatsRepository.count() == 3L
+        def td1
+        def td2
+        teacherDashboardRepository.findAll().forEach(td ->{
+            if(td.getCourseExecution().getId() == newce1.getId())
+                td1=td
+            if(td.getCourseExecution().getId() == newce2.getId())
+                td2=td
+        })
+        td1.getId() != 0
+        td2.getId() != 0
+        def quizS1
+        def quizS2
+        def quizS3
+
+        teacherDashboardService.updateAllTeacherDashboards()
+        quizStatsRepository.findAll().forEach(qs -> {
+            if (qs.getTeacherDashboard().getId() == td1.getId())
+                quizS1=qs
+            if (qs.getTeacherDashboard().getId() == td2.getId() && qs.getCourseExecution().getId() == newce1.getId())
+                quizS2=qs
+            if (qs.getTeacherDashboard().getId() == td2.getId() && qs.getCourseExecution().getId() == newce2.getId())
+                quizS3=qs
+        })
+
+        compareQuizStats(quizS1,1,1,1)
+        compareQuizStats(quizS2,1,1,1)
+        compareQuizStats(quizS3,2,2,2)
+    }
+
+    //CHANGE IT TO HAVE QUIZ
+    @Unroll
+    def "create a 2 empty dashboard and update them with 2 courses execution each"() {
+        when: "a dashboard is created"
+        CourseExecution newce0 = newCourseExecution(2020)
+        CourseExecution newce1 = newCourseExecution(2021)
+        teacher.addCourse(newce1)
+        teacherDashboardService.getTeacherDashboard(newce1.getId(), teacher.getId())
+        CourseExecution newce2 = newCourseExecution(2023)
+        teacher.addCourse(newce2)
+        teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+
+        //one student in a course execution that solves 2 unique quizzes
+        def quiz00 = newQuiz(newce0)
+        def quiz01 = newQuiz(newce0)
+        def student0 = newStudent(newce0, "toni")
+        createQuizAnswer(student0, quiz00)
+        createQuizAnswer(student0, quiz01)
+
+        //two students in a course execution with 2 unique tests each
+        def student11 = newStudent(newce1, "ze");
+        def student12 = newStudent(newce1, "ez");
+        for(int i = 0; i < 2; i++) {
+            createQuizAnswer(student11, newQuiz(newce1))
+        }
+        for(int i = 0; i < 2; i++) {
+            createQuizAnswer(student12, newQuiz(newce1))
+        }
+
+        //def rp2 =newStudent(newce2,"rasputin2")
+        //for(int i=3;i<7;i++){ newStudent(newce2,"bot"+i)}
+
+        then: "an empty dashboard is created with 1 courseExecution"
+        teacherDashboardRepository.count() == 2L
+        quizStatsRepository.count() == 5L
+        def td1
+        def td2
+        teacherDashboardRepository.findAll().forEach(td ->{
+            if(td.getCourseExecution().getId() == newce1.getId())
+                td1=td
+            if(td.getCourseExecution().getId() == newce2.getId())
+                td2=td
+        })
+        td1.getId() != 0
+        td2.getId() != 0
+        def quizS0
+        def quizS1
+        def quizS2
+        def quizS3
+        def quizS4
+
+        teacherDashboardService.updateAllTeacherDashboards()
+        quizStatsRepository.findAll().forEach(st -> {
+            if (st.getTeacherDashboard().getId() == td1.getId() && st.getCourseExecution().getId() == newce0.getId())
+                quizS0=st
+            if (st.getTeacherDashboard().getId() == td1.getId() && st.getCourseExecution().getId() == newce1.getId())
+                quizS1=st
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce1.getId())
+                quizS2=st
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce2.getId())
+                quizS3=st
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce0.getId())
+                quizS4=st
+        })
+
+        //depois coloca aqui os dados como deve ser
+        compareQuizStats(quizS0,2,2,2)
+        compareQuizStats(quizS1,4,4,2)
+        compareQuizStats(quizS2,4,4,2)
+        compareQuizStats(quizS3,0,0,0)
+        compareQuizStats(quizS4,2,2,2)
+    }
+
+    @Unroll
+    def "create an empty dashboard and update them with 3 courses execution each to see Dto"() {
+        when: "a dashboard is created"
+        CourseExecution newce0 = newCourseExecution(2020)
+        CourseExecution newce1 = newCourseExecution(2021)
+        CourseExecution newce2 = newCourseExecution(2023)
+        teacher.addCourse(newce2)
+        teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+
+        def quiz00 = newQuiz(newce0)
+        def quiz01 = newQuiz(newce0)
+        def student0 = newStudent(newce0, "toni")
+        createQuizAnswer(student0, quiz00)
+        createQuizAnswer(student0, quiz01)
+
+        //two students in a course execution with 2 unique tests each
+        def student11 = newStudent(newce1, "ze");
+        def student12 = newStudent(newce1, "ez");
+        for(int i = 0; i < 2; i++) {
+            createQuizAnswer(student11, newQuiz(newce1))
+        }
+        for(int i = 0; i < 2; i++) {
+            createQuizAnswer(student12, newQuiz(newce1))
+        }
+
+        then: "update a dashboard and compare the Dto"
+        teacherDashboardRepository.count() == 1L
+        quizStatsRepository.count() == 3L
+        def td2 = teacherDashboardRepository.findAll().get(0)
+        td2.getId() != 0
+        def quizS2
+        def quizS3
+        def quizS4
+
+        teacherDashboardService.updateAllTeacherDashboards()
+        quizStatsRepository.findAll().forEach(qs -> {
+            if (qs.getTeacherDashboard().getId() == td2.getId() && qs.getCourseExecution().getId() == newce1.getId()) {
+                quizS2=qs
+            }
+            if (qs.getTeacherDashboard().getId() == td2.getId() && qs.getCourseExecution().getId() == newce2.getId()) {
+                quizS3=qs
+            }
+            if (qs.getTeacherDashboard().getId() == td2.getId() && qs.getCourseExecution().getId() == newce0.getId()) {
+                quizS4=qs
+            }
+        })
+        quizS4.getNumQuizzes() == 2
+        def teacherDashboardDto = teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+        def quizStatsDto1
+        def quizStatsDto2
+        def quizStatsDto3
+        teacherDashboardDto.getQuizStatsDtos().stream().forEach(qsDto ->{
+            if(qsDto.getId()== quizS2.getId())
+                quizStatsDto1=qsDto
+            else if (qsDto.getId()== quizS3.getId())
+                quizStatsDto2=qsDto
+            else if (qsDto.getId()== quizS4.getId())
+                quizStatsDto3=qsDto
+        })
+
+        compareQuizzesStatsandDto(quizS2,quizStatsDto1,4,4,2.0)
+        testToString(quizS2,quizStatsDto1)
+        compareQuizzesStatsandDto(quizS3,quizStatsDto2,0,0,0.0)
+        compareQuizzesStatsandDto(quizS4,quizStatsDto3,2,2,2.0)
+
+        and: "testToString"
+        testToString(quizS3,quizStatsDto2)
+        testToString(quizS4,quizStatsDto3)
+        and: "testCreateByHand a QuizzesStatsDto"
+        def manual = new QuizStatsDto()
+        manual.setId(quizS2.getId())
+        manual.setNumQuizzes(quizS2.getNumQuizzes());
+        manual.setUniqueQuizzesSolved(quizS2.getUniqueQuizzesSolved());
+        manual.setAverageQuizzesSolved(quizS2.getAverageQuizzesSolved());
+        manual.toString()== quizStatsDto1.toString()
+    }
+
 
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
