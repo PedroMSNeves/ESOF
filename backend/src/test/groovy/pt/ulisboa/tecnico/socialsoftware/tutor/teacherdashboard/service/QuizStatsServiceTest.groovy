@@ -459,6 +459,94 @@ class QuizStatsServiceTest extends SpockTest {
         manual.toString()== quizStatsDto1.toString()
     }
 
+    @Unroll
+    def "create a dashboard with a course that has a courseExecution with null date"() {
+        when: "a dashboard is created"
+        CourseExecution newce0 = newCourseExecution(2020)
+        newce0.setEndDate(null)
+        courseExecutionRepository.save(newce0)
+        CourseExecution newce1 = newCourseExecution(2021)
+        CourseExecution newce2 = newCourseExecution(2023)
+        teacher.addCourse(newce2)
+
+        def quiz00 = newQuiz(newce2)
+        def quiz01 = newQuiz(newce2)
+        def student0 = newStudent(newce2, "toni")
+        createQuizAnswer(student0, quiz00)
+        createQuizAnswer(student0, quiz01)
+
+        //two students in a course execution with 2 unique tests each
+        def student11 = newStudent(newce1, "ze");
+        def student12 = newStudent(newce1, "ez");
+        for(int i = 0; i < 2; i++) {
+            createQuizAnswer(student11, newQuiz(newce1))
+        }
+        for(int i = 0; i < 2; i++) {
+            createQuizAnswer(student12, newQuiz(newce1))
+        }
+
+        then: "an dashboard is created with 2 courseExecution"
+        teacherDashboardRepository.count() == 0L
+        quizStatsRepository.count() == 0L
+
+
+        teacherDashboardService.updateAllTeacherDashboards()
+        teacherDashboardRepository.count() == 1L
+        quizStatsRepository.count() == 2L
+
+        def td2 = teacherDashboardRepository.findAll().get(0)
+        td2.getId() != 0
+        def quizS2
+        def quizS3
+
+        quizStatsRepository.findAll().forEach(st -> {
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce1.getId())
+                quizS2=st
+            if (st.getTeacherDashboard().getId() == td2.getId() && st.getCourseExecution().getId() == newce2.getId())
+                quizS3=st
+        })
+        def teacherDashboardDto = teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
+        def quizStatsDto1
+        def quizStatsDto2
+        teacherDashboardDto.getQuizStatsDtos().stream().forEach(qsDto ->{
+            if(qsDto.getId()== quizS2.getId())
+                quizStatsDto1=qsDto
+            else if (qsDto.getId()== quizS3.getId())
+                quizStatsDto2=qsDto
+        })
+        def qs = quizS3
+        def qsdto = quizStatsDto2
+
+
+        def num = 2
+        def val1 = 2
+        def val2 = 2.0
+        qsdto.getNumQuizzes() == num
+        qs.getNumQuizzes() == num
+        qs.getUniqueQuizzesSolved() == val1
+        qsdto.getUniqueQuizzesSolved() == val1 
+        qs.getAverageQuizzesSolved() == val2
+        qsdto.getAverageQuizzesSolved() == val2
+
+        def qs2 = quizS2
+        def qsdto2 = quizStatsDto1
+
+
+        def num2 = 4
+        def val12 = 4
+        def val22 = 2.0
+        qsdto2.getNumQuizzes() == num2
+        qs2.getNumQuizzes() == num2
+        qs2.getUniqueQuizzesSolved() == val12
+        qsdto2.getUniqueQuizzesSolved() == val12 
+        qs2.getAverageQuizzesSolved() == val22
+        qsdto2.getAverageQuizzesSolved() == val22
+        System.out.println(quizS2.getCourseExecution().getEndDate().getYear()+"  "+quizS3.getCourseExecution().getEndDate().getYear())
+    }
+
+
+
+
 
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
