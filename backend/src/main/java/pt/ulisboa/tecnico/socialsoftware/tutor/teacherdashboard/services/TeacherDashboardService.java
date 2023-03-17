@@ -106,7 +106,7 @@ public class TeacherDashboardService {
                             studentStatsRepository.save(st);
                             QuizStats qs = new QuizStats(ce, teacherDashboard);
                             qs.update();
-                quizStatsRepository.save(qs);
+                            quizStatsRepository.save(qs);
                         }
                     });
     }
