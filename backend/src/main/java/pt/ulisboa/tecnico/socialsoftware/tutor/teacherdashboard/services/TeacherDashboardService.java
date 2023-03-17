@@ -79,14 +79,13 @@ public class TeacherDashboardService {
 
    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void addLast3QuizStats(TeacherDashboard teacherDashboard) {
-        try{
-            teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().stream()
-                    .sorted(Comparator.comparing(CourseExecution::getEndDate).reversed()).limit(3).forEach(ce -> {
-                        QuizStats qs = new QuizStats(ce, teacherDashboard);
-                        quizStatsRepository.save(qs);
-                    });
-        } catch (Exception e) {// if it does not have an date, ignore
-        }
+        teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().stream()
+        .sorted(Comparator.comparing(CourseExecution::getEndDate,Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).limit(3).forEach(ce -> {
+            if(ce.getEndDate()!=null) {
+                QuizStats qs = new QuizStats(ce, teacherDashboard);
+                quizStatsRepository.save(qs);
+            }
+        });
     }
 
     public void updateTeacherDashboard(int dashboardId) {
