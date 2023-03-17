@@ -81,9 +81,9 @@ public class QuizStats implements DomainEntity {
         this.numQuizzes = this.courseExecution.getNumberOfQuizzes(); 
         //here we use the student class to acess the unique quizes that each student resolves
         
+        this.averageQuizzesSolved = 0;
+        this.uniqueQuizzesSolved = 0;
         if (students.size() == 0) {
-            this.averageQuizzesSolved = 0;
-            this.uniqueQuizzesSolved = 0;
             return;
         }
         Set<Quiz> quizCourse = this.courseExecution.getQuizzes();
