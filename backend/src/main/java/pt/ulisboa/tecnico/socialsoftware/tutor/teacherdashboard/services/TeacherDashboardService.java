@@ -96,6 +96,21 @@ public class TeacherDashboardService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void updateAllTeacherDashboards() {
+        Iterable<Teacher> teacher = teacherRepository.findAll();
+        teacher.forEach(t -> {
+            t.getCourseExecutions().forEach(ex -> {
+                if (!t.getDashboards().stream().anyMatch(dashboard -> dashboard.getCourseExecution().equals(ex)))
+                    createAndReturnTeacherDashboardDto(ex,t);
+                t.getCourseExecutionDashboard(ex).update();
+                teacherDashboardRepository.save(t.getCourseExecutionDashboard(ex));
+            });
+            teacherRepository.save(t);
+        });
+    }
+
+
+    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void removeTeacherDashboard(Integer dashboardId) {
         if (dashboardId == null) {
             throw new TutorException(DASHBOARD_NOT_FOUND, -1);
