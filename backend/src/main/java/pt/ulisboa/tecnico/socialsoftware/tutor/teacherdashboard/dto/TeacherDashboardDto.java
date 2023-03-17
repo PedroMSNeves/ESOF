@@ -10,18 +10,28 @@ import java.util.stream.Collectors;
 public class TeacherDashboardDto {
     private Integer id;
     private List<StudentStatsDto> studentStatsDtos;
+    private List<QuizStatsDto> quizStatsDtos;
+    
     public TeacherDashboardDto() {
     }
 
     public TeacherDashboardDto(TeacherDashboard teacherDashboard) {
         this.id = teacherDashboard.getId();
         setStudentStatsDtos(teacherDashboard.getStudentStats().stream().map(st -> new StudentStatsDto(st)).collect(Collectors.toList()));
+        setQuizStatsDtos(teacherDashboard.getQuizStats().stream().map(qs -> new StudentStatsDto(qs)).collect(Collectors.toList()));
     }
     public List<StudentStatsDto> getStudentStatsDtos() {
         return studentStatsDtos;
     }
     public void setStudentStatsDtos(List<StudentStatsDto> studentStatsDtos) {
         this.studentStatsDtos = studentStatsDtos;
+    }
+
+    public List<QuizStatsDto> getQuizStatsDtos() {
+        return quizStatsDtos;
+    }
+    public void setQuizStatsDtos(List<QuizStatsDto> quizStatsDtos) {
+        this.quizStatsDtos = quizStatsDtos;
     }
 
     public Integer getId() {
