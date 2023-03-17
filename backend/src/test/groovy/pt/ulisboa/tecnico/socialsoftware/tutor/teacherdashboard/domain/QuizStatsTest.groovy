@@ -39,7 +39,6 @@ class QuizStatsTest extends SpockTest {
     def newQuizStats(td, ce) {
         def quizStats = new QuizStats(ce,td)
         quizStatsRepository.save(quizStats)
-        td.addQuizStats(quizStats)
         return quizStats
     }
 
