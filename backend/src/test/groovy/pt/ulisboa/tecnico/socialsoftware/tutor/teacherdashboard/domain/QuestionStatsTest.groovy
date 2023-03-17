@@ -80,6 +80,7 @@ class QuestionStatsTest extends SpockTest {
         def newQuestion = new Question()
         newQuestion.setTitle("Question Title")
         newQuestion.setCourse(externalCourse)
+        newQuestion.setStatus(Question.Status.AVAILABLE)
         def questionDetails = new MultipleChoiceQuestion()
         newQuestion.setQuestionDetails(questionDetails)
         questionRepository.save(newQuestion)
@@ -175,6 +176,38 @@ class QuestionStatsTest extends SpockTest {
         teacherDashboard.getQuestionStats().size() == 1
         teacherDashboard.getQuestionStats().contains(result)
     }
+    
+    
+    @Unroll
+    def "create an empty QuestionStats and use Set methods"() {
+        when: "a questionStats is created"
+        def questionStats = newQuestionStats(externalCourseExecution, teacherDashboard)
+        then: "an empty dashboard is created"
+        def result = questionStats
+        result.getId() != 0
+        result.getNumQuestionsAvailable() == 0
+        result.getNumQuestionsAnsweredUniq() == 0
+        result.getAverageQuestionsAnsweredUniq() == 0
+        result.getCourseExecution().getId() == externalCourseExecution.getId()
+        result.getTeacherDashboard().getId() == teacherDashboard.getId()
+
+        and: "the teacherDashboard has a reference for the QuestionStats"
+        teacherDashboard.getQuestionStats().size() == 1
+        teacherDashboard.getQuestionStats().contains(result)
+        
+        and: "set method"
+        result.setNumQuestionsAvailable(3);
+        result.setNumQuestionsAnsweredUniq(6);
+        result.setAverageQuestionsAnsweredUniq(2);
+        
+        result.getId() != 0
+        result.getNumQuestionsAvailable() == 3
+        result.getNumQuestionsAnsweredUniq() == 6
+        result.getAverageQuestionsAnsweredUniq() == 2
+        result.getCourseExecution().getId() == externalCourseExecution.getId()
+        result.getTeacherDashboard().getId() == teacherDashboard.getId()
+
+    }
 
     @Unroll
     def "create an empty QuestionStats and remove it"() {
@@ -211,9 +244,57 @@ class QuestionStatsTest extends SpockTest {
         def result = questionStats//QuestionStatsRepository.findAll().get(0)
 
         result.update()
-        result.getNumQuestionsAvailable() == 0
+        result.getNumQuestionsAvailable() == 2
         result.getNumQuestionsAnsweredUniq() == 2
         result.getAverageQuestionsAnsweredUniq() == 1
+    }
+    
+    def "create 2 empty QuestionStats and update it with quizzes that have available questions"() {
+        when: "a questionStats is created"
+        
+        def questionStats = newQuestionStats(externalCourseExecution, teacherDashboard)
+
+        def student1 = newstudent(externalCourseExecution,"1")
+        def student2 = newstudent(externalCourseExecution,"2")
+
+        externalCourseExecution.addUser(student1)
+        externalCourseExecution.addUser(student2)
+        
+        def quiz1 = createQuiz();
+        for (int i = 0; i < 5; i++) {
+            def question = createQuestion()
+            def quizQuestion = createQuizQuestion(quiz1, question)
+        }
+        
+        def quiz2 = createQuiz();
+        for (int i = 0; i < 5; i++) {
+            def question = createQuestion()
+            def quizQuestion = createQuizQuestion(quiz2, question)
+        }
+        
+        def question1 = createQuestion()
+        def quizQuestion1 = createQuizQuestion(quiz1, question1)
+        def quizzAnswer1 = answerQuiz(false, false, true, quizQuestion1, quiz1, student1)
+        student1.getCourseExecutionDashboard(externalCourseExecution).statistics(quizzAnswer1)
+        
+        question1.setStatus(Question.Status.REMOVED);
+        
+        def question2 = createQuestion()
+        def quizQuestion2 = createQuizQuestion(quiz2, question2)
+        def quizzAnswer2 = answerQuiz(true, false, true, quizQuestion2, quiz2, student2)
+        student2.getCourseExecutionDashboard(externalCourseExecution).statistics(quizzAnswer2)
+        
+        question2.setStatus(Question.Status.REMOVED);
+        
+        then: "an empty questionStats is created and updated"
+        
+        def result = questionStats//QuestionStatsRepository.findAll().get(0)
+
+        result.update()
+        result.getNumQuestionsAvailable() == 10
+        result.getNumQuestionsAnsweredUniq() == 2
+        result.getAverageQuestionsAnsweredUniq() == 1
+        
     }
 
     @Unroll
@@ -309,7 +390,7 @@ class QuestionStatsTest extends SpockTest {
         def result = questionStatsRepository.findAll().get(0)
 
         teacherDashboard.update()
-        result.getNumQuestionsAvailable() == 0
+        result.getNumQuestionsAvailable() == 18
         result.getNumQuestionsAnsweredUniq() == 18
         result.getAverageQuestionsAnsweredUniq() == 6
     }

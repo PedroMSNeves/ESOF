@@ -72,23 +72,23 @@ public class TeacherDashboardService {
 
     private TeacherDashboardDto createAndReturnTeacherDashboardDto(CourseExecution courseExecution, Teacher teacher) {
         TeacherDashboard teacherDashboard = new TeacherDashboard(courseExecution, teacher);
-        this.addLast3YearExecutions(teacherDashboard);
+        this.addLast3Executions(teacherDashboard);
         teacherDashboardRepository.save(teacherDashboard);
 
         return new TeacherDashboardDto(teacherDashboard);
     }
 
-    private void addLast3YearExecutions(TeacherDashboard teacherDashboard) {
-        try {
-            teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().stream()
-                    .sorted(Comparator.comparing(CourseExecution::getEndDate).reversed()).limit(3).forEach(ce -> {
-                        QuestionStats qt = new QuestionStats(ce, teacherDashboard);
-                        questionStatsRepository.save(qt);
-                    });
-        } catch (Exception e) {
-
-        }
+    private void addLast3Executions(TeacherDashboard teacherDashboard) {
+        teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().stream()
+            .sorted(Comparator.comparing(CourseExecution::getEndDate,Comparator.nullsFirst(Comparator.naturalOrder())).reversed()).limit(3).forEach(ce -> {
+            if(ce.getEndDate()!=null) {
+                QuestionStats qt = new QuestionStats(ce, teacherDashboard);
+                qt.update();
+                questionStatsRepository.save(qt);
+            }
+        });
     }
+
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateAllTeacherDashboards() {

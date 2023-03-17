@@ -70,14 +70,17 @@ class QuestionStatsServiceTest extends SpockTest {
     {
         return qt.getNumQuestionsAvailable() == num && qtdto.getNumQuestionsAvailable() == num &&
                 qt.getNumQuestionsAnsweredUniq() == val1 && qtdto.getNumQuestionsAnsweredUniq() == val1 &&
-                qt.getAverageQuestionsAnsweredUniq() == val2 && qtdto.getAverageQuestionsAnsweredUniq() == val2
+                qt.getAverageQuestionsAnsweredUniq() == (float) val2 && qtdto.getAverageQuestionsAnsweredUniq() == (float) val2
     }
 
     def testToString(qt,qtdto)
     {
-        return qtdto.toString() == "QuestionStatsDto{" + "id=" + qt.getId() + ", numQuestions=" + qt.getNumQuestionsAvailable() +
-                ", numQuestionsAnsweredUniq=" + qt.getNumQuestionsAnsweredUniq() +
-                ", numAverageQuestionsAnsweredUniq=" + qt.getAverageQuestionsAnsweredUniq() + '}';
+        return qtdto.toString() == 
+                "QuestionStatsDto{" + "id = " + qt.getId() +
+                ",NumQuestionsAvailable = " + qt.getNumQuestionsAvailable() +
+                ",NumQuestionsAnsweredUniq = " + qt.getNumQuestionsAnsweredUniq() +
+                ",averageQuestionsAnsweredUniq = " + qt.getAverageQuestionsAnsweredUniq() +
+                "}"
     }
 
 
@@ -96,6 +99,7 @@ class QuestionStatsServiceTest extends SpockTest {
         def newQuestion = new Question()
         newQuestion.setTitle("Question Title")
         newQuestion.setCourse(course)
+        newQuestion.setStatus(Question.Status.AVAILABLE)
         def questionDetails = new MultipleChoiceQuestion()
         newQuestion.setQuestionDetails(questionDetails)
         questionRepository.save(newQuestion)
@@ -305,11 +309,11 @@ class QuestionStatsServiceTest extends SpockTest {
         })
 
         question1.getNumQuestionsAnsweredUniq() == 1 &&
-        question1.getNumQuestionsAvailable() == 0 &&
+        question1.getNumQuestionsAvailable() == 1 &&
 
         question1.getAverageQuestionsAnsweredUniq() == 1
 
-        question2.getNumQuestionsAvailable() == 0 &&
+        question2.getNumQuestionsAvailable() == 2 &&
         question2.getNumQuestionsAnsweredUniq() == 2 &&
         question2.getAverageQuestionsAnsweredUniq() == 1
 
@@ -370,8 +374,8 @@ class QuestionStatsServiceTest extends SpockTest {
                 question3=qt
         })
 
-        compareQuestionStats(question1,0,1,1)
-        compareQuestionStats(question2,0,1,1)
+        compareQuestionStats(question1,1,1,1)
+        compareQuestionStats(question2,1,1,1)
         //compareQuestionStats(question3,0,0,0)
     }
 
@@ -424,11 +428,11 @@ class QuestionStatsServiceTest extends SpockTest {
             if (qt.getTeacherDashboard().getId() == td2.getId() && qt.getCourseExecution().getId() == newce1.getId())
                 question2=qt
         })
-        compareQuestionStats(question0,0,15,7.5)
-        compareQuestionStats(question2,0,12,4)
+        compareQuestionStats(question0,15,15,7.5)
+        compareQuestionStats(question2,12,12,4)
     }
 
-   /* @Unroll
+    @Unroll
     def "create an empty dashboard and update them with 3 courses execution each to see Dto"() {
         when: "a dashboard is created"
         CourseExecution newce0 = newCourseExecution(2020)
@@ -472,18 +476,18 @@ class QuestionStatsServiceTest extends SpockTest {
         def questionStatsDto1
         def questionStatsDto2
         def questionStatsDto3
-        teacherDashboardDto.getStudentStatsDtos().stream().forEach(qtDto ->{
-            if(qtDto.getId()== question2.getId())
+        teacherDashboardDto.getQuestionStatsDto().stream().forEach(qtDto ->{
+            if(qtDto.getId() == question2.getId())
                 questionStatsDto1=qtDto
-            else if (qtDto.getId()== question3.getId())
+            else if (qtDto.getId() == question3.getId())
                 questionStatsDto2=qtDto
             else if (qtDto.getId()== question4.getId())
                 questionStatsDto3=qtDto
         })
 
-        compareQuestionStatsandDto(question2,questionStatsDto1,0,15,7.5)
-        compareQuestionStatsandDto(question3,questionStatsDto2,0,15,5)
-        compareQuestionStatsandDto(question4,questionStatsDto3,0,1,0.2)
+        compareQuestionStatsandDto(question2,questionStatsDto1,15,15,5)
+        compareQuestionStatsandDto(question3,questionStatsDto2,1,1,0.2)
+        compareQuestionStatsandDto(question4,questionStatsDto3,15,15,7.5)
         and: "testToString"
         testToString(question2,questionStatsDto1)
         testToString(question3,questionStatsDto2)
@@ -526,38 +530,9 @@ class QuestionStatsServiceTest extends SpockTest {
 
         teacherDashboardService.updateAllTeacherDashboards()
         teacherDashboardRepository.count() == 1L
-        questionStatsRepository.save(teacherDashboardService.getTeacherDashboard(newce1.getId(),teacher.getId()).getQuestionStats())
-        questionStatsRepository.save(teacherDashboardService.getTeacherDashboard(newce2.getId(),teacher.getId()).getQuestionStats())
 
-        questionStatsRepository.count() == 2L
-
-
-        def td2 = teacherDashboardRepository.findAll().get(0)
-        td2.getId() != 0
-        def questionS2
-        def questionS3
-
-        questionStatsRepository.findAll().forEach(qt -> {
-            if (qt.getTeacherDashboard().getId() == td2.getId() && qt.getCourseExecution().getId() == newce1.getId())
-                questionS2=qt
-            if (qt.getTeacherDashboard().getId() == td2.getId() && qt.getCourseExecution().getId() == newce2.getId())
-                questionS3=qt
-        })
-        def teacherDashboardDto = teacherDashboardService.getTeacherDashboard(newce2.getId(), teacher.getId())
-        def questionStatsDto1
-        def questionStatsDto2
-        teacherDashboardDto.getStudentStatsDtos().stream().forEach(qtDto ->{
-            if(qtDto.getId()== questionS2.getId())
-                questionStatsDto1=qtDto
-            else if (qtDto.getId()== questionS3.getId())
-                questionStatsDto2=qtDto
-        })
-
-        compareQuestionStatsandDto(questionS2,questionStatsDto1,0,15,5)
-        compareQuestionStatsandDto(questionS3,questionStatsDto2,0,22,4.4)
-        System.out.println(questiontS2.getCourseExecution().getEndDate().getYear()+"  "+questionS3.getCourseExecution().getEndDate().getYear())
     }
-*/
+
 
     @TestConfiguration
     static class LocalBeanConfiguration extends BeanConfiguration {}
