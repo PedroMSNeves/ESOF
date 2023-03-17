@@ -47,7 +47,8 @@ public class QuizStats implements DomainEntity {
     }
     public TeacherDashboard getTeacherDashboard(){ return teacherDashboard; }
     public void setTeacherDashboard(TeacherDashboard teacherDashboard){
-        this.teacherDashboard = teacherDashboard;
+        this.teacherDashboard = teacherDashboard;   
+        this.teacherDashboard.addQuizStats(this);
     }
 
     public Integer getId() {

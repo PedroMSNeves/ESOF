@@ -77,7 +77,7 @@ public class TeacherDashboardService {
         return new TeacherDashboardDto(teacherDashboard);
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
+   @Transactional(isolation = Isolation.READ_COMMITTED)
     public void addLast3QuizStats(TeacherDashboard teacherDashboard) {
         try{
             teacherDashboard.getCourseExecution().getCourse().getCourseExecutions().stream()
@@ -95,21 +95,14 @@ public class TeacherDashboardService {
         teacherDashboardRepository.save(teacherDashboard);
     }
 
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void updateAllTeacherDashboards() {
-        Iterable<Teacher> teacher = teacherRepository.findAll();
-        teacher.forEach(t -> {
-            t.getCourseExecutions().forEach(ex -> {
-                if (!t.getDashboards().stream().anyMatch(dashboard -> dashboard.getCourseExecution().equals(ex)))
-                    createAndReturnTeacherDashboardDto(ex,t);
-                t.getCourseExecutionDashboard(ex).update();
-                teacherDashboardRepository.save(t.getCourseExecutionDashboard(ex));
-            });
-            teacherRepository.save(t);
+        Iterable<TeacherDashboard> teacherDashboards = teacherDashboardRepository.findAll();
+        teacherDashboards.forEach(td -> {
+            td.update();
+            teacherDashboardRepository.save(td);
         });
     }
-
-
+ 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void removeTeacherDashboard(Integer dashboardId) {
         if (dashboardId == null) {
@@ -118,5 +111,5 @@ public class TeacherDashboardService {
         TeacherDashboard teacherDashboard = teacherDashboardRepository.findById(dashboardId).orElseThrow(() -> new TutorException(DASHBOARD_NOT_FOUND, dashboardId));
         teacherDashboard.remove();
         teacherDashboardRepository.delete(teacherDashboard);
-    }
+    }    
 }
