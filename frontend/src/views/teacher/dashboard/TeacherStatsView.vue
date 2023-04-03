@@ -2,16 +2,61 @@
   <div class="container">
     <h2>Statistics for this course execution</h2>
     <div v-if="teacherDashboard != null" class="stats-container">
-      <div class="items">
-        <div ref="totalStudents" class="icon-wrapper">
-          <animated-number :number="teacherDashboard.numberOfStudents" />
+      <div v-if="studentStatsRecent == null" class="stats-container">
+            <div class="items">
+                <div ref="totalStudents" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Students</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="totalStudents" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Students who Solved > 75% Questions</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="totalStudents" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Students who Solved >= 3 Quizzes</p>
+                </div>
+            </div>
         </div>
-        <div class="project-name">
-          <p>Number of Students</p>
+        <div v-else-if="studentStatsRecent != null" class="stats-container">
+            <div class="items">
+                <div ref="totalStudents" class="icon-wrapper">
+                    <animated-number :number="studentStatsRecent.numStudents" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Students</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="totalStudents" class="icon-wrapper">
+                    <animated-number :number="studentStatsRecent.numMore75CorrectQuestions" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Students who Solved > 75% Questions</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="totalStudents" class="icon-wrapper">
+                    <animated-number :number="studentStatsRecent.numAtLeast3Quizzes" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Students who Solved >= 3 Quizzes</p>
+                </div>
+            </div>
         </div>
-      </div>
     </div>
-</div>
+
+  </div>
 </template>
 
 <script lang="ts">
@@ -19,6 +64,7 @@ import { Component, Prop, Vue } from 'vue-property-decorator';
 import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/dashboard/TeacherDashboard';
+import TeacherDashboardStudentStats from '@/models/dashboard/TeacherDashboardStudentStats';
 
 @Component({
   components: { AnimatedNumber },
@@ -27,11 +73,17 @@ import TeacherDashboard from '@/models/dashboard/TeacherDashboard';
 export default class TeacherStatsView extends Vue {
   @Prop() readonly dashboardId!: number;
   teacherDashboard: TeacherDashboard | null = null;
+  studentStats: TeacherDashboardStudentStats[] = [];
+  studentStatsRecent: TeacherDashboardStudentStats | null = null;
 
   async created() {
     await this.$store.dispatch('loading');
     try {
       this.teacherDashboard = await RemoteServices.getTeacherDashboard();
+      this.studentStats = this.teacherDashboard.studentStats;
+      if (this.studentStats.length != 0){
+        this.studentStatsRecent = this.studentStats[0];
+      }
     } catch (error) {
       await this.$store.dispatch('error', error);
     }

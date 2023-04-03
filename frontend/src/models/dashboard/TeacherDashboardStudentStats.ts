@@ -1,6 +1,6 @@
 export default class TeacherDashboardStudentStats {
   id!: number;
-  numStudent!: number;
+  numStudents!: number;
   numMore75CorrectQuestions!: number;
   numAtLeast3Quizzes!: number;
   courseExecutionYear!: number;
@@ -8,7 +8,7 @@ export default class TeacherDashboardStudentStats {
   constructor(jsonObj?: TeacherDashboardStudentStats) {
     if (jsonObj) {
       this.id = jsonObj.id;
-      this.numStudent = jsonObj.numStudent;
+      this.numStudents = jsonObj.numStudents;
       this.numMore75CorrectQuestions = jsonObj.numMore75CorrectQuestions;
       this.numAtLeast3Quizzes = jsonObj.numAtLeast3Quizzes;
       this.courseExecutionYear = jsonObj.courseExecutionYear;
