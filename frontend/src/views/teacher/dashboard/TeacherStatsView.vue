@@ -56,7 +56,7 @@
         </div>
     </div>
     <div class="bar-chart">
-      <BarChart />
+      <BarChart :stats1="stats1" :stats2="stats2" :stats3="stats3" />
     </div>
 
   </div>
@@ -77,11 +77,20 @@ import BarChart from '@/components/BarChart.vue';
 export default class TeacherStatsView extends Vue {
   @Prop() readonly dashboardId!: number;
   teacherDashboard: TeacherDashboard | null = null;
-
+  years : number[] = [];
+  stats1: number[] = [];
+  stats2: number[] = [];
+  stats3: number[] = [];
   async created() {
     await this.$store.dispatch('loading');
     try {
       this.teacherDashboard = await RemoteServices.getTeacherDashboard();
+      for( var i =0; i< this.teacherDashboard.studentStats.length; i++){
+        this.years.push(this.teacherDashboard.studentStats[i].courseExecutionYear);
+        this.stats1.push(this.teacherDashboard.studentStats[i].numStudents);
+        this.stats2.push(this.teacherDashboard.studentStats[i].numMore75CorrectQuestions);
+        this.stats3.push(this.teacherDashboard.studentStats[i].numAtLeast3Quizzes);
+      }
 
     } catch (error) {
       await this.$store.dispatch('error', error);

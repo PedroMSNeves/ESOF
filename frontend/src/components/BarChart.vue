@@ -5,6 +5,7 @@
 </template>
 
 <script lang="ts">
+import {Prop, Vue, Watch} from 'vue-property-decorator';
 import { Bar } from 'vue-chartjs/legacy'
 import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js'
 
@@ -12,6 +13,11 @@ ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
 
 export default {
 
+  props: {
+    stats1: Array,
+    stats2: Array,
+    stats3: Array,
+    },
   name: 'BarChart',
   components: { Bar },
   data() {
@@ -19,9 +25,9 @@ export default {
 
       chartData: {
         labels: ['January', 'February', 'March'],
-        datasets: [ { label: 'Total Number of Students', data: [40, 20, 12] , backgroundColor: ['#d60001']},
-                    { label: 'Students who Solved > 75% of Questions',data: [10, 21, 34] , backgroundColor: ['#006ca2']},
-                    { label: 'Students who Solved >= 3 Quizzes ',data: [39, 8, 23] , backgroundColor: ['#0b6e00']}]
+        datasets: [ { label: 'Total Number of Students', data:  this.props.stats1, backgroundColor: ['#d60001']},
+                    { label: 'Students who Solved > 75% of Questions',data:  this.props.stats2  , backgroundColor: ['#006ca2']},
+                    { label: 'Students who Solved >= 3 Quizzes ',data: this.props.stats3 , backgroundColor: ['#0b6e00']}]
       },
       chartOptions: {
         maintainAspectRatio: false
