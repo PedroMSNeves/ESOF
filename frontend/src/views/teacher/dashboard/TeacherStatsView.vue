@@ -55,6 +55,9 @@
             </div>
         </div>
     </div>
+    <div class="bar-chart">
+      <BarChart />
+    </div>
 
   </div>
 </template>
@@ -65,9 +68,10 @@ import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/dashboard/TeacherDashboard';
 import TeacherDashboardStudentStats from '@/models/dashboard/TeacherDashboardStudentStats';
+import BarChart from '@/components/BarChart.vue';
 
 @Component({
-  components: { AnimatedNumber },
+  components: { AnimatedNumber, BarChart },
 })
 
 export default class TeacherStatsView extends Vue {
@@ -111,6 +115,7 @@ export default class TeacherStatsView extends Vue {
   .bar-chart {
     background-color: rgba(255, 255, 255, 0.90);
     height: 400px;
+    width: 700px;
   }
 }
 
