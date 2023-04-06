@@ -54,9 +54,64 @@
                 </div>
             </div>
         </div>
+        <div v-if="teacherDashboard.questionStats == null" class="stats-container">
+            <div class="items">
+                <div ref="numAvailable" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Questions Available</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="answeredQuestionsUnique" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Answered Questions Unique</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="averageQuestionsAnswered" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Average of Answered Questions Unique per student</p>
+                </div>
+            </div>
+        </div>
+        <div v-else-if="teacherDashboard.questionStats != null" class="stats-container">
+            <div class="items">
+                <div ref="numAvailable" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.questionStats[0].numAvailable" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Questions Available</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="answeredQuestionsUnique" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.questionStats[0].answeredQuestionsUnique" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Answered Questions Unique</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="averageQuestionsAnswered" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.questionStats[0].averageQuestionsAnswered" />
+                </div>
+                <div class="project-name">
+                    <p>Average of Answered Questions Unique per student</p>
+                </div>
+            </div>
+        </div>
     </div>
     <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
             <BarChart :stats1="stats1" :stats2="stats2" :stats3="stats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
+    </div>
+    <div v-if="teacherDashboard.questionStats.length >1" class="bar-chart">
+            <BarChart :stats1="questionStats1" :stats2="questionStats2" :stats3="questionStats3" :years="questionStatsYears" :label="['Total Number of Questions Available','Number of Answered Questions Unique','Average of Answered Questions Unique per student']"/>
     </div>
 
   </div>
@@ -68,6 +123,7 @@ import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/dashboard/TeacherDashboard';
 import TeacherDashboardStudentStats from '@/models/dashboard/TeacherDashboardStudentStats';
+import TeacherDashboardQuestionStats from '@/models/dashboard/TeacherDashboardQuestionStats';
 import BarChart from '@/components/BarChart.vue';
 
 @Component({
@@ -81,6 +137,12 @@ export default class TeacherStatsView extends Vue {
   stats1: number[] = [];
   stats2: number[] = [];
   stats3: number[] = [];
+  questionStatsYears: number[] = [];
+  questionStats1    : number[] = [];
+  questionStats2    : number[] = [];
+  questionStats3    : number[] = [];
+
+
   async created() {
     await this.$store.dispatch('loading');
     try {
@@ -90,6 +152,12 @@ export default class TeacherStatsView extends Vue {
         this.stats1.push(this.teacherDashboard.studentStats[i].numStudents);
         this.stats2.push(this.teacherDashboard.studentStats[i].numMore75CorrectQuestions);
         this.stats3.push(this.teacherDashboard.studentStats[i].numAtLeast3Quizzes);
+      }
+      for(var i = 0; i < this.teacherDashboard.questionStats.length;i++){
+        this.questionStatsYears.push(this.teacherDashboard.questionStats[i].courseExecutionYear);
+        this.questionStats1.push(this.teacherDashboard.questionStats[i].numAvailable);
+        this.questionStats2.push(this.teacherDashboard.questionStats[i].answeredQuestionsUnique);
+        this.questionStats3.push(this.teacherDashboard.questionStats[i].averageQuestionsAnswered);
       }
     } catch (error) {
       await this.$store.dispatch('error', error);
