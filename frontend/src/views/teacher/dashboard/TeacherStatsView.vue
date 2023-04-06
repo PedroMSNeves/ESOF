@@ -56,7 +56,7 @@
         </div>
     </div>
     <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
-            <BarChart :stats1="stats1" :stats2="stats2" :stats3="stats3" :years="years"/>
+            <BarChart :stats1="stats1" :stats2="stats2" :stats3="stats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
     </div>
 
   </div>
