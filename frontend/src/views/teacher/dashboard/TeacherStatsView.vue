@@ -55,8 +55,8 @@
             </div>
         </div>
     </div>
-    <div class="bar-chart">
-      <BarChart :stats1="stats1" :stats2="stats2" :stats3="stats3" />
+    <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
+            <BarChart :stats1="stats1" :stats2="stats2" :stats3="stats3" :years="years"/>
     </div>
 
   </div>
@@ -91,14 +91,12 @@ export default class TeacherStatsView extends Vue {
         this.stats2.push(this.teacherDashboard.studentStats[i].numMore75CorrectQuestions);
         this.stats3.push(this.teacherDashboard.studentStats[i].numAtLeast3Quizzes);
       }
-
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
     await this.$store.dispatch('clearLoading');
   }
 }
-
 </script>
 
 <style lang="scss" scoped>
