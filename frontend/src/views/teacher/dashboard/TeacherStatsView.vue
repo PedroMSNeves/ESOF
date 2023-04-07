@@ -54,11 +54,66 @@
                 </div>
             </div>
         </div>
+
+      <div v-if="teacherDashboard.quizStats == null" class="stats-container">
+            <div class="items">
+                <div ref="numQuizzes" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Quizzes</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="uniqueQuizzesSolved" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Unique Quizzes Solved</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="averageQuizzesSolved" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Average Quizzes Solved</p>
+                </div>
+            </div>
+        </div>
+        <div v-else-if="teacherDashboard.quizStats != null" class="stats-container">
+            <div class="items">
+                <div ref="numQuizzes" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.quizStats[0].numQuizzes" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Quizzes</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="uniqueQuizzesSoleved" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.quizStats[0].uniqueQuizzesSolved" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Unique Quizzes Solved</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="averageQuizzesSolved" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.quizStats[0].averageQuizzesSolved" />
+                </div>
+                <div class="project-name">
+                    <p>Average Quizzes Solved</p>
+                </div>
+            </div>
+        </div>
     </div>
     <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
             <BarChart :stats1="stats1" :stats2="stats2" :stats3="stats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
-    </div>
-
+            </div>
+    <div v-if="teacherDashboard.quizStats.length >1" class="bar-chart">
+            <BarChart :stats1="quizStats1" :stats2="quizStats2" :stats3="quizStats3" :years="quizYears" :label="['Total Number of Quizzes','Number of Unique Quizzes Solved','Average Quizzes Solved']"/>
+            </div>
   </div>
 </template>
 
