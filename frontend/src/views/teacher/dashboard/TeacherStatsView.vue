@@ -126,7 +126,7 @@ import TeacherDashboardStudentStats from '@/models/dashboard/TeacherDashboardStu
 import TeacherDashboardQuizStats from '@/models/dashboard/TeacherDashboardQuizStats.js';
 import BarChart from '@/components/BarChart.vue';
 
-@Component({
+Component({
   components: { AnimatedNumber, BarChart },
 })
 
