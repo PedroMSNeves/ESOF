@@ -56,7 +56,7 @@
         </div>
     </div>
     <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
-            <BarChart :stats1="stats1" :stats2="stats2" :stats3="stats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
+            <BarChart :stats1="studentStats1" :stats2="studentStats2" :stats3="studentStats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
     </div>
 
   </div>
@@ -78,9 +78,9 @@ export default class TeacherStatsView extends Vue {
   @Prop() readonly dashboardId!: number;
   teacherDashboard: TeacherDashboard | null = null;
   years : number[] = [];
-  stats1: number[] = [];
-  stats2: number[] = [];
-  stats3: number[] = [];
+  studentStats1: number[] = [];
+  studentStats2: number[] = [];
+  studentStats3: number[] = [];
   async created() {
     await this.$store.dispatch('loading');
     try {
