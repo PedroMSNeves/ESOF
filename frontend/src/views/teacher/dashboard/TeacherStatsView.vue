@@ -108,7 +108,7 @@
         </div>
     </div>
     <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
-            <BarChart :stats1="stats1" :stats2="stats2" :stats3="stats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
+            <BarChart :stats1="studentStats1" :stats2="studentStats2" :stats3="studentStats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
     </div>
     <div v-if="teacherDashboard.questionStats.length >1" class="bar-chart">
             <BarChart :stats1="questionStats1" :stats2="questionStats2" :stats3="questionStats3" :years="questionStatsYears" :label="['Total Number of Questions Available','Number of Answered Questions Unique','Average of Answered Questions Unique per student']"/>
