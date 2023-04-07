@@ -68,9 +68,10 @@ import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/dashboard/TeacherDashboard';
 import TeacherDashboardStudentStats from '@/models/dashboard/TeacherDashboardStudentStats';
+import QuizStats from '@/models/dashboard/QuizStats';
 import BarChart from '@/components/BarChart.vue';
 
-@Component({
+Component({
   components: { AnimatedNumber, BarChart },
 })
 
@@ -81,6 +82,10 @@ export default class TeacherStatsView extends Vue {
   stats1: number[] = [];
   stats2: number[] = [];
   stats3: number[] = [];
+  quizYears : number[] = [];
+  quizStats1 : number[] = [];
+  quizStats2 : number[] = [];
+  quizStats3 : number[] = [];
   async created() {
     await this.$store.dispatch('loading');
     try {
@@ -90,6 +95,12 @@ export default class TeacherStatsView extends Vue {
         this.stats1.push(this.teacherDashboard.studentStats[i].numStudents);
         this.stats2.push(this.teacherDashboard.studentStats[i].numMore75CorrectQuestions);
         this.stats3.push(this.teacherDashboard.studentStats[i].numAtLeast3Quizzes);
+      }
+      for(var j = 0; j < this.teacherDashboard.quizStats.length; j++) {
+        this.years.push(this.teacherDashboard.quizStats[j].courseExecutionYear);
+        this.quizStats1.push(this.teacherDashboard.quizStats[j].numQuizzes);   
+        this.quizStats1.push(this.teacherDashboard.quizStats[j].uniqueQuizzesSolved);   
+        this.quizStats1.push(this.teacherDashboard.quizStats[j].averageQuizzesSolved);   
       }
     } catch (error) {
       await this.$store.dispatch('error', error);
