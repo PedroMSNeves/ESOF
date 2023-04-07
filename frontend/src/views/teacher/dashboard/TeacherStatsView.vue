@@ -54,11 +54,66 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
-            <BarChart :stats1="studentStats1" :stats2="studentStats2" :stats3="studentStats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
-    </div>
 
+        <div v-if="teacherDashboard.quizStats == null" class="stats-container">
+            <div class="items">
+                <div ref="numQuizzes" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Quizzes</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="numUniqueAnsweredQuizzes" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Unique Quizzes Solved</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="averageQuizzesSolved" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Average Quizzes Solved</p>
+                </div>
+            </div>
+        </div>
+        <div v-else-if="teacherDashboard.quizStats != null" class="stats-container">
+            <div class="items">
+                <div ref="numQuizzes" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.quizStats[0].numQuizzes" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Quizzes</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="numUniqueAnsweredQuizzes" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.quizStats[0].numUniqueAnsweredQuizzes" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Unique Quizzes Solved</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="averageQuizzesSolved" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.quizStats[0].averageQuizzesSolved" />
+                </div>
+                <div class="project-name">
+                    <p>Average Quizzes Solved</p>
+                </div>
+            </div>
+        </div>
+      </div>
+      <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
+              <BarChart :stats1="studentStats1" :stats2="studentStats2" :stats3="studentStats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
+              </div>
+      <div v-if="teacherDashboard.quizStats.length >1" class="bar-chart">
+              <BarChart :stats1="quizStats1" :stats2="quizStats2" :stats3="quizStats3" :years="years" :label="['Total Number of Quizzes','Number of Unique Quizzes Solved','Average Quizzes Solved']"/>
+              </div>
   </div>
 </template>
 
@@ -68,6 +123,7 @@ import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/dashboard/TeacherDashboard';
 import TeacherDashboardStudentStats from '@/models/dashboard/TeacherDashboardStudentStats';
+import TeacherDashboardQuizStats from '@/models/dashboard/TeacherDashboardQuizStats.js';
 import BarChart from '@/components/BarChart.vue';
 
 @Component({
@@ -81,6 +137,9 @@ export default class TeacherStatsView extends Vue {
   studentStats1: number[] = [];
   studentStats2: number[] = [];
   studentStats3: number[] = [];
+  quizStats1 : number[] = [];
+  quizStats2 : number[] = [];
+  quizStats3 : number[] = [];
   async created() {
     await this.$store.dispatch('loading');
     try {
@@ -90,7 +149,11 @@ export default class TeacherStatsView extends Vue {
         this.studentStats1.push(this.teacherDashboard.studentStats[i].numStudents);
         this.studentStats2.push(this.teacherDashboard.studentStats[i].numMore75CorrectQuestions);
         this.studentStats3.push(this.teacherDashboard.studentStats[i].numAtLeast3Quizzes);
+        this.quizStats1.push(this.teacherDashboard.quizStats[i].numQuizzes);   
+        this.quizStats2.push(this.teacherDashboard.quizStats[i].numUniqueAnsweredQuizzes);   
+        this.quizStats3.push(this.teacherDashboard.quizStats[i].averageQuizzesSolved);   
       }
+      
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
