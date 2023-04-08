@@ -149,9 +149,9 @@ export default class TeacherStatsView extends Vue {
       this.teacherDashboard = await RemoteServices.getTeacherDashboard();
       for( var i =0; i< this.teacherDashboard.studentStats.length; i++){
         this.years.push(this.teacherDashboard.studentStats[i].courseExecutionYear);
-        this.stats1.push(this.teacherDashboard.studentStats[i].numStudents);
-        this.stats2.push(this.teacherDashboard.studentStats[i].numMore75CorrectQuestions);
-        this.stats3.push(this.teacherDashboard.studentStats[i].numAtLeast3Quizzes);
+        this.studentStats1.push(this.teacherDashboard.studentStats[i].numStudents);
+        this.studentStats2.push(this.teacherDashboard.studentStats[i].numMore75CorrectQuestions);
+        this.studentStats3.push(this.teacherDashboard.studentStats[i].numAtLeast3Quizzes);
       }
       for(var i = 0; i < this.teacherDashboard.questionStats.length;i++){
         this.questionStatsYears.push(this.teacherDashboard.questionStats[i].courseExecutionYear);

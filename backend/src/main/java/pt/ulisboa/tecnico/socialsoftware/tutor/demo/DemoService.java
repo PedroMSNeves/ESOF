@@ -35,6 +35,12 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.repository.UserRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.utils.DateHandler;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.dto.AuthDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.AuthUserService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -95,6 +101,9 @@ public class DemoService {
 
     @Autowired
     private DifficultQuestionRepository difficultQuestionRepository;
+
+    @Autowired
+    private AuthUserService authUserService;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void resetDemoDashboards() {
@@ -303,5 +312,39 @@ public class DemoService {
         quizRepository.save(inClassQuiz);
         quizRepository.save(proposedQuiz);
         quizRepository.save(scrambledQuiz);
+
+        CourseExecution demoExecution = courseExecutionRepository.findById(courseExecutionId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_EXECUTION_NOT_FOUND));
+        demoExecution.setEndDate(DateHandler.toLocalDateTime("2017-12-31T10:15:30+01:00[Europe/Lisbon]"));
+
+        // Simulate login of demo teacher (this adds the demo teacher to the original demo execution
+        AuthDto authDemoTeacherDto = authUserService.demoTeacherAuth();
+
+        // Get demo course and demo teacher
+        Course demoCourse = courseRepository.findById(courseId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_NOT_FOUND));
+        User demoTeacher = userRepository.findById(authDemoTeacherDto.getUser().getId())
+                .orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND));
+
+        // Create three additional course executions
+        List<String> endDates = Arrays.asList(
+                "2019-12-31T10:15:30+01:00[Europe/Lisbon]",
+                "2022-12-31T10:15:30+01:00[Europe/Lisbon]",
+                "2023-12-31T10:15:30+01:00[Europe/Lisbon]"
+        );
+        List<String> academicTerms = Arrays.asList("1st semester 2019/2020", "1st semester 2022/2023", "1st semester 2023/2024");
+
+        for (int i = 0; i < endDates.size(); i++) {
+            CourseExecution newCE = new CourseExecution(
+                    demoCourse,
+                    "Demo Course",
+                    academicTerms.get(i),
+                    Course.Type.TECNICO,
+                    DateHandler.toLocalDateTime(endDates.get(i)));
+
+            demoTeacher.addCourse(newCE);
+
+            courseExecutionRepository.save(newCE);
+        }
     }
 }
