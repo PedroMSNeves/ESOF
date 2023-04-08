@@ -35,6 +35,12 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.repository.UserRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.utils.DateHandler;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.dto.AuthDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.AuthUserService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -95,6 +101,9 @@ public class DemoService {
 
     @Autowired
     private DifficultQuestionRepository difficultQuestionRepository;
+
+    @Autowired
+    private AuthUserService authUserService;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void resetDemoDashboards() {

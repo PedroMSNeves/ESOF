@@ -137,15 +137,12 @@ export default class TeacherStatsView extends Vue {
   studentStats1: number[] = [];
   studentStats2: number[] = [];
   studentStats3: number[] = [];
-<<<<<<< HEAD
   questionStatsYears: number[] = [];
   questionStats1    : number[] = [];
   questionStats2    : number[] = [];
   questionStats3    : number[] = [];
 
 
-=======
->>>>>>> 7e20d45d (fix: syntax (names))
   async created() {
     await this.$store.dispatch('loading');
     try {
