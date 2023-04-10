@@ -134,9 +134,9 @@ export default class TeacherStatsView extends Vue {
   @Prop() readonly dashboardId!: number;
   teacherDashboard: TeacherDashboard | null = null;
   years : number[] = [];
-  stats1: number[] = [];
-  stats2: number[] = [];
-  stats3: number[] = [];
+  studentStats1: number[] = [];
+  studentStats2: number[] = [];
+  studentStats3: number[] = [];
   questionStatsYears: number[] = [];
   questionStats1    : number[] = [];
   questionStats2    : number[] = [];
