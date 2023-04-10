@@ -1,5 +1,5 @@
 import TeacherDashboardStudentStats from '@/models/dashboard/TeacherDashboardStudentStats';
-import QuizStats from "./QuizStats";
+import QuizStats from '@/models/dashboard/QuizStats';
 
 export default class TeacherDashboard {
   id!: number;

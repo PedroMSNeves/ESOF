@@ -109,10 +109,10 @@
         </div>
     </div>
     <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
-            <BarChart :stats1="stats1" :stats2="stats2" :stats3="stats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
+            <BarChart :stats1="studentStats1" :stats2="studentStats2" :stats3="studentStats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
             </div>
     <div v-if="teacherDashboard.quizStats.length >1" class="bar-chart">
-            <BarChart :stats1="quizStats1" :stats2="quizStats2" :stats3="quizStats3" :years="quizYears" :label="['Total Number of Quizzes','Number of Unique Quizzes Solved','Average Quizzes Solved']"/>
+            <BarChart :stats1="quizStats1" :stats2="quizStats2" :stats3="quizStats3" :years="years" :label="['Total Number of Quizzes','Number of Unique Quizzes Solved','Average Quizzes Solved']"/>
             </div>
   </div>
 </template>
@@ -134,10 +134,9 @@ export default class TeacherStatsView extends Vue {
   @Prop() readonly dashboardId!: number;
   teacherDashboard: TeacherDashboard | null = null;
   years : number[] = [];
-  stats1: number[] = [];
-  stats2: number[] = [];
-  stats3: number[] = [];
-  quizYears : number[] = [];
+  studentStats1: number[] = [];
+  studentStats2: number[] = [];
+  studentStats3: number[] = [];
   quizStats1 : number[] = [];
   quizStats2 : number[] = [];
   quizStats3 : number[] = [];
@@ -147,16 +146,14 @@ export default class TeacherStatsView extends Vue {
       this.teacherDashboard = await RemoteServices.getTeacherDashboard();
       for( var i =0; i< this.teacherDashboard.studentStats.length; i++){
         this.years.push(this.teacherDashboard.studentStats[i].courseExecutionYear);
-        this.stats1.push(this.teacherDashboard.studentStats[i].numStudents);
-        this.stats2.push(this.teacherDashboard.studentStats[i].numMore75CorrectQuestions);
-        this.stats3.push(this.teacherDashboard.studentStats[i].numAtLeast3Quizzes);
+        this.studentStats1.push(this.teacherDashboard.studentStats[i].numStudents);
+        this.studentStats2.push(this.teacherDashboard.studentStats[i].numMore75CorrectQuestions);
+        this.studentStats3.push(this.teacherDashboard.studentStats[i].numAtLeast3Quizzes);
+        this.quizStats1.push(this.teacherDashboard.quizStats[i].numQuizzes);   
+        this.quizStats2.push(this.teacherDashboard.quizStats[i].uniqueQuizzesSolved);   
+        this.quizStats3.push(this.teacherDashboard.quizStats[i].averageQuizzesSolved);   
       }
-      for(var j = 0; j < this.teacherDashboard.quizStats.length; j++) {
-        this.years.push(this.teacherDashboard.quizStats[j].courseExecutionYear);
-        this.quizStats1.push(this.teacherDashboard.quizStats[j].numQuizzes);   
-        this.quizStats1.push(this.teacherDashboard.quizStats[j].uniqueQuizzesSolved);   
-        this.quizStats1.push(this.teacherDashboard.quizStats[j].averageQuizzesSolved);   
-      }
+      
     } catch (error) {
       await this.$store.dispatch('error', error);
     }
