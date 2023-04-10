@@ -98,7 +98,7 @@
                     <p>Number of Unique Quizzes Solved</p>
                 </div>
             </div>
-            <div class="items">
+            <div class="">
                 <div ref="averageQuizzesSolved" class="icon-wrapper">
                     <animated-number :number="teacherDashboard.quizStats[0].averageQuizzesSolved" />
                 </div>
