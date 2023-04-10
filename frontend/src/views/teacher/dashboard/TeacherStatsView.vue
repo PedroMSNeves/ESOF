@@ -55,7 +55,7 @@
             </div>
         </div>
 
-      <div v-if="teacherDashboard.quizStats == null" class="stats-container">
+        <div v-if="teacherDashboard.quizStats == null" class="stats-container">
             <div class="items">
                 <div ref="numQuizzes" class="icon-wrapper">
                     <animated-number :number="0" />
@@ -98,7 +98,7 @@
                     <p>Number of Unique Quizzes Solved</p>
                 </div>
             </div>
-            <div class="items">
+            <div class="">
                 <div ref="averageQuizzesSolved" class="icon-wrapper">
                     <animated-number :number="teacherDashboard.quizStats[0].averageQuizzesSolved" />
                 </div>

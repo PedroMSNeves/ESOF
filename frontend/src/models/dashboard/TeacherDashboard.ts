@@ -4,7 +4,11 @@ import TeacherDashboardQuizStats from '@/models/dashboard/TeacherDashboardQuizSt
 export default class TeacherDashboard {
   id!: number;
   studentStats: TeacherDashboardStudentStats[] = [];
+<<<<<<< HEAD
   quizStats: TeacherDashboardQuizStats[] = [];
+=======
+  quizStats: TeacherDashboardQuizStats[] = []
+>>>>>>> 53d25f22d0d7f04033735074cd956380d5b7b1bc
 
   constructor(jsonObj?: TeacherDashboard) {
     if (jsonObj) {
