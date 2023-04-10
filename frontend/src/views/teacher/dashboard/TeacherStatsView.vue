@@ -55,7 +55,7 @@
             </div>
         </div>
 
-      <div v-if="teacherDashboard.quizStats == null" class="stats-container">
+        <div v-if="teacherDashboard.quizStats == null" class="stats-container">
             <div class="items">
                 <div ref="numQuizzes" class="icon-wrapper">
                     <animated-number :number="0" />
@@ -98,7 +98,7 @@
                     <p>Number of Unique Quizzes Solved</p>
                 </div>
             </div>
-            <div class="items">
+            <div class="">
                 <div ref="averageQuizzesSolved" class="icon-wrapper">
                     <animated-number :number="teacherDashboard.quizStats[0].averageQuizzesSolved" />
                 </div>
@@ -113,7 +113,7 @@
             </div>
     <div v-if="teacherDashboard.quizStats.length >1" class="bar-chart">
             <BarChart :stats1="quizStats1" :stats2="quizStats2" :stats3="quizStats3" :years="years" :label="['Total Number of Quizzes','Number of Unique Quizzes Solved','Average Quizzes Solved']"/>
-            </div>
+    </div>
   </div>
 </template>
 
@@ -123,7 +123,7 @@ import RemoteServices from '@/services/RemoteServices';
 import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/dashboard/TeacherDashboard';
 import TeacherDashboardStudentStats from '@/models/dashboard/TeacherDashboardStudentStats';
-import QuizStats from '@/models/dashboard/QuizStats';
+import TeacherDashboardQuizStats from '@/models/dashboard/TeacherDashboardQuizStats';
 import BarChart from '@/components/BarChart.vue';
 
 Component({
