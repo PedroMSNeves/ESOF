@@ -1,7 +1,7 @@
 export default class TeacherDashboardQuizStats{
   numQuizzes!: number;
-  numUniqueAnsweredQuizzes!:number
-  averageQuizzesSolved!:number
+  numUniqueAnsweredQuizzes!:number;
+  averageQuizzesSolved!:number;
   courseExecutionYear!: number;
 
   constructor(jsonObj?: TeacherDashboardQuizStats) {
