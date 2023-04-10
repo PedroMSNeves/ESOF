@@ -60,7 +60,7 @@
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
-                    <p>Number of Questions Available</p>
+                    <p>Number of Questions</p>
                 </div>
             </div>
             <div class="items">
@@ -68,7 +68,7 @@
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
-                    <p>Number of Answered Questions Unique</p>
+                    <p>Number of Questions Solved (Unique)</p>
                 </div>
             </div>
             <div class="items">
@@ -76,7 +76,7 @@
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
-                    <p>Average of Answered Questions Unique per student</p>
+                    <p>Average of Questions Solved Correctly (Unique, Average Per Strdent)</p>
                 </div>
             </div>
         </div>
@@ -86,7 +86,7 @@
                     <animated-number :number="teacherDashboard.questionStats[0].numAvailable" />
                 </div>
                 <div class="project-name">
-                    <p>Number of Questions Available</p>
+                    <p>Number of Questions</p>
                 </div>
             </div>
             <div class="items">
@@ -94,7 +94,7 @@
                     <animated-number :number="teacherDashboard.questionStats[0].answeredQuestionsUnique" />
                 </div>
                 <div class="project-name">
-                    <p>Number of Answered Questions Unique</p>
+                    <p>Number of Questions Solved (Unique)</p>
                 </div>
             </div>
             <div class="items">
@@ -102,7 +102,7 @@
                     <animated-number :number="teacherDashboard.questionStats[0].averageQuestionsAnswered" />
                 </div>
                 <div class="project-name">
-                    <p>Average of Answered Questions Unique per student</p>
+                    <p>Number of Questions Solved Correctly (Unique, Average Per Student)</p>
                 </div>
             </div>
         </div>
