@@ -91,7 +91,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="uniqueQuizzesSoleved" class="icon-wrapper">
+                <div ref="uniqueQuizzesSolved" class="icon-wrapper">
                     <animated-number :number="teacherDashboard.quizStats[0].uniqueQuizzesSolved" />
                 </div>
                 <div class="project-name">
