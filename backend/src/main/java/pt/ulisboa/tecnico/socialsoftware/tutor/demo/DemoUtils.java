@@ -36,7 +36,7 @@ public class DemoUtils {
         demoService.resetDemoQuestionSubmissions();
         demoService.resetDemoStudents();
 
-        if (environment.acceptsProfiles(Profiles.of("dev")) || environment.acceptsProfiles(Profiles.of("prod"))) {
+        if (environment.acceptsProfiles(Profiles.of("dev")) || environment.acceptsProfiles(Profiles.of("prod")) || environment.acceptsProfiles(Profiles.of("test-int"))) {
             demoService.populateDemo();
         }
     }
