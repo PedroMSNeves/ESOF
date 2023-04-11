@@ -107,7 +107,7 @@
                 </div>
             </div>
         </div>
-        <div v-if="teacherDashboard.questionsStats == null" class="stats-container">
+        <div v-if="teacherDashboard.questionStats == null" class="stats-container">
             <div class="items">
                 <div ref="numQuestions" class="icon-wrapper">
                     <animated-number :number="0" />
@@ -133,7 +133,7 @@
                 </div>
             </div>
         </div>
-        <div v-else-if="teacherDashboard.questionsStats != null" class="stats-container">
+        <div v-else-if="teacherDashboard.questionStats != null" class="stats-container">
             <div class="items">
                 <div ref="numQuestions" class="icon-wrapper">
                     <animated-number :number="teacherDashboard.questionsStats[0].numAvailable" />
@@ -167,7 +167,7 @@
       <div v-if="teacherDashboard.quizStats.length >1" class="bar-chart">
               <BarChart :stats1="quizStats1" :stats2="quizStats2" :stats3="quizStats3" :years="years" :label="['Total Number of Quizzes','Number of Unique Quizzes Solved','Average Quizzes Solved']"/>
               </div>
-      <div v-if="teacherDashboard.questionsStats.length >1" class="bar-chart">
+      <div v-if="teacherDashboard.questionStats.length >1" class="bar-chart">
               <BarChart :stats1="questionsStats1" :stats2="questionsStats2" :stats3="questionsStats3" :years="years" :label="['Total Number of Questions', 'Number of Questions Solved (Unique)', 'Average Number of Questions Answered']"/>
               </div>
   </div>
@@ -212,9 +212,9 @@ export default class TeacherStatsView extends Vue {
         this.quizStats1.push(this.teacherDashboard.quizStats[i].numQuizzes);   
         this.quizStats2.push(this.teacherDashboard.quizStats[i].numUniqueAnsweredQuizzes);   
         this.quizStats3.push(this.teacherDashboard.quizStats[i].averageQuizzesSolved);
-        this.questionsStats1.push(this.teacherDashboard.questionsStats[i].numAvailable);
-        this.questionsStats2.push(this.teacherDashboard.questionsStats[i].answeredQuestionsUnique);
-        this.questionsStats3.push(this.teacherDashboard.questionsStats[i].averageQuestionsAnswered);
+        this.questionsStats1.push(this.teacherDashboard.questionStats[i].numAvailable);
+        this.questionsStats2.push(this.teacherDashboard.questionStats[i].answeredQuestionsUnique);
+        this.questionsStats3.push(this.teacherDashboard.questionStats[i].averageQuestionsAnswered);
       }
       
     } catch (error) {

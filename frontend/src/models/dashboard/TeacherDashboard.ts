@@ -6,7 +6,7 @@ export default class TeacherDashboard {
   id!: number;
   studentStats: TeacherDashboardStudentStats[] = [];
   quizStats: TeacherDashboardQuizStats[] = [];
-  questionsStats: TeacherDashboardQuestionStats[] = [];
+  questionStats: TeacherDashboardQuestionStats[] = [];
 
   constructor(jsonObj?: TeacherDashboard) {
     if (jsonObj) {
@@ -19,9 +19,9 @@ export default class TeacherDashboard {
         this.quizStats = jsonObj.quizStats.map(
           (quizStats: TeacherDashboardQuizStats) => new TeacherDashboardQuizStats(quizStats));
       }
-      if(jsonObj.questionsStats) {
-          this.questionsStats = jsonObj.questionsStats.map(
-            (questionsStats: TeacherDashboardQuestionStats) => new TeacherDashboardQuestionStats(questionsStats));
+      if(jsonObj.questionStats) {
+          this.questionStats = jsonObj.questionStats.map(
+            (questionStats: TeacherDashboardQuestionStats) => new TeacherDashboardQuestionStats(questionStats));
       }
     }
   }
