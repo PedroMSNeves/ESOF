@@ -136,7 +136,7 @@
         <div v-else-if="teacherDashboard.questionStats != null" class="stats-container">
             <div class="items">
                 <div ref="numQuestions" class="icon-wrapper">
-                    <animated-number :number="teacherDashboard.questionsStats[0].numAvailable" />
+                    <animated-number :number="teacherDashboard.questionStats[0].numAvailable" />
                 </div>
                 <div class="project-name">
                     <p>Number of Questions</p>
@@ -144,7 +144,7 @@
             </div>
             <div class="items">
                 <div ref="numUniqueQuestionsSolved" class="icon-wrapper">
-                    <animated-number :number="teacherDashboard.questionsStats[0].answeredQuestionsUnique" />
+                    <animated-number :number="teacherDashboard.questionStats[0].answeredQuestionsUnique" />
                 </div>
                 <div class="project-name">
                     <p>Number of Questions Solved (Unique)</p>
@@ -152,7 +152,7 @@
             </div>
             <div class="items">
                 <div ref="averageQuestionsSolved" class="icon-wrapper">
-                    <animated-number :number="teacherDashboard.questionsStats[0].averageQuestionsAnswered" />
+                    <animated-number :number="teacherDashboard.questionStats[0].averageQuestionsAnswered" />
                 </div>
                 <div class="project-name">
                     <p>Number of Questions Correctly Solved (Unique, Average Per Student)</p>
