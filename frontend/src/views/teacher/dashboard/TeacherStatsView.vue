@@ -107,12 +107,68 @@
                 </div>
             </div>
         </div>
+        <div v-if="teacherDashboard.questionsStats == null" class="stats-container">
+            <div class="items">
+                <div ref="numQuestions" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Questions</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="numUniqueQuestionsSolved" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Questions Solved (Unique)</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="averageQuestionsSolved" class="icon-wrapper">
+                    <animated-number :number="0" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Questions Correctly Solved (Unique, Average Per Student)</p>
+                </div>
+            </div>
+        </div>
+        <div v-else-if="teacherDashboard.questionsStats != null" class="stats-container">
+            <div class="items">
+                <div ref="numQuestions" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.questionsStats[0].numAvailable" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Questions</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="numUniqueQuestionsSolved" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.questionsStats[0].answeredQuestionsUnique" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Questions Solved (Unique)</p>
+                </div>
+            </div>
+            <div class="items">
+                <div ref="averageQuestionsSolved" class="icon-wrapper">
+                    <animated-number :number="teacherDashboard.questionsStats[0].averageQuestionsAnswered" />
+                </div>
+                <div class="project-name">
+                    <p>Number of Questions Correctly Solved (Unique, Average Per Student)</p>
+                </div>
+            </div>
+        </div>
+
       </div>
       <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
               <BarChart :stats1="studentStats1" :stats2="studentStats2" :stats3="studentStats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
               </div>
       <div v-if="teacherDashboard.quizStats.length >1" class="bar-chart">
               <BarChart :stats1="quizStats1" :stats2="quizStats2" :stats3="quizStats3" :years="years" :label="['Total Number of Quizzes','Number of Unique Quizzes Solved','Average Quizzes Solved']"/>
+              </div>
+      <div v-if="teacherDashboard.questionsStats.length >1" class="bar-chart">
+              <BarChart :stats1="questionsStats1" :stats2="questionsStats2" :stats3="questionsStats3" :years="years" :label="['Total Number of Questions', 'Number of Questions Solved (Unique)', 'Average Number of Questions Answered']"/>
               </div>
   </div>
 </template>
@@ -124,6 +180,7 @@ import AnimatedNumber from '@/components/AnimatedNumber.vue';
 import TeacherDashboard from '@/models/dashboard/TeacherDashboard';
 import TeacherDashboardStudentStats from '@/models/dashboard/TeacherDashboardStudentStats';
 import TeacherDashboardQuizStats from '@/models/dashboard/TeacherDashboardQuizStats.js';
+import TeacherDashboardQuestionStats from '@/models/dashboard/TeacherDashboardQuestionStats';
 import BarChart from '@/components/BarChart.vue';
 
 @Component({
@@ -140,6 +197,9 @@ export default class TeacherStatsView extends Vue {
   quizStats1 : number[] = [];
   quizStats2 : number[] = [];
   quizStats3 : number[] = [];
+  questionsStats1: number[] = [];
+  questionsStats2 : number[] = [];
+  questionsStats3 : number[] = [];
   async created() {
     await this.$store.dispatch('loading');
     try {
@@ -151,7 +211,10 @@ export default class TeacherStatsView extends Vue {
         this.studentStats3.push(this.teacherDashboard.studentStats[i].numAtLeast3Quizzes);
         this.quizStats1.push(this.teacherDashboard.quizStats[i].numQuizzes);   
         this.quizStats2.push(this.teacherDashboard.quizStats[i].numUniqueAnsweredQuizzes);   
-        this.quizStats3.push(this.teacherDashboard.quizStats[i].averageQuizzesSolved);   
+        this.quizStats3.push(this.teacherDashboard.quizStats[i].averageQuizzesSolved);
+        this.questionsStats1.push(this.teacherDashboard.questionsStats[i].numAvailable);
+        this.questionsStats2.push(this.teacherDashboard.questionsStats[i].answeredQuestionsUnique);
+        this.questionsStats3.push(this.teacherDashboard.questionsStats[i].averageQuestionsAnswered);
       }
       
     } catch (error) {
