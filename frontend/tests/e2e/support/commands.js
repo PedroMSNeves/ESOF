@@ -25,6 +25,10 @@
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
 /// <reference types="Cypress" />
 
+import { addMatchImageSnapshotCommand, addMatchImageSnapshotPlugin } from "cypress-image-snapshot/command";
+
+addMatchImageSnapshotCommand();
+
 Cypress.Commands.add('createCourseExecution', (name, acronym, academicTerm) => {
   cy.get('[data-cy="createButton"]').click({ force: true });
   cy.get('[data-cy="courseExecutionNameInput"]').type(name);

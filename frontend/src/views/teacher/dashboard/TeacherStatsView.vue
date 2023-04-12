@@ -4,7 +4,7 @@
     <div v-if="teacherDashboard != null" class="stats-container">
       <div v-if="teacherDashboard.studentStats == null" class="stats-container">
             <div class="items">
-                <div ref="numStudents" class="icon-wrapper">
+                <div ref="numStudents" class="icon-wrapper" data-cy="numStudents">
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
@@ -12,7 +12,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="numMore75CorrectQuestions" class="icon-wrapper">
+                <div ref="numMore75CorrectQuestions" class="icon-wrapper" data-cy="numMore75CorrectQustions">
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
@@ -20,7 +20,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="numAtLeast3Quizzes" class="icon-wrapper">
+                <div ref="numAtLeast3Quizzes" class="icon-wrapper" data-cy="numAtLeast3Quizzes">
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
@@ -30,7 +30,7 @@
         </div>
         <div v-else-if="teacherDashboard.studentStats != null" class="stats-container">
             <div class="items">
-                <div ref="numStudents" class="icon-wrapper">
+                <div ref="numStudents" class="icon-wrapper" data-cy="numStudents">
                     <animated-number :number="teacherDashboard.studentStats[0].numStudents" />
                 </div>
                 <div class="project-name">
@@ -38,7 +38,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="numMore75CorrectQuestions" class="icon-wrapper">
+                <div ref="numMore75CorrectQuestions" class="icon-wrapper" data-cy="numMore75CorrectQustions">
                     <animated-number :number="teacherDashboard.studentStats[0].numMore75CorrectQuestions" />
                 </div>
                 <div class="project-name">
@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="numAtLeast3Quizzes" class="icon-wrapper">
+                <div ref="numAtLeast3Quizzes" class="icon-wrapper" data-cy="numAtLeast3Quizzes">
                     <animated-number :number="teacherDashboard.studentStats[0].numAtLeast3Quizzes" />
                 </div>
                 <div class="project-name">
@@ -54,10 +54,9 @@
                 </div>
             </div>
         </div>
-
         <div v-if="teacherDashboard.quizStats == null" class="stats-container">
             <div class="items">
-                <div ref="numQuizzes" class="icon-wrapper">
+                <div ref="numQuizzes" class="icon-wrapper" data-cy="numQuizzes">
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
@@ -65,7 +64,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="numUniqueAnsweredQuizzes" class="icon-wrapper">
+                <div ref="numUniqueAnsweredQuizzes" class="icon-wrapper" data-cy="numUniqueAnsweredQuizzes">
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
@@ -73,7 +72,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="averageQuizzesSolved" class="icon-wrapper">
+                <div ref="averageQuizzesSolved" class="icon-wrapper"  data-cy="averageQuizzesSolved">
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
@@ -83,7 +82,7 @@
         </div>
         <div v-else-if="teacherDashboard.quizStats != null" class="stats-container">
             <div class="items">
-                <div ref="numQuizzes" class="icon-wrapper">
+                <div ref="numQuizzes" class="icon-wrapper" data-cy="numQuizzes">
                     <animated-number :number="teacherDashboard.quizStats[0].numQuizzes" />
                 </div>
                 <div class="project-name">
@@ -91,7 +90,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="numUniqueAnsweredQuizzes" class="icon-wrapper">
+                <div ref="numUniqueAnsweredQuizzes" class="icon-wrapper" data-cy="numUniqueAnsweredQuizzes">
                     <animated-number :number="teacherDashboard.quizStats[0].numUniqueAnsweredQuizzes" />
                 </div>
                 <div class="project-name">
@@ -99,7 +98,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="averageQuizzesSolved" class="icon-wrapper">
+                <div ref="averageQuizzesSolved" class="icon-wrapper" data-cy="averageQuizzesSolved">
                     <animated-number :number="teacherDashboard.quizStats[0].averageQuizzesSolved" />
                 </div>
                 <div class="project-name">
@@ -109,7 +108,7 @@
         </div>
         <div v-if="teacherDashboard.questionStats == null" class="stats-container">
             <div class="items">
-                <div ref="numQuestions" class="icon-wrapper">
+                <div ref="numQuestions" class="icon-wrapper" data-cy="numQuestions">
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
@@ -117,7 +116,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="numUniqueQuestionsSolved" class="icon-wrapper">
+                <div ref="numUniqueQuestionsSolved" class="icon-wrapper" data-cy="numUniqueQuestionsSolved">
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
@@ -125,7 +124,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="averageQuestionsSolved" class="icon-wrapper">
+                <div ref="averageQuestionsSolved" class="icon-wrapper" data-cy="averageQuestionsSolved">
                     <animated-number :number="0" />
                 </div>
                 <div class="project-name">
@@ -135,7 +134,7 @@
         </div>
         <div v-else-if="teacherDashboard.questionStats != null" class="stats-container">
             <div class="items">
-                <div ref="numQuestions" class="icon-wrapper">
+                <div ref="numQuestions" class="icon-wrapper" data-cy="numQuestions">
                     <animated-number :number="teacherDashboard.questionStats[0].numAvailable" />
                 </div>
                 <div class="project-name">
@@ -143,7 +142,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="numUniqueQuestionsSolved" class="icon-wrapper">
+                <div ref="numUniqueQuestionsSolved" class="icon-wrapper" data-cy="numUniqueQuestionsSolved">
                     <animated-number :number="teacherDashboard.questionStats[0].answeredQuestionsUnique" />
                 </div>
                 <div class="project-name">
@@ -151,7 +150,7 @@
                 </div>
             </div>
             <div class="items">
-                <div ref="averageQuestionsSolved" class="icon-wrapper">
+                <div ref="averageQuestionsSolved" class="icon-wrapper"  data-cy="averageQuestionsSolved">
                     <animated-number :number="teacherDashboard.questionStats[0].averageQuestionsAnswered" />
                 </div>
                 <div class="project-name">
@@ -161,16 +160,13 @@
         </div>
 
       </div>
-      <div class="stats-container">
-      <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
+      <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart" data-cy="barChartStudentStats">
               <BarChart :stats1="studentStats1" :stats2="studentStats2" :stats3="studentStats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
               </div>
-
-      <div v-if="teacherDashboard.quizStats.length >1" class="bar-chart">
+      <div v-if="teacherDashboard.quizStats.length >1" class="bar-chart" data-cy="barChartQuizStats">
               <BarChart :stats1="quizStats1" :stats2="quizStats2" :stats3="quizStats3" :years="years" :label="['Total Number of Quizzes','Number of Unique Quizzes Solved','Average Quizzes Solved']"/>
               </div>
-
-      <div v-if="teacherDashboard.questionStats.length >1" class="bar-chart">
+      <div v-if="teacherDashboard.questionStats.length >1" class="bar-chart" data-cy="barChartQuestionStats">
               <BarChart :stats1="questionsStats1" :stats2="questionsStats2" :stats3="questionsStats3" :years="years" :label="['Total Number of Questions', 'Number of Questions Solved (Unique)', 'Average Number of Questions Answered']"/>
               </div>
       </div>
