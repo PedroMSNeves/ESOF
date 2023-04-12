@@ -88,7 +88,7 @@ Cypress.Commands.add('afterEachTournament', () => {
 
 Cypress.Commands.add('addQuestionSubmission', (title, submissionStatus) => {
   dbCommand(`
-    WITH course as (SELECT ce.course_id as course_id, ce.id as course_execution_id FROM courses c JOIN course_executions ce on ce.course_id = c.id WHERE name = 'Demo Course')     
+    WITH course as (SELECT ce.course_id as course_id, ce.id as course_execution_id FROM courses c JOIN course_executions ce on ce.course_id = c.id WHERE name = 'Demo Course' AND academic_term = '1st Semester')
     , quest AS (
       INSERT INTO questions (title, content, status, course_id, creation_date) 
       VALUES ('${title}', 'Question?', 'SUBMITTED', (select course_id from course), current_timestamp) RETURNING id
