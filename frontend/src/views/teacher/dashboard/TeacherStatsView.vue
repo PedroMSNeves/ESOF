@@ -161,15 +161,19 @@
         </div>
 
       </div>
+      <div class="stats-container">
       <div v-if="teacherDashboard.studentStats.length >1" class="bar-chart">
               <BarChart :stats1="studentStats1" :stats2="studentStats2" :stats3="studentStats3" :years="years" :label="['Total Number of Students','Students who Solved > 75% of Questions','Students who Solved >= 3 Quizzes']"/>
               </div>
+
       <div v-if="teacherDashboard.quizStats.length >1" class="bar-chart">
               <BarChart :stats1="quizStats1" :stats2="quizStats2" :stats3="quizStats3" :years="years" :label="['Total Number of Quizzes','Number of Unique Quizzes Solved','Average Quizzes Solved']"/>
               </div>
+
       <div v-if="teacherDashboard.questionStats.length >1" class="bar-chart">
               <BarChart :stats1="questionsStats1" :stats2="questionsStats2" :stats3="questionsStats3" :years="years" :label="['Total Number of Questions', 'Number of Questions Solved (Unique)', 'Average Number of Questions Answered']"/>
               </div>
+      </div>
   </div>
 </template>
 
@@ -234,6 +238,7 @@ export default class TeacherStatsView extends Vue {
   align-items: stretch;
   align-content: center;
   height: 100%;
+  
 
   .items {
     background-color: rgba(255, 255, 255, 0.75);
@@ -248,7 +253,8 @@ export default class TeacherStatsView extends Vue {
   .bar-chart {
     background-color: rgba(255, 255, 255, 0.90);
     height: 400px;
-    width: 700px;
+    margin:10px;
+    //width: 700px;
   }
 }
 
