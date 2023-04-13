@@ -35,6 +35,23 @@ import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Student;
 import pt.ulisboa.tecnico.socialsoftware.tutor.user.repository.UserRepository;
 import pt.ulisboa.tecnico.socialsoftware.tutor.utils.DateHandler;
 
+import pt.ulisboa.tecnico.socialsoftware.tutor.execution.domain.CourseExecution;
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.dto.AuthDto;
+import pt.ulisboa.tecnico.socialsoftware.tutor.question.domain.Course;
+import pt.ulisboa.tecnico.socialsoftware.tutor.auth.AuthUserService;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.User;
+
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.StudentStats;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.StudentStatsRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuizStats;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.QuizStatsRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.QuestionStats;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.QuestionStatsRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.domain.TeacherDashboard;
+import pt.ulisboa.tecnico.socialsoftware.tutor.teacherdashboard.repository.TeacherDashboardRepository;
+import pt.ulisboa.tecnico.socialsoftware.tutor.user.domain.Teacher;
+import java.util.Collections;
+
 import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
@@ -95,6 +112,21 @@ public class DemoService {
 
     @Autowired
     private DifficultQuestionRepository difficultQuestionRepository;
+
+    @Autowired
+    private AuthUserService authUserService;
+
+    @Autowired
+    private StudentStatsRepository studentStatsRepository;
+
+    @Autowired
+    private QuizStatsRepository quizStatsRepository;
+
+    @Autowired
+    private QuestionStatsRepository questionStatsRepository;
+
+    @Autowired
+    private TeacherDashboardRepository teacherDashboardRepository;
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public void resetDemoDashboards() {
@@ -303,6 +335,227 @@ public class DemoService {
         quizRepository.save(inClassQuiz);
         quizRepository.save(proposedQuiz);
         quizRepository.save(scrambledQuiz);
+    }
 
+    @Transactional(isolation = Isolation.READ_COMMITTED)
+    public void NewPopulateDemo() {
+        Integer courseId = courseExecutionService.getDemoCourse().getCourseId();
+        Integer courseExecutionId = courseExecutionService.getDemoCourse().getCourseExecutionId();
+
+        // Let's update the end date of the demo execution
+        CourseExecution demoExecution = courseExecutionRepository.findById(courseExecutionId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_EXECUTION_NOT_FOUND));
+        demoExecution.setEndDate(DateHandler.toLocalDateTime("2017-12-31T10:15:30+01:00[Europe/Lisbon]"));
+
+        // Simulate login of demo teacher (this adds the demo teacher to the original demo execution
+        AuthDto authDemoTeacherDto = authUserService.demoTeacherAuth();
+
+        // Get demo course and demo teacher
+        Course demoCourse = courseRepository.findById(courseId)
+                .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_NOT_FOUND));
+        User demoTeacher = userRepository.findById(authDemoTeacherDto.getUser().getId())
+                .orElseThrow(() -> new TutorException(ErrorMessage.USER_NOT_FOUND));
+
+        // Create three additional course executions
+        List<String> endDates = Arrays.asList(
+                "2019-12-31T10:15:30+01:00[Europe/Lisbon]",
+                "2022-12-31T10:15:30+01:00[Europe/Lisbon]",
+                "2023-12-31T10:15:30+01:00[Europe/Lisbon]"
+        );
+        List<String> academicTerms = Arrays.asList("2st semester 2019/2020", "2st semester 2022/2023", "2st semester 2023/2024");
+
+        StudentStats st1_1 = new StudentStats();
+        st1_1.setNumStudents(5);
+        st1_1.setNumMore75CorrectQuestions(0);
+        st1_1.setNumAtLeast3Quizzes(2);
+
+        StudentStats st2_1 = new StudentStats();
+        st2_1.setNumStudents(5);
+        st2_1.setNumMore75CorrectQuestions(0);
+        st2_1.setNumAtLeast3Quizzes(2);
+
+        StudentStats st2_2 = new StudentStats();
+        st2_2.setNumStudents(7);
+        st2_2.setNumMore75CorrectQuestions(1);
+        st2_2.setNumAtLeast3Quizzes(3);
+
+        StudentStats st3_1 = new StudentStats();
+        st3_1.setNumStudents(5);
+        st3_1.setNumMore75CorrectQuestions(0);
+        st3_1.setNumAtLeast3Quizzes(2);
+
+        StudentStats st3_2 = new StudentStats();
+        st3_2.setNumStudents(7);
+        st3_2.setNumMore75CorrectQuestions(1);
+        st3_2.setNumAtLeast3Quizzes(3);
+
+        StudentStats st3_3 = new StudentStats();
+        st3_3.setNumStudents(21);
+        st3_3.setNumMore75CorrectQuestions(10);
+        st3_3.setNumAtLeast3Quizzes(21);
+
+
+
+        QuizStats quiz1_1 = new QuizStats();
+        quiz1_1.setNumQuizzes(5);
+        quiz1_1.setNumUniqueAnsweredQuizzes(0);
+        quiz1_1.setAverageQuizzesSolved(2);
+
+        QuizStats quiz2_1 = new QuizStats();
+        quiz2_1.setNumQuizzes(5);
+        quiz2_1.setNumUniqueAnsweredQuizzes(0);
+        quiz2_1.setAverageQuizzesSolved(2);
+
+        QuizStats quiz2_2 = new QuizStats();
+        quiz2_2.setNumQuizzes(7);
+        quiz2_2.setNumUniqueAnsweredQuizzes(1);
+        quiz2_2.setAverageQuizzesSolved(3);
+
+        QuizStats quiz3_1 = new QuizStats();
+        quiz3_1.setNumQuizzes(5);
+        quiz3_1.setNumUniqueAnsweredQuizzes(0);
+        quiz3_1.setAverageQuizzesSolved(2);
+
+        QuizStats quiz3_2 = new QuizStats();
+        quiz3_2.setNumQuizzes(7);
+        quiz3_2.setNumUniqueAnsweredQuizzes(1);
+        quiz3_2.setAverageQuizzesSolved(3);
+
+        QuizStats quiz3_3 = new QuizStats();
+        quiz3_3.setNumQuizzes(21);
+        quiz3_3.setNumUniqueAnsweredQuizzes(10);
+        quiz3_3.setAverageQuizzesSolved(21);
+
+        QuestionStats quest1_1 = new QuestionStats();
+        quest1_1.setNumAvailable(5);
+        quest1_1.setAnsweredQuestionsUnique(0);
+        quest1_1.setAverageQuestionsAnswered(2.9f);
+
+        QuestionStats quest2_1 = new QuestionStats();
+        quest2_1.setNumAvailable(5);
+        quest2_1.setAnsweredQuestionsUnique(0);
+        quest2_1.setAverageQuestionsAnswered(2.9f);
+
+        QuestionStats quest2_2 = new QuestionStats();
+        quest2_2.setNumAvailable(7);
+        quest2_2.setAnsweredQuestionsUnique(1);
+        quest2_2.setAverageQuestionsAnswered(3.2f);
+
+        QuestionStats quest3_1 = new QuestionStats();
+        quest3_1.setNumAvailable(5);
+        quest3_1.setAnsweredQuestionsUnique(0);
+        quest3_1.setAverageQuestionsAnswered(2.9f);
+
+        QuestionStats quest3_2 = new QuestionStats();
+        quest3_2.setNumAvailable(7);
+        quest3_2.setAnsweredQuestionsUnique(1);
+        quest3_2.setAverageQuestionsAnswered(3.2f);
+
+        QuestionStats quest3_3 = new QuestionStats();
+        quest3_3.setNumAvailable(21);
+        quest3_3.setAnsweredQuestionsUnique(10);
+        quest3_3.setAverageQuestionsAnswered(21.0f);
+
+        for (int i = 0; i < endDates.size(); i++) {
+            CourseExecution newCE = new CourseExecution(
+                    demoCourse,
+                    "Demo Course",
+                    academicTerms.get(i),
+                    Course.Type.TECNICO,
+                    DateHandler.toLocalDateTime(endDates.get(i)));
+
+            demoTeacher.addCourse(newCE);
+
+            courseExecutionRepository.save(newCE);
+
+            TeacherDashboard teacherDashboard = new TeacherDashboard(newCE,(Teacher)demoTeacher);
+
+            if(i==0){
+                st3_1.setCourseExecution(newCE);
+                quest3_1.setCourseExecution(newCE);
+                quiz3_1.setCourseExecution(newCE);
+                st2_1.setCourseExecution(newCE);
+                quest2_1.setCourseExecution(newCE);
+                quiz2_1.setCourseExecution(newCE);
+
+                st1_1.setCourseExecution(newCE);
+                quest1_1.setCourseExecution(newCE);
+                quiz1_1.setCourseExecution(newCE);
+                st1_1.setTeacherDashboard(teacherDashboard);
+                quest1_1.setDashboard(teacherDashboard);
+                quiz1_1.setTeacherDashboard(teacherDashboard);
+
+                studentStatsRepository.save(st1_1);
+                quizStatsRepository.save(quiz1_1);
+                questionStatsRepository.save(quest1_1);
+
+            }
+            if(i==1){
+                st3_2.setCourseExecution(newCE);
+                quest3_2.setCourseExecution(newCE);
+                quiz3_2.setCourseExecution(newCE);
+
+                st2_2.setCourseExecution(newCE);
+                quest2_2.setCourseExecution(newCE);
+                quiz2_2.setCourseExecution(newCE);
+                st2_2.setTeacherDashboard(teacherDashboard);
+                quest2_2.setDashboard(teacherDashboard);
+                quiz2_2.setTeacherDashboard(teacherDashboard);
+
+
+                st2_1.setTeacherDashboard(teacherDashboard);
+                quest2_1.setDashboard(teacherDashboard);
+                quiz2_1.setTeacherDashboard(teacherDashboard);
+
+                studentStatsRepository.save(st2_2);
+                quizStatsRepository.save(quiz2_2);
+                questionStatsRepository.save(quest2_2);
+                studentStatsRepository.save(st2_1);
+                quizStatsRepository.save(quiz2_1);
+                questionStatsRepository.save(quest2_1);
+            }
+            if(i==2){
+                st3_3.setCourseExecution(newCE);
+                quest3_3.setCourseExecution(newCE);
+                quiz3_3.setCourseExecution(newCE);
+                st3_3.setTeacherDashboard(teacherDashboard);
+                quest3_3.setDashboard(teacherDashboard);
+                quiz3_3.setTeacherDashboard(teacherDashboard);
+
+
+                st3_2.setTeacherDashboard(teacherDashboard);
+                quest3_2.setDashboard(teacherDashboard);
+                quiz3_2.setTeacherDashboard(teacherDashboard);
+
+                st3_1.setTeacherDashboard(teacherDashboard);
+                quest3_1.setDashboard(teacherDashboard);
+                quiz3_1.setTeacherDashboard(teacherDashboard);
+
+                studentStatsRepository.save(st3_3);
+                quizStatsRepository.save(quiz3_3);
+                questionStatsRepository.save(quest3_3);
+                studentStatsRepository.save(st3_2);
+                quizStatsRepository.save(quiz3_2);
+                questionStatsRepository.save(quest3_2);
+                studentStatsRepository.save(st3_1);
+                quizStatsRepository.save(quiz3_1);
+                questionStatsRepository.save(quest3_1);
+
+
+            }
+
+            teacherDashboardRepository.save(teacherDashboard);
+        }
+
+        CourseExecution newCE = new CourseExecution(
+                demoCourse,
+                "Demo Course",
+                "2st semester 2000/2001",
+                Course.Type.TECNICO,
+                DateHandler.toLocalDateTime( "2001-12-31T10:15:30+01:00[Europe/Lisbon]"));
+
+        demoTeacher.addCourse(newCE);
+        courseExecutionRepository.save(newCE);
+        userRepository.save(demoTeacher);
     }
 }
