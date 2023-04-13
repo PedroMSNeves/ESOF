@@ -54,6 +54,7 @@ import java.util.Collections;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.ArrayList;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -364,98 +365,55 @@ public class DemoService {
         );
         List<String> academicTerms = Arrays.asList("2st semester 2019/2020", "2st semester 2022/2023", "2st semester 2023/2024");
 
-        StudentStats st1_1 = new StudentStats();
-        st1_1.setNumStudents(5);
-        st1_1.setNumMore75CorrectQuestions(0);
-        st1_1.setNumAtLeast3Quizzes(2);
+        List<List<StudentStats>> stl = new ArrayList<>();
+        List<List<QuestionStats>> qel = new ArrayList<>();
+        List<List<QuizStats>> qul = new ArrayList<>();
+        List<Integer> vals = Arrays.asList(5,0,2,7,1,3,21,10,21);
+        List<Float> floatL = Arrays.asList(2.9f,3.2f,21.0f);
+        for(int i = 0; i< 3 ; i++){
+            stl.add(new ArrayList<>());
+            qel.add(new ArrayList<>());
+            qul.add(new ArrayList<>());
+        }
 
-        StudentStats st2_1 = new StudentStats();
-        st2_1.setNumStudents(5);
-        st2_1.setNumMore75CorrectQuestions(0);
-        st2_1.setNumAtLeast3Quizzes(2);
+        for(int i =0; i<3; i++)
+        {
+            for(int j=i; j<3;j++) {
+                StudentStats st = new StudentStats();
+                st.setNumStudents(vals.get(3 * i + 0));
+                st.setNumMore75CorrectQuestions(vals.get(3 * i + 1));
+                st.setNumAtLeast3Quizzes(vals.get(3 * i + 2));
 
-        StudentStats st2_2 = new StudentStats();
-        st2_2.setNumStudents(7);
-        st2_2.setNumMore75CorrectQuestions(1);
-        st2_2.setNumAtLeast3Quizzes(3);
+                QuizStats quiz = new QuizStats();
+                quiz.setNumQuizzes(vals.get(3 * i + 0));
+                quiz.setNumUniqueAnsweredQuizzes(vals.get(3 * i + 1));
+                quiz.setAverageQuizzesSolved(floatL.get(i));
 
-        StudentStats st3_1 = new StudentStats();
-        st3_1.setNumStudents(5);
-        st3_1.setNumMore75CorrectQuestions(0);
-        st3_1.setNumAtLeast3Quizzes(2);
+                QuestionStats quest = new QuestionStats();
+                quest.setNumAvailable(vals.get(3 * i + 0));
+                quest.setAnsweredQuestionsUnique(vals.get(3 * i + 1));
+                quest.setAverageQuestionsAnswered(floatL.get(i));
 
-        StudentStats st3_2 = new StudentStats();
-        st3_2.setNumStudents(7);
-        st3_2.setNumMore75CorrectQuestions(1);
-        st3_2.setNumAtLeast3Quizzes(3);
+                if (i == 0) {
+                    stl.get(j).add(st);
+                    qel.get(j).add(quest);
+                    qul.get(j).add(quiz);
 
-        StudentStats st3_3 = new StudentStats();
-        st3_3.setNumStudents(21);
-        st3_3.setNumMore75CorrectQuestions(10);
-        st3_3.setNumAtLeast3Quizzes(21);
+                }
+                if (i == 1) {
+                    stl.get(j).add(st);
+                    qel.get(j).add(quest);
+                    qul.get(j).add(quiz);
 
+                }
+                if (i == 2) {
+                    stl.get(j).add(st);
+                    qel.get(j).add(quest);
+                    qul.get(j).add(quiz);
 
-
-        QuizStats quiz1_1 = new QuizStats();
-        quiz1_1.setNumQuizzes(5);
-        quiz1_1.setNumUniqueAnsweredQuizzes(0);
-        quiz1_1.setAverageQuizzesSolved(2);
-
-        QuizStats quiz2_1 = new QuizStats();
-        quiz2_1.setNumQuizzes(5);
-        quiz2_1.setNumUniqueAnsweredQuizzes(0);
-        quiz2_1.setAverageQuizzesSolved(2);
-
-        QuizStats quiz2_2 = new QuizStats();
-        quiz2_2.setNumQuizzes(7);
-        quiz2_2.setNumUniqueAnsweredQuizzes(1);
-        quiz2_2.setAverageQuizzesSolved(3);
-
-        QuizStats quiz3_1 = new QuizStats();
-        quiz3_1.setNumQuizzes(5);
-        quiz3_1.setNumUniqueAnsweredQuizzes(0);
-        quiz3_1.setAverageQuizzesSolved(2);
-
-        QuizStats quiz3_2 = new QuizStats();
-        quiz3_2.setNumQuizzes(7);
-        quiz3_2.setNumUniqueAnsweredQuizzes(1);
-        quiz3_2.setAverageQuizzesSolved(3);
-
-        QuizStats quiz3_3 = new QuizStats();
-        quiz3_3.setNumQuizzes(21);
-        quiz3_3.setNumUniqueAnsweredQuizzes(10);
-        quiz3_3.setAverageQuizzesSolved(21);
-
-        QuestionStats quest1_1 = new QuestionStats();
-        quest1_1.setNumAvailable(5);
-        quest1_1.setAnsweredQuestionsUnique(0);
-        quest1_1.setAverageQuestionsAnswered(2.9f);
-
-        QuestionStats quest2_1 = new QuestionStats();
-        quest2_1.setNumAvailable(5);
-        quest2_1.setAnsweredQuestionsUnique(0);
-        quest2_1.setAverageQuestionsAnswered(2.9f);
-
-        QuestionStats quest2_2 = new QuestionStats();
-        quest2_2.setNumAvailable(7);
-        quest2_2.setAnsweredQuestionsUnique(1);
-        quest2_2.setAverageQuestionsAnswered(3.2f);
-
-        QuestionStats quest3_1 = new QuestionStats();
-        quest3_1.setNumAvailable(5);
-        quest3_1.setAnsweredQuestionsUnique(0);
-        quest3_1.setAverageQuestionsAnswered(2.9f);
-
-        QuestionStats quest3_2 = new QuestionStats();
-        quest3_2.setNumAvailable(7);
-        quest3_2.setAnsweredQuestionsUnique(1);
-        quest3_2.setAverageQuestionsAnswered(3.2f);
-
-        QuestionStats quest3_3 = new QuestionStats();
-        quest3_3.setNumAvailable(21);
-        quest3_3.setAnsweredQuestionsUnique(10);
-        quest3_3.setAverageQuestionsAnswered(21.0f);
-
+                }
+            }
+        }
         for (int i = 0; i < endDates.size(); i++) {
             CourseExecution newCE = new CourseExecution(
                     demoCourse,
@@ -471,77 +429,52 @@ public class DemoService {
             TeacherDashboard teacherDashboard = new TeacherDashboard(newCE,(Teacher)demoTeacher);
 
             if(i==0){
-                st3_1.setCourseExecution(newCE);
-                quest3_1.setCourseExecution(newCE);
-                quiz3_1.setCourseExecution(newCE);
-                st2_1.setCourseExecution(newCE);
-                quest2_1.setCourseExecution(newCE);
-                quiz2_1.setCourseExecution(newCE);
+                for(int j=0; j<3;j++){
+                    stl.get(j).get(0).setCourseExecution(newCE);
+                    qel.get(j).get(0).setCourseExecution(newCE);
+                    qul.get(j).get(0).setCourseExecution(newCE);
+                }
 
-                st1_1.setCourseExecution(newCE);
-                quest1_1.setCourseExecution(newCE);
-                quiz1_1.setCourseExecution(newCE);
-                st1_1.setTeacherDashboard(teacherDashboard);
-                quest1_1.setDashboard(teacherDashboard);
-                quiz1_1.setTeacherDashboard(teacherDashboard);
+                stl.get(0).get(0).setTeacherDashboard(teacherDashboard);
+                qel.get(0).get(0).setDashboard(teacherDashboard);
+                qul.get(0).get(0).setTeacherDashboard(teacherDashboard);
 
-                studentStatsRepository.save(st1_1);
-                quizStatsRepository.save(quiz1_1);
-                questionStatsRepository.save(quest1_1);
-
+                studentStatsRepository.save(stl.get(0).get(0));
+                questionStatsRepository.save(qel.get(0).get(0));
+                quizStatsRepository.save(qul.get(0).get(0));
             }
             if(i==1){
-                st3_2.setCourseExecution(newCE);
-                quest3_2.setCourseExecution(newCE);
-                quiz3_2.setCourseExecution(newCE);
-
-                st2_2.setCourseExecution(newCE);
-                quest2_2.setCourseExecution(newCE);
-                quiz2_2.setCourseExecution(newCE);
-                st2_2.setTeacherDashboard(teacherDashboard);
-                quest2_2.setDashboard(teacherDashboard);
-                quiz2_2.setTeacherDashboard(teacherDashboard);
-
-
-                st2_1.setTeacherDashboard(teacherDashboard);
-                quest2_1.setDashboard(teacherDashboard);
-                quiz2_1.setTeacherDashboard(teacherDashboard);
-
-                studentStatsRepository.save(st2_2);
-                quizStatsRepository.save(quiz2_2);
-                questionStatsRepository.save(quest2_2);
-                studentStatsRepository.save(st2_1);
-                quizStatsRepository.save(quiz2_1);
-                questionStatsRepository.save(quest2_1);
+                for(int j=1; j<3;j++){
+                    stl.get(j).get(1).setCourseExecution(newCE);
+                    qel.get(j).get(1).setCourseExecution(newCE);
+                    qul.get(j).get(1).setCourseExecution(newCE);
+                }
+                for(int j=0; j<2;j++){
+                    stl.get(1).get(j).setTeacherDashboard(teacherDashboard);
+                    qel.get(1).get(j).setDashboard(teacherDashboard);
+                    qul.get(1).get(j).setTeacherDashboard(teacherDashboard);
+                }
+                for(int j=1;j>=0;j--){
+                    studentStatsRepository.save( stl.get(1).get(j));
+                    questionStatsRepository.save( qel.get(1).get(j));
+                    quizStatsRepository.save( qul.get(1).get(j));
+                }
             }
             if(i==2){
-                st3_3.setCourseExecution(newCE);
-                quest3_3.setCourseExecution(newCE);
-                quiz3_3.setCourseExecution(newCE);
-                st3_3.setTeacherDashboard(teacherDashboard);
-                quest3_3.setDashboard(teacherDashboard);
-                quiz3_3.setTeacherDashboard(teacherDashboard);
+                stl.get(2).get(2).setCourseExecution(newCE);
+                qel.get(2).get(2).setCourseExecution(newCE);
+                qul.get(2).get(2).setCourseExecution(newCE);
 
-
-                st3_2.setTeacherDashboard(teacherDashboard);
-                quest3_2.setDashboard(teacherDashboard);
-                quiz3_2.setTeacherDashboard(teacherDashboard);
-
-                st3_1.setTeacherDashboard(teacherDashboard);
-                quest3_1.setDashboard(teacherDashboard);
-                quiz3_1.setTeacherDashboard(teacherDashboard);
-
-                studentStatsRepository.save(st3_3);
-                quizStatsRepository.save(quiz3_3);
-                questionStatsRepository.save(quest3_3);
-                studentStatsRepository.save(st3_2);
-                quizStatsRepository.save(quiz3_2);
-                questionStatsRepository.save(quest3_2);
-                studentStatsRepository.save(st3_1);
-                quizStatsRepository.save(quiz3_1);
-                questionStatsRepository.save(quest3_1);
-
-
+                for(int j=0; j<3;j++){
+                    stl.get(2).get(j).setTeacherDashboard(teacherDashboard);
+                    qel.get(2).get(j).setDashboard(teacherDashboard);
+                    qul.get(2).get(j).setTeacherDashboard(teacherDashboard);
+                }
+                for(int j=2;j>=0;j--){
+                    studentStatsRepository.save( stl.get(2).get(j));
+                    questionStatsRepository.save( qel.get(2).get(j));
+                    quizStatsRepository.save( qul.get(2).get(j));
+                }
             }
 
             teacherDashboardRepository.save(teacherDashboard);
