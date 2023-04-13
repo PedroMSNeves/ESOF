@@ -19,7 +19,7 @@ function dbCommand(command) {
 
 Cypress.Commands.add('beforeEachTournament', () => {
   dbCommand(`
-      WITH tmpCourse as (SELECT ce.course_id, ce.id as course_execution_id FROM courses c JOIN course_executions ce on ce.course_id = c.id WHERE name = 'Demo Course')      
+      WITH tmpCourse as (SELECT ce.course_id, ce.id as course_execution_id FROM courses c JOIN course_executions ce on ce.course_id = c.id WHERE name = 'Demo Course' AND academic_term = '1st Semester')
         ,insert1 as (INSERT INTO assessments (id, sequence, status, title, course_execution_id) VALUES (1, 0, 'AVAILABLE', 'test1', (select course_execution_id from tmpCourse)))
         ,insert2 as (INSERT INTO assessments (id, sequence, status, title, course_execution_id) VALUES (2, 0, 'AVAILABLE', 'test2', (select course_execution_id from tmpCourse)))
         ,insert3 as (INSERT INTO topic_conjunctions (id, assessment_id) VALUES (100, 1))
@@ -80,7 +80,7 @@ Cypress.Commands.add('afterEachTournament', () => {
          DELETE FROM question_details WHERE id = 1000;
          DELETE FROM questions WHERE id = 1389;
          DELETE FROM tournaments_participants;
-         DELETE FROM tournaments; 
+         DELETE FROM tournaments;
          ALTER SEQUENCE tournaments_id_seq RESTART WITH 1;
          UPDATE tournaments SET id=nextval('tournaments_id_seq');
     `);
@@ -88,12 +88,12 @@ Cypress.Commands.add('afterEachTournament', () => {
 
 Cypress.Commands.add('addQuestionSubmission', (title, submissionStatus) => {
   dbCommand(`
-    WITH course as (SELECT ce.course_id as course_id, ce.id as course_execution_id FROM courses c JOIN course_executions ce on ce.course_id = c.id WHERE name = 'Demo Course')     
+    WITH course as (SELECT ce.course_id as course_id, ce.id as course_execution_id FROM courses c JOIN course_executions ce on ce.course_id = c.id WHERE name = 'Demo Course' AND academic_term = '1st Semester')
     , quest AS (
-      INSERT INTO questions (title, content, status, course_id, creation_date) 
+      INSERT INTO questions (title, content, status, course_id, creation_date)
       VALUES ('${title}', 'Question?', 'SUBMITTED', (select course_id from course), current_timestamp) RETURNING id
       )
-    INSERT INTO question_submissions (status, question_id, submitter_id, course_execution_id) 
+    INSERT INTO question_submissions (status, question_id, submitter_id, course_execution_id)
     VALUES ('${submissionStatus}', (SELECT id from quest), (select id from users where name = 'Demo Student'), (select course_execution_id from course));`);
 
   //add options
@@ -102,7 +102,7 @@ Cypress.Commands.add('addQuestionSubmission', (title, submissionStatus) => {
     dbCommand(
       `WITH quest AS (SELECT id FROM questions WHERE title='${title}' limit 1),
       quest_details as (INSERT INTO question_details (question_type, question_id) VALUES ('multiple_choice', (SELECT id FROM quest)) RETURNING id)
-      INSERT INTO options(content, correct, question_details_id, sequence) 
+      INSERT INTO options(content, correct, question_details_id, sequence)
       VALUES ('${content}', '${correct}', (SELECT id FROM quest_details), ${content});`
     );
   }
@@ -111,13 +111,13 @@ Cypress.Commands.add('addQuestionSubmission', (title, submissionStatus) => {
 Cypress.Commands.add('removeQuestionSubmission', (hasReviews = false) => {
   if (hasReviews) {
     dbCommand(`WITH rev AS (DELETE FROM reviews WHERE id IN (SELECT max(id) FROM reviews) RETURNING question_submission_id)
-                      , sub AS (DELETE FROM question_submissions WHERE id IN (SELECT * FROM rev) RETURNING question_id) 
-                      , opt AS (DELETE FROM options WHERE question_details_id IN (SELECT qd.id FROM sub JOIN question_details qd on qd.question_id = sub.question_id)) 
+                      , sub AS (DELETE FROM question_submissions WHERE id IN (SELECT * FROM rev) RETURNING question_id)
+                      , opt AS (DELETE FROM options WHERE question_details_id IN (SELECT qd.id FROM sub JOIN question_details qd on qd.question_id = sub.question_id))
                       , det AS (DELETE FROM question_details WHERE question_id in (SELECT * FROM sub))
                         DELETE FROM questions WHERE id IN (SELECT * FROM sub);`);
   } else {
     dbCommand(`WITH sub AS (DELETE FROM question_submissions WHERE id IN (SELECT max(id) FROM question_submissions) RETURNING question_id)
-                      , opt AS (DELETE FROM options WHERE question_details_id IN (SELECT qd.id FROM sub JOIN question_details qd on qd.question_id = sub.question_id)) 
+                      , opt AS (DELETE FROM options WHERE question_details_id IN (SELECT qd.id FROM sub JOIN question_details qd on qd.question_id = sub.question_id))
                       , det AS (DELETE FROM question_details WHERE question_id in (SELECT * FROM sub))
                     DELETE FROM questions WHERE id IN (SELECT * FROM sub);`);
   }
@@ -125,7 +125,7 @@ Cypress.Commands.add('removeQuestionSubmission', (hasReviews = false) => {
 
 Cypress.Commands.add('cleanMultipleChoiceQuestionsByName', (questionName) => {
   dbCommand(`WITH toDelete AS (SELECT qt.id as question_id FROM questions qt JOIN question_details qd ON qd.question_id = qt.id and qd.question_type='multiple_choice' where title like '%${questionName}%')
-                  , opt AS (DELETE FROM options WHERE question_details_id IN (SELECT qd.id FROM toDelete JOIN question_details qd on qd.question_id = toDelete.question_id)) 
+                  , opt AS (DELETE FROM options WHERE question_details_id IN (SELECT qd.id FROM toDelete JOIN question_details qd on qd.question_id = toDelete.question_id))
                   , det AS (DELETE FROM question_details WHERE question_id in (SELECT question_id FROM toDelete))
                 DELETE FROM questions WHERE id IN (SELECT question_id FROM toDelete);`);
 });
@@ -134,7 +134,7 @@ Cypress.Commands.add('cleanCodeFillInQuestionsByName', (questionName) => {
   dbCommand(`WITH toDelete AS (SELECT qt.id as question_id FROM questions qt JOIN question_details qd ON qd.question_id = qt.id and qd.question_type='code_fill_in' where title like '%${questionName}%')
                 , fillToDelete AS (SELECT id FROM  code_fill_in_spot WHERE question_details_id IN (SELECT qd.id FROM toDelete JOIN question_details qd on qd.question_id = toDelete.question_id))
                 , opt AS (DELETE FROM  code_fill_in_options WHERE code_fill_in_id IN (SELECT id FROM fillToDelete))
-                , fill AS (DELETE FROM  code_fill_in_spot WHERE id IN (SELECT id FROM fillToDelete)) 
+                , fill AS (DELETE FROM  code_fill_in_spot WHERE id IN (SELECT id FROM fillToDelete))
                 , det AS (DELETE FROM question_details WHERE question_id in (SELECT question_id FROM toDelete))
               DELETE FROM questions WHERE id IN (SELECT question_id FROM toDelete);`);
 });
@@ -163,7 +163,7 @@ Cypress.Commands.add('deleteFailedAnswers', () => {
 
 Cypress.Commands.add('addTopicAndAssessment', () => {
   dbCommand(`
-      WITH tmpCourse as (SELECT ce.course_id, ce.id as course_execution_id FROM courses c JOIN course_executions ce on ce.course_id = c.id WHERE name = 'Demo Course')      
+      WITH tmpCourse as (SELECT ce.course_id, ce.id as course_execution_id FROM courses c JOIN course_executions ce on ce.course_id = c.id WHERE name = 'Demo Course' AND academic_term = '1st Semester')
         ,insert1 as (INSERT INTO assessments (id, sequence, status, title, course_execution_id) VALUES (1, 0, 'AVAILABLE', 'assessment one', (select course_execution_id from tmpCourse)))
         ,insert2 as (INSERT INTO topic_conjunctions (id, assessment_id) VALUES (100, 1))
         ,insert3 as (INSERT INTO topics (id, name, course_id) VALUES (82, 'Software Architecture', (select course_id from tmpCourse)))
