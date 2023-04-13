@@ -8,7 +8,7 @@
         :key="term"
       >
         <v-card class="mx-auto" elevation="10">
-          <v-list rounded>
+          <v-list rounded data-cy="courseSquare">
             <v-subheader class="title">{{ term }}</v-subheader>
             <v-list-item-group color="primary">
               <v-tooltip
