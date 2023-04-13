@@ -338,7 +338,7 @@ public class DemoService {
     }
 
     @Transactional(isolation = Isolation.READ_COMMITTED)
-    public void NewPopulateDemo() {
+    public void newPopulateDemo() {
         Integer courseId = courseExecutionService.getDemoCourse().getCourseId();
         Integer courseExecutionId = courseExecutionService.getDemoCourse().getCourseExecutionId();
 
