@@ -14,7 +14,7 @@ describe('Dashboard', () => {
     date = new Date();
     //create quiz
     cy.demoTeacherLogin();
-
+    cy.changeCourseToDemo('Demo Course (DemoCourse)');
     cy.addTopicAndAssessment();
 
     cy.createQuestion(

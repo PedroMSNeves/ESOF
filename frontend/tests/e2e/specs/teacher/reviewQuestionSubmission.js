@@ -4,6 +4,7 @@ describe('Teacher walkthrough', () => {
     cy.demoStudentLogin();
     cy.contains('Logout').click();
     cy.demoTeacherLogin();
+    cy.changeCourseToDemo('Demo Course (DemoCourse)');
     cy.log('student submits a question');
     cy.addQuestionSubmission('Test', 'IN_REVIEW');
     cy.get('[data-cy="managementMenuButton"]').click();

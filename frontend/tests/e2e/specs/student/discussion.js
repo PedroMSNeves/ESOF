@@ -3,6 +3,7 @@ describe('Student Walkthrough', () => {
     cy.deleteQuestionsAndAnswers();
     //create quiz
     cy.demoTeacherLogin();
+    cy.changeCourseToDemo('Demo Course (DemoCourse)');
     cy.createQuestion(
       'Question Title',
       'Question',
