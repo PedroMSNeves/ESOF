@@ -42,6 +42,7 @@ describe('Teacher Walkthrough', () => {
 
   it('reply to discussion', () => {
     cy.demoTeacherLogin();
+    cy.changeCourseToDemo('Demo Course (DemoCourse)');
     cy.replyToDiscussion('DISCUSSAO REPLY TEST', 'Resposta');
     cy.contains('Logout').click();
   });
