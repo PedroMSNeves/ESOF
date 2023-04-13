@@ -107,6 +107,10 @@ public class TeacherDashboard implements DomainEntity {
         teacher = null;
         new ArrayList<>(studentStats).forEach(StudentStats::remove);
         studentStats = null;
+        new ArrayList<>(quizStats).forEach(QuizStats::remove);
+        quizStats = null;
+        new ArrayList<>(questionStats).forEach(QuestionStats::remove);
+        questionStats = null;
     }
 
     public void accept(Visitor visitor) {

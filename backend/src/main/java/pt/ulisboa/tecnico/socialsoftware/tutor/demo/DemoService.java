@@ -345,7 +345,7 @@ public class DemoService {
 
         // Let's update the end date of the demo execution
         CourseExecution demoExecution = courseExecutionRepository.findById(courseExecutionId)
-                .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_EXECUTION_NOT_FOUND));
+               .orElseThrow(() -> new TutorException(ErrorMessage.COURSE_EXECUTION_NOT_FOUND));
         demoExecution.setEndDate(DateHandler.toLocalDateTime("2017-12-31T10:15:30+01:00[Europe/Lisbon]"));
 
         // Simulate login of demo teacher (this adds the demo teacher to the original demo execution
@@ -394,24 +394,9 @@ public class DemoService {
                 quest.setAnsweredQuestionsUnique(vals.get(3 * i + 1));
                 quest.setAverageQuestionsAnswered(floatL.get(i));
 
-                if (i == 0) {
-                    stl.get(j).add(st);
-                    qel.get(j).add(quest);
-                    qul.get(j).add(quiz);
-
-                }
-                if (i == 1) {
-                    stl.get(j).add(st);
-                    qel.get(j).add(quest);
-                    qul.get(j).add(quiz);
-
-                }
-                if (i == 2) {
-                    stl.get(j).add(st);
-                    qel.get(j).add(quest);
-                    qul.get(j).add(quiz);
-
-                }
+                stl.get(j).add(st);
+                qel.get(j).add(quest);
+                qul.get(j).add(quiz);
             }
         }
         for (int i = 0; i < endDates.size(); i++) {
@@ -427,56 +412,23 @@ public class DemoService {
             courseExecutionRepository.save(newCE);
 
             TeacherDashboard teacherDashboard = new TeacherDashboard(newCE,(Teacher)demoTeacher);
+            teacherDashboardRepository.save(teacherDashboard);
 
-            if(i==0){
-                for(int j=0; j<3;j++){
-                    stl.get(j).get(0).setCourseExecution(newCE);
-                    qel.get(j).get(0).setCourseExecution(newCE);
-                    qul.get(j).get(0).setCourseExecution(newCE);
-                }
-
-                stl.get(0).get(0).setTeacherDashboard(teacherDashboard);
-                qel.get(0).get(0).setDashboard(teacherDashboard);
-                qul.get(0).get(0).setTeacherDashboard(teacherDashboard);
-
-                studentStatsRepository.save(stl.get(0).get(0));
-                questionStatsRepository.save(qel.get(0).get(0));
-                quizStatsRepository.save(qul.get(0).get(0));
+            for(int j=i; j<3;j++){
+                stl.get(j).get(i).setCourseExecution(newCE);
+                qel.get(j).get(i).setCourseExecution(newCE);
+                qul.get(j).get(i).setCourseExecution(newCE);
             }
-            if(i==1){
-                for(int j=1; j<3;j++){
-                    stl.get(j).get(1).setCourseExecution(newCE);
-                    qel.get(j).get(1).setCourseExecution(newCE);
-                    qul.get(j).get(1).setCourseExecution(newCE);
-                }
-                for(int j=0; j<2;j++){
-                    stl.get(1).get(j).setTeacherDashboard(teacherDashboard);
-                    qel.get(1).get(j).setDashboard(teacherDashboard);
-                    qul.get(1).get(j).setTeacherDashboard(teacherDashboard);
-                }
-                for(int j=1;j>=0;j--){
-                    studentStatsRepository.save( stl.get(1).get(j));
-                    questionStatsRepository.save( qel.get(1).get(j));
-                    quizStatsRepository.save( qul.get(1).get(j));
-                }
+            for(int j=0; j<(i+1);j++){
+                stl.get(i).get(j).setTeacherDashboard(teacherDashboard);
+                qel.get(i).get(j).setDashboard(teacherDashboard);
+                qul.get(i).get(j).setTeacherDashboard(teacherDashboard);
             }
-            if(i==2){
-                stl.get(2).get(2).setCourseExecution(newCE);
-                qel.get(2).get(2).setCourseExecution(newCE);
-                qul.get(2).get(2).setCourseExecution(newCE);
-
-                for(int j=0; j<3;j++){
-                    stl.get(2).get(j).setTeacherDashboard(teacherDashboard);
-                    qel.get(2).get(j).setDashboard(teacherDashboard);
-                    qul.get(2).get(j).setTeacherDashboard(teacherDashboard);
-                }
-                for(int j=2;j>=0;j--){
-                    studentStatsRepository.save( stl.get(2).get(j));
-                    questionStatsRepository.save( qel.get(2).get(j));
-                    quizStatsRepository.save( qul.get(2).get(j));
-                }
+            for(int j=i;j>=0;j--){
+                studentStatsRepository.save( stl.get(i).get(j));
+                questionStatsRepository.save( qel.get(i).get(j));
+                quizStatsRepository.save( qul.get(i).get(j));
             }
-
             teacherDashboardRepository.save(teacherDashboard);
         }
 
