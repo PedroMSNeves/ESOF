@@ -19,6 +19,7 @@
                 <template v-slot:activator="{ on }">
                   <v-list-item
                     v-on="on"
+                    data-cy="courseButton"
                     @click="selectCourse(course)"
                     :class="course.status.toLowerCase()"
                   >

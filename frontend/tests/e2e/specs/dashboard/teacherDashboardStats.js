@@ -1,47 +1,54 @@
 describe('Teacher Dashboard Stats', () => {
 
     beforeEach( () => {
-        //colocar stats diferentes para todos os anos
-        cy.request('http://localhost:8081/auth/demo/teacher')
+        /*cy.request('http://localhost:8081/auth/demo/teacher')
         .as('loginResponse')
         .then((response) => {
         Cypress.env('token', response.body.token);
         return response;
-      });
-    date = new Date();
-    cy.demoTeacherLogin();
-    //colocar aqui os dados das course execution caso nao sejam criadas no populate demo
-
+      });*/
+      cy.demoTeacherLogin();
     });
 
     //um teste
-    it('teacher access dashboard', () => {
-        cy.intercept('GET', '**/teacher/dashboard/').as('getTeacherDashboard');
+    it('teacher access dashboard of 2023', () => {
+        cy.intercept('GET', '**/teachers/dashboards/executions/*').as('getTeacherDashboard');
        
         //go to the courses menu
-        cy.get('[data-cy]="coursesMenuButton').click();
-        cy.get('[data-cy]="courseSquare').should('contain', ).click();
-
-        //go to the dashboard menu
-        cy.get('[data-cy]="dashboardMenuButton').click();
-
-
-        //compara os valores
-        cy.get('[data-cy]="numStudents"').should(have.value, );
-        cy.get('[data-cy]="numMore75CorrectQuestions"').should(have.value, );
-        cy.get('[data-cy]="numAtLeast3Quizzes"').should(have.value, );
-
-        cy.get('[data-cy]="numQuizzes"').should(have.value, );
-        cy.get('[data-cy]="numUniqueAnsweredQuizzes"').should(have.value, );
-        cy.get('[data-cy]="averageQuizzesSolved"').should(have.value, );
-
-        cy.get('[data-cy]="numQuestions"').should(have.value, );        
-        cy.get('[data-cy]="numUniqueQuestionsSolved"').should(have.value, );
-        cy.get('[data-cy]="averageQuestionsSolved"').should(have.value, );
+        cy.get('[data-cy="coursesMenuButton"]').click();
+        cy.contains('2st semester 2023/2024').parent().find('[data-cy="courseButton"]').click();
         
-        //compara os graficos
-        cy.get('[data-cy]="barChartStudentStats"').matchImageSnapshot('barChartStudentStats');
-        cy.get('[data-cy]="barChartQuizStats"').matchImageSnapshot('barChartQuizStats');
-        cy.get('[data-cy]="barChartQuestionStats"').matchImageSnapshot('barChartQuestionStats');
-    });
+        //go to the dashboard menu
+        cy.get('[data-cy="dashboardMenuButton"]').click();
+        cy.wait('@getTeacherDashboard');
+
+        //compare the values
+        cy.get('[data-cy="numMore75CorrectQuestions"]').should('have.text', 10);
+        cy.get('[data-cy="numStudents"]').should('have.text', 21);
+        cy.get('[data-cy="numMore75CorrectQuestions"]').should('have.text', 10);
+        cy.get('[data-cy="numAtLeast3Quizzes"]').should('have.text', 21);
+        cy.get('[data-cy="numQuizzes"]').should('have.text', 21);
+        cy.get('[data-cy="numUniqueAnsweredQuizzes"]').should('have.text', 10);
+        cy.get('[data-cy="averageQuizzesSolved"]').should('have.text', 21);
+        cy.get('[data-cy="numQuestions"]').should('have.text', 21);        
+        cy.get('[data-cy="numUniqueQuestionsSolved"]').should('have.text', 10);
+        cy.get('[data-cy="averageQuestionsSolved"]').should('have.text', 21);
+        
+        
+        //compare the charts
+        cy.get('[data-cy="barChartStudentStats"]') .scrollIntoView().wait(5000).screenshot('base-screenshots/expeted/studentStats2023');
+        cy.get('[data-cy="barChartQuizStats"]')    .scrollIntoView().wait(5000).screenshot('base-screenshots/expeted/quizStats2023');
+        cy.get('[data-cy="barChartQuestionStats"]').scrollIntoView().wait(5000).screenshot('base-screenshots/expeted/questionStats2023');
+        
+        cy.get('[data-cy="barChartStudentStats"]') .scrollIntoView().wait(5000).screenshot('test-pics/studentStats2023');
+        cy.get('[data-cy="barChartQuizStats"]')    .scrollIntoView().wait(5000).screenshot('test-pics/quizStats2023');
+        cy.get('[data-cy="barChartQuestionStats"]').scrollIntoView().wait(5000).screenshot('test-pics/questionStats2023');
+        cy.compareScreenshots('./tests/e2e/screenshots/dashboard/teacherDashboardStats.js/base-screenshots/expeted/studentStats2023.png',
+         './tests/e2e/screenshots/dashboard/teacherDashboardStats.js/test-pics/studentStats2023.png');
+        cy.compareScreenshots('./tests/e2e/screenshots/dashboard/teacherDashboardStats.js/base-screenshots/expeted/quizStats2023.png',
+         './tests/e2e/screenshots/dashboard/teacherDashboardStats.js/test-pics/quizStats2023.png');
+        cy.compareScreenshots('./tests/e2e/screenshots/dashboard/teacherDashboardStats.js/base-screenshots/expeted/questionStats2023.png',
+         './tests/e2e/screenshots/dashboard/teacherDashboardStats.js/test-pics/questionStats2023.png');
+
+      });
 });
